@@ -1,0 +1,794 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
+<meta name="mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<title>Cockpit — João Batista da Controle</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--red:#c0392b;--dark:#111;--gray:#1e1e1e;--gray2:#2a2a2a;--gray3:#333;--white:#fff;--green:#27ae60;--blue:#2980b9;--orange:#e67e22;--gold:#f1c40f}
+html,body{height:100%;width:100%;overflow:hidden;background:var(--dark);font-family:'Segoe UI',sans-serif;color:var(--white);position:fixed;inset:0}
+
+/* TELAS */
+.screen{position:fixed;inset:0;display:flex;flex-direction:column;background:var(--dark);z-index:10;transition:transform .3s ease}
+.screen.hidden{transform:translateX(100%);pointer-events:none}
+
+/* LOGIN */
+#loginScreen{z-index:500;align-items:center;justify-content:center;padding:24px;gap:0}
+.login-logo{font-size:28px;font-weight:800;text-align:center;margin-bottom:6px}
+.login-sub{font-size:13px;color:rgba(255,255,255,.4);text-align:center;margin-bottom:32px;letter-spacing:.5px}
+.login-card{background:var(--gray2);border-radius:18px;padding:26px;width:100%;max-width:340px}
+.inp{width:100%;background:rgba(255,255,255,.08);border:1.5px solid rgba(255,255,255,.12);border-radius:12px;padding:14px 16px;color:#fff;font-size:16px;margin-bottom:12px;outline:none;-webkit-appearance:none}
+.inp:focus{border-color:var(--red)}
+.btn-login{width:100%;background:var(--red);color:#fff;border:none;border-radius:12px;padding:16px;font-size:17px;font-weight:700;cursor:pointer;letter-spacing:.3px}
+.login-err{color:#e74c3c;font-size:13px;text-align:center;margin-top:10px;display:none}
+
+/* HEADER */
+.hdr{background:var(--red);padding:12px 16px;padding-top:max(12px,env(safe-area-inset-top));display:flex;align-items:center;justify-content:space-between;flex-shrink:0;z-index:100}
+.hdr-logo{font-size:16px;font-weight:800;color:#fff;line-height:1.2}
+.hdr-logo span{display:block;font-size:10px;font-weight:400;opacity:.8;letter-spacing:.8px;text-transform:uppercase}
+.hbtn{background:rgba(255,255,255,.2);border:none;color:#fff;padding:9px 14px;border-radius:9px;font-size:13px;cursor:pointer;font-weight:600}
+
+/* BOTTOM NAV */
+.bnav{position:fixed;bottom:0;left:0;right:0;background:var(--gray2);border-top:1px solid rgba(255,255,255,.08);display:flex;z-index:200;padding-bottom:env(safe-area-inset-bottom)}
+.nbtn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:10px 4px;cursor:pointer;border:none;background:transparent;color:rgba(255,255,255,.4);font-size:11px;font-weight:600;gap:4px;transition:color .2s}
+.nbtn.active{color:var(--red)}
+.nbtn-icon{font-size:22px}
+
+/* SCROLL AREA */
+.scroll{flex:1;overflow-y:auto;padding-bottom:70px}
+
+/* ── COCKPIT ── */
+.cockpit{padding:14px}
+
+/* BUSCA */
+.busca-card{background:var(--gray2);border-radius:16px;padding:16px;margin-bottom:14px}
+.busca-card h2{font-size:14px;font-weight:700;color:rgba(255,255,255,.5);text-transform:uppercase;letter-spacing:.5px;margin-bottom:12px}
+.busca-row{display:flex;gap:8px}
+.busca-inp{flex:1;background:rgba(255,255,255,.08);border:1.5px solid rgba(255,255,255,.15);border-radius:12px;padding:14px 16px;color:#fff;font-size:14px;outline:none}
+.busca-inp:focus{border-color:var(--red)}
+.busca-inp::placeholder{color:rgba(255,255,255,.3)}
+.btn-buscar{background:var(--red);border:none;color:#fff;border-radius:12px;padding:0 20px;font-size:20px;cursor:pointer;font-weight:700;flex-shrink:0}
+
+/* CARD IMÓVEL */
+.imovel-card{background:var(--gray2);border-radius:16px;padding:16px;margin-bottom:14px;border-left:4px solid var(--red)}
+.im-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:10px}
+.im-nome{font-size:16px;font-weight:800;line-height:1.3;margin-bottom:3px}
+.im-bairro{font-size:12px;color:rgba(255,255,255,.45)}
+.im-preco{font-size:24px;font-weight:800;color:var(--red);margin-bottom:12px}
+.im-tags{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:14px}
+.im-tag{background:rgba(255,255,255,.09);border:1px solid rgba(255,255,255,.12);color:rgba(255,255,255,.8);padding:6px 12px;border-radius:8px;font-size:12px;font-weight:600}
+.im-link{font-size:11px;color:rgba(255,255,255,.3);margin-bottom:14px;word-break:break-all}
+
+/* BOTÕES DE AÇÃO — GRANDES */
+.acoes-titulo{font-size:11px;font-weight:700;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px}
+.acoes-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}
+.acao{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:18px 10px;border-radius:14px;border:none;cursor:pointer;font-size:13px;font-weight:700;color:#fff;transition:opacity .15s;min-height:80px}
+.acao:active{opacity:.8}
+.acao-icon{font-size:26px}
+.acao-wpp{background:#25D366}
+.acao-sim{background:var(--blue)}
+.acao-comp{background:var(--orange)}
+.acao-share{background:var(--gray3);border:1px solid rgba(255,255,255,.15)}
+.acao-full{grid-column:1/-1;padding:16px;min-height:60px;flex-direction:row;gap:12px;font-size:15px}
+
+/* COMPARAR */
+.comp-slots{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px}
+.comp-slot{background:var(--gray2);border-radius:12px;padding:12px;min-height:100px;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;border:1.5px dashed rgba(255,255,255,.15);text-align:center}
+.comp-slot.filled{border-color:rgba(255,255,255,.2);align-items:flex-start;justify-content:flex-start;cursor:default}
+.comp-slot-add-icon{font-size:26px;color:rgba(255,255,255,.25);margin-bottom:4px}
+.comp-slot-add-txt{font-size:11px;color:rgba(255,255,255,.3)}
+.comp-slot-nome{font-size:11px;font-weight:700;margin-bottom:3px;line-height:1.3}
+.comp-slot-preco{font-size:13px;font-weight:800;color:var(--red)}
+.comp-slot-rem{background:rgba(192,57,43,.2);border:1px solid rgba(192,57,43,.3);color:#e74c3c;border-radius:6px;padding:3px 7px;font-size:10px;font-weight:700;cursor:pointer;margin-top:6px;width:100%;text-align:center}
+.comp-table{background:var(--gray2);border-radius:14px;overflow:hidden;margin-bottom:14px}
+.comp-row{display:flex;border-bottom:1px solid rgba(255,255,255,.05)}
+.comp-row:last-child{border:none}
+.comp-row div{padding:10px 12px;font-size:12px;flex:1}
+.comp-row div:first-child{color:rgba(255,255,255,.4);font-weight:600;background:rgba(255,255,255,.03);flex:0 0 80px}
+.comp-best{color:#27ae60!important;font-weight:700!important}
+.btn-big{width:100%;border:none;border-radius:14px;padding:18px;font-size:16px;font-weight:700;cursor:pointer;color:#fff;margin-bottom:10px;display:flex;align-items:center;justify-content:center;gap:10px}
+.btn-big-green{background:var(--green)}
+.btn-big-red{background:var(--red)}
+.btn-big-blue{background:var(--blue)}
+.btn-big-gray{background:var(--gray3);border:1px solid rgba(255,255,255,.12)}
+
+/* FINANCIAMENTO */
+.fin-card{background:var(--gray2);border-radius:14px;padding:14px;margin-bottom:12px}
+.fin-card h3{font-size:11px;font-weight:700;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:.5px;margin-bottom:12px}
+.fin-tabs{display:flex;gap:8px;margin-bottom:14px}
+.fin-tab{flex:1;background:rgba(255,255,255,.07);border:1.5px solid rgba(255,255,255,.12);color:rgba(255,255,255,.5);border-radius:12px;padding:12px;text-align:center;font-size:14px;font-weight:700;cursor:pointer}
+.fin-tab.active{background:var(--red);color:#fff;border-color:var(--red)}
+.fin-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+.fin-field label{display:block;font-size:11px;color:rgba(255,255,255,.4);margin-bottom:5px;font-weight:600}
+.fin-field .inp{margin-bottom:0;padding:12px 14px;font-size:15px}
+.fin-result-card{background:var(--gray3);border-radius:14px;padding:16px;margin-bottom:12px}
+.fin-result-card h3{font-size:11px;font-weight:700;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:.5px;margin-bottom:12px}
+.fin-row{display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid rgba(255,255,255,.06)}
+.fin-row:last-child{border:none}
+.fin-row label{font-size:13px;color:rgba(255,255,255,.5)}
+.fin-row span{font-size:14px;font-weight:700}
+.fin-destaque{font-size:24px!important;font-weight:800!important;color:var(--red)!important}
+
+/* LEADS */
+.leads-card{background:var(--gray2);border-radius:16px;padding:14px;margin-bottom:10px}
+.leads-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.leads-header h2{font-size:16px;font-weight:800}
+.lead-item{background:var(--gray3);border-radius:12px;padding:14px;margin-bottom:8px;border-left:3px solid var(--red)}
+.lead-item-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:8px}
+.lead-nome{font-size:15px;font-weight:700;margin-bottom:2px}
+.lead-imovel{font-size:12px;color:rgba(255,255,255,.45)}
+.lead-btns{display:flex;gap:7px;margin-top:10px;flex-wrap:wrap}
+.lead-btn{flex:1;min-width:80px;border:none;border-radius:10px;padding:12px 8px;font-size:12px;font-weight:700;cursor:pointer;color:#fff;text-align:center}
+.lbtn-wpp{background:#25D366}
+.lbtn-edit{background:var(--gray2);border:1px solid rgba(255,255,255,.15)}
+.lbtn-del{background:rgba(192,57,43,.2);border:1px solid rgba(192,57,43,.3);color:#e74c3c}
+.lead-status{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.lstatus{font-size:10px;font-weight:700;padding:4px 9px;border-radius:6px;cursor:pointer;border:1px solid transparent}
+.lstatus-novo{background:rgba(52,152,219,.2);color:#3498db;border-color:rgba(52,152,219,.3)}
+.lstatus-contato{background:rgba(230,126,34,.2);color:#e67e22;border-color:rgba(230,126,34,.3)}
+.lstatus-visita{background:rgba(142,68,173,.2);color:#9b59b6;border-color:rgba(142,68,173,.3)}
+.lstatus-proposta{background:rgba(241,196,15,.2);color:#f1c40f;border-color:rgba(241,196,15,.3)}
+.lstatus-fechado{background:rgba(39,174,96,.2);color:#27ae60;border-color:rgba(39,174,96,.3)}
+.lstatus-perdido{background:rgba(192,57,43,.2);color:#e74c3c;border-color:rgba(192,57,43,.3)}
+.lstatus.ativo{filter:brightness(1.4);border-width:2px}
+.msgs-wrap{padding:14px}
+.msg-bloco{background:var(--gray2);border-radius:14px;padding:14px;margin-bottom:10px}
+.msg-bloco h3{font-size:11px;font-weight:700;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px}
+
+/* MODAL */
+.modal-ov{position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:9000;display:none;align-items:flex-end}
+.modal-ov.open{display:flex}
+.modal{background:var(--gray2);border-radius:20px 20px 0 0;padding:20px;width:100%;max-height:88vh;overflow-y:auto;padding-bottom:max(20px,env(safe-area-inset-bottom))}
+.modal h3{font-size:17px;font-weight:700;margin-bottom:14px}
+.modal .inp{margin-bottom:10px}
+.modal-btns{display:flex;gap:8px;margin-top:10px}
+.modal-btns button{flex:1;padding:14px;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer;border:none}
+.mcancel{background:rgba(255,255,255,.1);color:#fff}
+.mconfirm{background:var(--red);color:#fff}
+.mconfirm-g{background:var(--green);color:#fff}
+.toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#27ae60;color:#fff;padding:11px 22px;border-radius:11px;font-size:14px;font-weight:700;z-index:9999;opacity:0;transition:opacity .3s;pointer-events:none;white-space:nowrap;box-shadow:0 4px 16px rgba(0,0,0,.4)}
+.toast.show{opacity:1}
+.toast.err{background:#c0392b}
+.loading-txt{text-align:center;padding:20px;color:rgba(255,255,255,.4);font-size:14px}
+.empty-st{text-align:center;padding:30px 20px;color:rgba(255,255,255,.3);font-size:14px;line-height:1.8}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div class="screen" id="loginScreen">
+  <div class="login-logo">Controle Imóveis</div>
+  <div class="login-sub">Cockpit de Atendimento — João Batista</div>
+  <div class="login-card">
+    <input type="password" class="inp" id="senhaInput" placeholder="Senha de acesso" onkeydown="if(event.key==='Enter')login()"/>
+    <button class="btn-login" onclick="login()">🔐 Entrar</button>
+    <div class="login-err" id="loginErr">Senha incorreta.</div>
+  </div>
+</div>
+
+<!-- COCKPIT PRINCIPAL -->
+<div class="screen hidden" id="cockpitScreen">
+  <div class="hdr">
+    <div class="hdr-logo">Cockpit<span>João Batista da Controle</span></div>
+    <button class="hbtn" onclick="showScreen('leads')">👥 Leads</button>
+  </div>
+  <div class="scroll">
+    <div class="cockpit">
+
+      <!-- BUSCA -->
+      <div class="busca-card">
+        <h2>🔗 Cole o link do imóvel</h2>
+        <div class="busca-row">
+          <input class="busca-inp" id="link-input" placeholder="https://controleimoveis.com.br/imovel/..." onkeydown="if(event.key==='Enter')buscarImovel()"/>
+          <button class="btn-buscar" onclick="buscarImovel()">→</button>
+        </div>
+      </div>
+
+      <!-- RESULTADO -->
+      <div id="resultado"></div>
+
+    </div>
+  </div>
+  <div class="bnav" id="bnav1">
+    <button class="nbtn active" onclick="showScreen('cockpit')"><span class="nbtn-icon">🏠</span>Início</button>
+    <button class="nbtn" onclick="showScreen('comparar')"><span class="nbtn-icon">⚖️</span>Comparar</button>
+    <button class="nbtn" onclick="showScreen('financ')"><span class="nbtn-icon">💰</span>Financ.</button>
+    <button class="nbtn" onclick="showScreen('leads')"><span class="nbtn-icon">👥</span>Leads</button>
+    <button class="nbtn" onclick="showScreen('msgs')"><span class="nbtn-icon">💬</span>Msgs</button>
+  </div>
+</div>
+
+<!-- COMPARAR -->
+<div class="screen hidden" id="compararScreen">
+  <div class="hdr">
+    <div class="hdr-logo">Comparar<span>até 3 imóveis</span></div>
+    <button class="hbtn" onclick="showScreen('cockpit')">← Voltar</button>
+  </div>
+  <div class="scroll">
+    <div class="cockpit">
+      <div class="comp-slots" id="comp-slots"></div>
+      <div id="comp-table"></div>
+      <div id="comp-wpp"></div>
+    </div>
+  </div>
+  <div class="bnav" id="bnav2">
+    <button class="nbtn" onclick="showScreen('cockpit')"><span class="nbtn-icon">🏠</span>Início</button>
+    <button class="nbtn active" onclick="showScreen('comparar')"><span class="nbtn-icon">⚖️</span>Comparar</button>
+    <button class="nbtn" onclick="showScreen('financ')"><span class="nbtn-icon">💰</span>Financ.</button>
+    <button class="nbtn" onclick="showScreen('leads')"><span class="nbtn-icon">👥</span>Leads</button>
+    <button class="nbtn" onclick="showScreen('msgs')"><span class="nbtn-icon">💬</span>Msgs</button>
+  </div>
+</div>
+
+<!-- FINANCIAMENTO -->
+<div class="screen hidden" id="financScreen">
+  <div class="hdr">
+    <div class="hdr-logo">Simulação<span>Financiamento Imobiliário</span></div>
+    <button class="hbtn" onclick="showScreen('cockpit')">← Voltar</button>
+  </div>
+  <div class="scroll">
+    <div class="cockpit">
+      <div class="fin-card">
+        <h3>Sistema de Amortização</h3>
+        <div class="fin-tabs">
+          <button class="fin-tab active" id="tab-price" onclick="setFinTab('price',this)">Tabela Price</button>
+          <button class="fin-tab" id="tab-sac" onclick="setFinTab('sac',this)">SAC</button>
+        </div>
+        <div class="fin-grid">
+          <div class="fin-field"><label>Valor do Imóvel</label><input class="inp" id="fin-valor" placeholder="Ex: 500000" oninput="calcFin()"/></div>
+          <div class="fin-field"><label>Entrada</label><input class="inp" id="fin-entrada" placeholder="Ex: 100000" oninput="calcFin()"/></div>
+          <div class="fin-field"><label>Taxa anual (%)</label><input class="inp" id="fin-taxa" placeholder="Ex: 10.5" oninput="calcFin()"/></div>
+          <div class="fin-field"><label>Prazo (meses)</label><input class="inp" id="fin-prazo" placeholder="Ex: 360" oninput="calcFin()"/></div>
+          <div class="fin-field"><label>Renda familiar</label><input class="inp" id="fin-renda" placeholder="Ex: 10000" oninput="calcFin()"/></div>
+          <div class="fin-field"><label>FGTS</label><input class="inp" id="fin-fgts" placeholder="Ex: 0" oninput="calcFin()"/></div>
+        </div>
+      </div>
+      <div id="fin-result"></div>
+    </div>
+  </div>
+  <div class="bnav" id="bnav3">
+    <button class="nbtn" onclick="showScreen('cockpit')"><span class="nbtn-icon">🏠</span>Início</button>
+    <button class="nbtn" onclick="showScreen('comparar')"><span class="nbtn-icon">⚖️</span>Comparar</button>
+    <button class="nbtn active" onclick="showScreen('financ')"><span class="nbtn-icon">💰</span>Financ.</button>
+    <button class="nbtn" onclick="showScreen('leads')"><span class="nbtn-icon">👥</span>Leads</button>
+    <button class="nbtn" onclick="showScreen('msgs')"><span class="nbtn-icon">💬</span>Msgs</button>
+  </div>
+</div>
+
+<!-- LEADS -->
+<div class="screen hidden" id="leadsScreen">
+  <div class="hdr">
+    <div class="hdr-logo">Leads<span>Atendimento rápido</span></div>
+    <button class="hbtn" onclick="abrirNovoLead()">+ Novo</button>
+  </div>
+  <div class="scroll">
+    <div class="cockpit">
+      <div id="lista-leads"></div>
+    </div>
+  </div>
+  <div class="bnav" id="bnav4">
+    <button class="nbtn" onclick="showScreen('cockpit')"><span class="nbtn-icon">🏠</span>Início</button>
+    <button class="nbtn" onclick="showScreen('comparar')"><span class="nbtn-icon">⚖️</span>Comparar</button>
+    <button class="nbtn" onclick="showScreen('financ')"><span class="nbtn-icon">💰</span>Financ.</button>
+    <button class="nbtn active" onclick="showScreen('leads')"><span class="nbtn-icon">👥</span>Leads</button>
+    <button class="nbtn" onclick="showScreen('msgs')"><span class="nbtn-icon">💬</span>Msgs</button>
+  </div>
+</div>
+
+<!-- MENSAGENS -->
+<div class="screen hidden" id="msgsScreen">
+  <div class="hdr">
+    <div class="hdr-logo">Mensagens<span>Templates editáveis</span></div>
+    <button class="hbtn" onclick="showScreen('cockpit')">← Voltar</button>
+  </div>
+  <div class="scroll">
+    <div class="msgs-wrap">
+      <p style="font-size:12px;color:rgba(255,255,255,.4);margin-bottom:14px;line-height:1.7">Variáveis: <b>{nome}</b> {imovel} {preco} {bairro} {area} {quartos} {cod}</p>
+      <div class="msg-bloco"><h3>1ª Abordagem</h3><textarea class="inp" id="msg1" rows="6" style="resize:vertical;font-size:13px;line-height:1.6;margin:0"></textarea></div>
+      <div class="msg-bloco"><h3>Follow-up</h3><textarea class="inp" id="msg2" rows="6" style="resize:vertical;font-size:13px;line-height:1.6;margin:0"></textarea></div>
+      <div class="msg-bloco"><h3>Após Visita</h3><textarea class="inp" id="msg3" rows="6" style="resize:vertical;font-size:13px;line-height:1.6;margin:0"></textarea></div>
+      <div class="msg-bloco"><h3>Proposta</h3><textarea class="inp" id="msg4" rows="6" style="resize:vertical;font-size:13px;line-height:1.6;margin:0"></textarea></div>
+      <button class="btn-big btn-big-green" onclick="salvarMsgs()">💾 Salvar mensagens</button>
+      <button class="btn-big btn-big-gray" onclick="restaurarMsgs()">🔄 Restaurar padrão</button>
+    </div>
+  </div>
+  <div class="bnav" id="bnav5">
+    <button class="nbtn" onclick="showScreen('cockpit')"><span class="nbtn-icon">🏠</span>Início</button>
+    <button class="nbtn" onclick="showScreen('comparar')"><span class="nbtn-icon">⚖️</span>Comparar</button>
+    <button class="nbtn" onclick="showScreen('financ')"><span class="nbtn-icon">💰</span>Financ.</button>
+    <button class="nbtn" onclick="showScreen('leads')"><span class="nbtn-icon">👥</span>Leads</button>
+    <button class="nbtn active" onclick="showScreen('msgs')"><span class="nbtn-icon">💬</span>Msgs</button>
+  </div>
+</div>
+
+<!-- MODAL -->
+<div class="modal-ov" id="modalOv">
+  <div class="modal">
+    <h3 id="modal-title"></h3>
+    <div id="modal-body"></div>
+    <div class="modal-btns" id="modal-btns">
+      <button class="mcancel" onclick="closeModal()">Cancelar</button>
+      <button class="mconfirm" id="modal-ok">OK</button>
+    </div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+const SENHA='mello99100';
+const LK='cockpit_leads_v1';
+const MK='cockpit_msgs_v1';
+const CK='cockpit_comp_v1';
+
+const MSGS_DEF={
+  msg1:`Aqui é o *João Batista da Controle!* 😊\n\nOlá, {nome}! Vi que você tem interesse no *{imovel}* em {bairro}.\n\nPosso te apresentar esse imóvel? 🏠`,
+  msg2:`Aqui é o *João Batista da Controle!*\n\nOlá, {nome}! Passando para saber se ainda tem interesse no *{imovel}*.\n\nEstou à disposição! 😊`,
+  msg3:`Aqui é o *João Batista da Controle!*\n\nOlá, {nome}! Foi um prazer mostrar o *{imovel}* para você!\n\nO que achou? Podemos avançar? 🏠`,
+  msg4:`Aqui é o *João Batista da Controle!*\n\nOlá, {nome}! Segue proposta para o *{imovel}*:\n\n💰 {preco} | {bairro}\n\nAguardo retorno! 😊`
+};
+
+function getLeads(){try{const s=localStorage.getItem(LK);if(s)return JSON.parse(s);}catch(e){}return[];}
+function saveLeads(d){localStorage.setItem(LK,JSON.stringify(d));}
+function getMsgs(){try{const s=localStorage.getItem(MK);if(s)return JSON.parse(s);}catch(e){}return{...MSGS_DEF};}
+function saveMsgsData(d){localStorage.setItem(MK,JSON.stringify(d));}
+function getComp(){try{const s=localStorage.getItem(CK);if(s)return JSON.parse(s);}catch(e){}return[null,null,null];}
+function saveComp(d){localStorage.setItem(CK,JSON.stringify(d));}
+
+// TELAS
+let telaAtual='cockpit';
+function showScreen(s){
+  document.querySelectorAll('.screen').forEach(el=>el.classList.add('hidden'));
+  document.getElementById(s+'Screen').classList.remove('hidden');
+  telaAtual=s;
+  if(s==='leads')renderLeads();
+  if(s==='comparar')renderComp();
+  if(s==='msgs')carregarMsgs();
+  document.querySelectorAll('.nbtn').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll(`[onclick="showScreen('${s}')"]`).forEach(b=>b.classList.add('active'));
+}
+
+// LOGIN
+function login(){
+  if(document.getElementById('senhaInput').value===SENHA){
+    document.getElementById('loginErr').style.display='none';
+    showScreen('cockpit');
+  } else {
+    document.getElementById('loginErr').style.display='block';
+    document.getElementById('senhaInput').value='';
+  }
+}
+document.getElementById('senhaInput').addEventListener('keydown',e=>{if(e.key==='Enter')login();});
+
+// IMÓVEL ATUAL
+let imovelAtual=null;
+
+// BUSCA
+async function buscarImovel(){
+  const link=document.getElementById('link-input').value.trim();
+  if(!link){showToast('Cole o link do imóvel','err');return;}
+  const el=document.getElementById('resultado');
+  el.innerHTML='<div class="loading-txt">⏳ Buscando imóvel...</div>';
+  try{
+    const r=await fetch(link);
+    const html=await r.text();
+    const parser=new DOMParser();
+    const doc=parser.parseFromString(html,'text/html');
+    const im=extrairDados(doc,link);
+    if(!im){el.innerHTML='<div class="empty-st">❌ Não foi possível extrair os dados.<br>Verifique o link e tente novamente.</div>';return;}
+    imovelAtual=im;
+    renderImovel(im,el);
+  }catch(e){
+    // Fallback: extrair do URL
+    const im=extrairDoURL(link);
+    if(im){imovelAtual=im;renderImovel(im,el);}
+    else el.innerHTML='<div class="empty-st">❌ Erro ao buscar.<br>Verifique sua conexão.</div>';
+  }
+}
+
+function extrairDados(doc,link){
+  try{
+    const precoEl=doc.querySelector('h2,h3,[class*="preco"],[class*="price"]');
+    const tituloEl=doc.querySelector('h1,[class*="titulo"],[class*="title"]');
+    const titulo=tituloEl?.textContent?.trim()||'';
+    const precoTexto=doc.body?.innerText||doc.body?.textContent||'';
+    const precoMatch=precoTexto.match(/R\$\s*[\d.,]+/);
+    const areaMatch=precoTexto.match(/(\d+(?:[.,]\d+)?)\s*m²/i);
+    const quartosMatch=precoTexto.match(/(\d+)\s*[Dd]ormit/);
+    const suitesMatch=precoTexto.match(/(\d+)\s*[Ss]uíte/);
+    const vagasMatch=precoTexto.match(/(\d+)\s*[Vv]aga/);
+    const codMatch=link.match(/-(\d{4,6})(?:$|\/)/);
+    const bairroMatch=link.match(/apartamento-([^-]+)-sao-jose/);
+    return{
+      nome:titulo.substring(0,60)||'Imóvel Controle',
+      preco:precoMatch?precoMatch[0]:'Consultar',
+      area:areaMatch?areaMatch[1]:'—',
+      quartos:quartosMatch?quartosMatch[1]:'—',
+      suites:suitesMatch?suitesMatch[1]:'0',
+      vagas:vagasMatch?vagasMatch[1]:'—',
+      bairro:bairroMatch?capitalize(bairroMatch[1]):'São José/SC',
+      cod:codMatch?codMatch[1]:'',
+      link
+    };
+  }catch(e){return null;}
+}
+
+function extrairDoURL(link){
+  try{
+    const cod=link.match(/-(\d{4,6})(?:$|\/)/)?.[1]||'';
+    const bairroM=link.match(/apartamento-([^-]+)-sao-jose/);
+    const areaM=link.match(/(\d+(?:\.\d+)?)m2/);
+    const quartosM=link.match(/(\d+)-quartos/);
+    return{
+      nome:`Imóvel Cód. ${cod}`,
+      preco:'Consultar no site',
+      area:areaM?areaM[1]:'—',
+      quartos:quartosM?quartosM[1]:'—',
+      suites:'—',vagas:'—',
+      bairro:bairroM?capitalize(bairroM[1]):'São José/SC',
+      cod,link
+    };
+  }catch(e){return null;}
+}
+
+function capitalize(s){return s.charAt(0).toUpperCase()+s.slice(1);}
+
+function renderImovel(im,el){
+  el.innerHTML=`
+    <div class="imovel-card">
+      <div class="im-header">
+        <div>
+          <div class="im-nome">${im.nome}</div>
+          <div class="im-bairro">📍 ${im.bairro}${im.cod?' · Cód. '+im.cod:''}</div>
+        </div>
+      </div>
+      <div class="im-preco">${im.preco}</div>
+      <div class="im-tags">
+        ${im.area!=='—'?`<span class="im-tag">📐 ${im.area}m²</span>`:''}
+        ${im.quartos!=='—'?`<span class="im-tag">🛏 ${im.quartos} quartos</span>`:''}
+        ${im.suites&&im.suites!=='0'&&im.suites!=='—'?`<span class="im-tag">✨ ${im.suites} suíte(s)</span>`:''}
+        ${im.vagas!=='—'?`<span class="im-tag">🚗 ${im.vagas} vaga(s)</span>`:''}
+      </div>
+      <div class="acoes-titulo">Ações rápidas</div>
+      <div class="acoes-grid">
+        <button class="acao acao-wpp" onclick="abrirWppMenu()">
+          <span class="acao-icon">💬</span>WhatsApp
+        </button>
+        <button class="acao acao-sim" onclick="simularFinanciamento()">
+          <span class="acao-icon">💰</span>Simular
+        </button>
+        <button class="acao acao-comp" onclick="adicionarComparativo()">
+          <span class="acao-icon">⚖️</span>Comparar
+        </button>
+        <button class="acao acao-share" onclick="compartilhar()">
+          <span class="acao-icon">📤</span>Compartilhar
+        </button>
+      </div>
+      <button class="acao acao-full" onclick="window.open('${im.link}','_blank')">
+        <span class="acao-icon">🔗</span>Ver imóvel no site
+      </button>
+      <button class="acao acao-full" style="background:rgba(39,174,96,.15);border:1px solid rgba(39,174,96,.3);color:#2ecc71;margin-top:0" onclick="abrirNovoLeadComImovel()">
+        <span class="acao-icon">👤</span>Criar lead com este imóvel
+      </button>
+    </div>
+  `;
+}
+
+// WHATSAPP
+function abrirWppMenu(){
+  const msgs=getMsgs();
+  const nomes={msg1:'1ª Abordagem',msg2:'Follow-up',msg3:'Após visita',msg4:'Proposta'};
+  document.getElementById('modal-title').textContent='Enviar WhatsApp';
+  document.getElementById('modal-body').innerHTML=`
+    <p style="font-size:13px;color:rgba(255,255,255,.4);margin-bottom:12px">Escolha o template:</p>
+    ${Object.entries(msgs).map(([k,v])=>`
+      <button onclick="enviarWppTemplate('${k}')" style="width:100%;background:rgba(37,211,102,.1);border:1px solid rgba(37,211,102,.2);color:#fff;border-radius:12px;padding:14px;font-size:13px;font-weight:600;cursor:pointer;margin-bottom:8px;text-align:left;line-height:1.5">
+        💬 <b>${nomes[k]}</b><br><span style="font-size:11px;color:rgba(255,255,255,.4)">${v.substring(0,60)}...</span>
+      </button>`).join('')}
+    <button onclick="wppPersonalizado()" style="width:100%;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);color:#fff;border-radius:12px;padding:14px;font-size:14px;font-weight:600;cursor:pointer">✏️ Mensagem personalizada</button>
+  `;
+  document.getElementById('modal-btns').innerHTML=`<button class="mcancel" onclick="closeModal()" style="flex:1;padding:14px;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer;border:none;background:rgba(255,255,255,.1);color:#fff">Fechar</button>`;
+  document.getElementById('modalOv').classList.add('open');
+}
+
+function preencherMsg(t,im,nomeCliente=''){
+  return t.replace(/{nome}/g,nomeCliente||'').replace(/{imovel}/g,im?.nome||'').replace(/{preco}/g,im?.preco||'').replace(/{bairro}/g,im?.bairro||'').replace(/{area}/g,im?.area||'').replace(/{quartos}/g,im?.quartos||'').replace(/{cod}/g,im?.cod||'');
+}
+
+function enviarWppTemplate(key){
+  const msgs=getMsgs();
+  const msg=preencherMsg(msgs[key],imovelAtual);
+  closeModal();
+  window.open('https://wa.me/?text='+encodeURIComponent(msg),'_blank');
+}
+
+function wppPersonalizado(){
+  closeModal();
+  document.getElementById('modal-title').textContent='Mensagem Personalizada';
+  document.getElementById('modal-body').innerHTML=`<textarea class="inp" id="wpp-custom" rows="7" placeholder="Digite a mensagem..." style="resize:vertical;margin:0"></textarea>`;
+  document.getElementById('modal-btns').innerHTML=`
+    <button class="mcancel" onclick="closeModal()" style="flex:1;padding:14px;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer;border:none;background:rgba(255,255,255,.1);color:#fff">Cancelar</button>
+    <button class="mconfirm-g" onclick="enviarWppCustom()" style="flex:1;padding:14px;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer;border:none;background:var(--green);color:#fff">Enviar</button>
+  `;
+  document.getElementById('modalOv').classList.add('open');
+}
+
+function enviarWppCustom(){
+  const msg=document.getElementById('wpp-custom').value.trim();
+  if(!msg)return;
+  closeModal();
+  window.open('https://wa.me/?text='+encodeURIComponent(msg),'_blank');
+}
+
+function compartilhar(){
+  if(!imovelAtual)return;
+  const txt=`🏠 *${imovelAtual.nome}*\n📍 ${imovelAtual.bairro}\n💰 ${imovelAtual.preco}\n📐 ${imovelAtual.area}m² | ${imovelAtual.quartos} quartos\n\n🔗 ${imovelAtual.link}\n\n_João Batista da Controle_`;
+  if(navigator.share){navigator.share({title:imovelAtual.nome,text:txt,url:imovelAtual.link});}
+  else{navigator.clipboard.writeText(txt);showToast('Copiado!');}
+}
+
+// SIMULAÇÃO
+function simularFinanciamento(){
+  if(imovelAtual?.preco){
+    const v=imovelAtual.preco.replace(/[^\d]/g,'');
+    if(v){document.getElementById('fin-valor').value=v;calcFin();}
+  }
+  showScreen('financ');
+}
+
+let tipoFin='price';
+function setFinTab(t,el){
+  tipoFin=t;
+  document.querySelectorAll('.fin-tab').forEach(b=>b.classList.remove('active'));
+  el.classList.add('active');
+  calcFin();
+}
+function calcFin(){
+  const valor=parseFloat(document.getElementById('fin-valor').value.replace(/\D/g,''))||0;
+  const entrada=parseFloat(document.getElementById('fin-entrada').value.replace(/\D/g,''))||0;
+  const fgts=parseFloat(document.getElementById('fin-fgts').value.replace(/\D/g,''))||0;
+  const taxa=parseFloat(document.getElementById('fin-taxa').value)||10.5;
+  const prazo=parseInt(document.getElementById('fin-prazo').value)||360;
+  const renda=parseFloat(document.getElementById('fin-renda').value.replace(/\D/g,''))||0;
+  const el=document.getElementById('fin-result');
+  if(!valor||!entrada){el.innerHTML='';return;}
+  const fin=valor-entrada-fgts;
+  if(fin<=0){el.innerHTML='<div class="fin-result-card"><p style="color:rgba(255,255,255,.5)">Entrada cobre o valor total!</p></div>';return;}
+  const taxaM=taxa/100/12;
+  let p1,total,juros;
+  if(tipoFin==='price'){
+    p1=fin*(taxaM*Math.pow(1+taxaM,prazo))/(Math.pow(1+taxaM,prazo)-1);
+    total=p1*prazo;juros=total-fin;
+  } else {
+    const amort=fin/prazo;p1=amort+fin*taxaM;
+    total=prazo*amort+(fin*(1+prazo)*taxaM/2);juros=total-fin;
+  }
+  el.innerHTML=`
+    <div class="fin-result-card">
+      <h3>${tipoFin==='price'?'Tabela Price':'SAC'}</h3>
+      <div class="fin-row"><label>Financiado</label><span>${fmt(fin)}</span></div>
+      <div class="fin-row"><label>${tipoFin==='price'?'Parcela mensal':'1ª parcela'}</label><span class="fin-destaque">${fmt(p1)}</span></div>
+      ${tipoFin==='sac'?`<div class="fin-row"><label>Última parcela</label><span>${fmt(fin/prazo*(1+taxaM))}</span></div>`:''}
+      <div class="fin-row"><label>Prazo</label><span>${prazo} meses (${(prazo/12).toFixed(0)} anos)</span></div>
+      <div class="fin-row"><label>Total de juros</label><span style="color:#e74c3c">${fmt(juros)}</span></div>
+      <div class="fin-row"><label>Total pago</label><span>${fmt(total)}</span></div>
+      ${renda?`<div class="fin-row"><label>Comprometimento</label><span style="color:${(p1/renda)>.3?'#e74c3c':'#27ae60'}">${((p1/renda)*100).toFixed(1)}% ${(p1/renda)>.3?'⚠️':'✅'}</span></div>`:''}
+    </div>
+    <button class="btn-big btn-big-green" onclick="enviarSimulacaoWpp(${fin.toFixed(0)},${p1.toFixed(2)},${prazo},${taxa},'${tipoFin}')">📤 Enviar simulação no WhatsApp</button>
+  `;
+}
+function fmt(v){return'R$ '+v.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});}
+function enviarSimulacaoWpp(fin,parc,prazo,taxa,tipo){
+  const im=imovelAtual;
+  const msg=`*Simulação de Financiamento — ${tipo==='price'?'Tabela Price':'SAC'}*\n\n${im?`🏠 ${im.nome}\n💰 ${im.preco}\n\n`:''}📊 Financiado: ${fmt(fin)}\n📋 ${tipo==='price'?'Parcela':'1ª parcela'}: ${fmt(parseFloat(parc))}\n📅 Prazo: ${prazo} meses\n📈 Taxa: ${taxa}% a.a.\n\n_João Batista da Controle_`;
+  window.open('https://wa.me/?text='+encodeURIComponent(msg),'_blank');
+}
+
+// COMPARAR
+let compSlots=[null,null,null];
+function adicionarComparativo(){
+  if(!imovelAtual){showToast('Busque um imóvel primeiro','err');return;}
+  const idx=compSlots.findIndex(s=>s===null);
+  if(idx===-1){showToast('Máximo 3 imóveis','err');return;}
+  compSlots[idx]=imovelAtual;
+  saveComp(compSlots);
+  showToast('Adicionado ao comparativo!');
+  showScreen('comparar');
+}
+function renderComp(){
+  compSlots=getComp();
+  const slotsEl=document.getElementById('comp-slots');
+  slotsEl.innerHTML=compSlots.map((s,i)=>`
+    <div class="comp-slot${s?' filled':''}">
+      ${s?`<div class="comp-slot-nome">${s.nome}</div>
+        <div class="comp-slot-preco">${s.preco}</div>
+        <button class="comp-slot-rem" onclick="removerComp(${i})">Remover</button>`
+      :`<div class="comp-slot-add-icon">+</div><div class="comp-slot-add-txt">Adicionar do cockpit</div>`}
+    </div>`).join('');
+  const filled=compSlots.filter(Boolean);
+  const table=document.getElementById('comp-table');
+  const wpp=document.getElementById('comp-wpp');
+  if(filled.length<2){table.innerHTML='<div class="empty-st">Cole links no cockpit e toque em ⚖️ Comparar para adicionar imóveis aqui.</div>';wpp.innerHTML='';return;}
+  const campos=[{l:'Bairro',k:'bairro'},{l:'Área',k:'area',s:'m²'},{l:'Quartos',k:'quartos'},{l:'Suítes',k:'suites'},{l:'Vagas',k:'vagas'},{l:'Preço',k:'preco'}];
+  table.innerHTML=`<div class="comp-table">
+    <div class="comp-row"><div></div>${filled.map(s=>`<div style="font-weight:700;font-size:11px">${s.nome.substring(0,20)}</div>`).join('')}</div>
+    ${campos.map(c=>{
+      const vals=filled.map(s=>s[c.k]||'—');
+      const nums=vals.map(v=>parseFloat(v.replace(/[^\d.,]/g,'').replace(',','.'))||null);
+      const maxN=Math.max(...nums.filter(Boolean));
+      const minN=Math.min(...nums.filter(Boolean));
+      return`<div class="comp-row"><div>${c.l}</div>${vals.map((v,i)=>{
+        let cls='';
+        if(c.k==='preco'&&nums[i]===minN&&filled.length>1)cls='comp-best';
+        if((c.k==='area'||c.k==='quartos')&&nums[i]===maxN&&filled.length>1)cls='comp-best';
+        return`<div class="${cls}">${v}${c.s||''}</div>`;
+      }).join('')}</div>`;
+    }).join('')}
+  </div>`;
+  const msg=`*Comparativo de Imóveis*\n_João Batista da Controle_\n\n${filled.map(s=>`🏠 *${s.nome}*\n💰 ${s.preco} | 📍 ${s.bairro}\n📐 ${s.area||'—'}m² | 🛏 ${s.quartos||'—'} quartos\n🔗 ${s.link}`).join('\n\n')}`;
+  wpp.innerHTML=`<button class="btn-big btn-big-green" onclick="window.open('https://wa.me/?text='+encodeURIComponent(${JSON.stringify(msg)}),'_blank')">📤 Enviar comparativo no WhatsApp</button>
+  <button class="btn-big btn-big-gray" onclick="limparComp()">🗑️ Limpar comparativo</button>`;
+}
+function removerComp(i){compSlots[i]=null;saveComp(compSlots);renderComp();}
+function limparComp(){compSlots=[null,null,null];saveComp(compSlots);renderComp();}
+
+// LEADS
+function getLeadsData(){try{const s=localStorage.getItem(LK);if(s)return JSON.parse(s);}catch(e){}return[];}
+const STATUS=['novo','contato','visita','proposta','fechado','perdido'];
+const STATUS_LABEL={novo:'Novo',contato:'Contato',visita:'Visita',proposta:'Proposta',fechado:'Fechado',perdido:'Perdido'};
+const STATUS_CLS={novo:'lstatus-novo',contato:'lstatus-contato',visita:'lstatus-visita',proposta:'lstatus-proposta',fechado:'lstatus-fechado',perdido:'lstatus-perdido'};
+
+function renderLeads(){
+  const leads=getLeadsData();
+  const el=document.getElementById('lista-leads');
+  if(!leads.length){el.innerHTML='<div class="empty-st">👥 Nenhum lead ainda.<br>Toque em <b>+ Novo</b> para adicionar.</div>';return;}
+  el.innerHTML=leads.map(l=>`
+    <div class="lead-item" style="border-left-color:${l.status==='fechado'?'#27ae60':l.status==='perdido'?'#e74c3c':'var(--red)'}">
+      <div class="lead-item-top">
+        <div style="flex:1">
+          <div class="lead-nome">${l.nome}</div>
+          ${l.tel?`<div style="font-size:13px;color:rgba(255,255,255,.6);margin-top:2px">📞 ${l.tel}</div>`:''}
+          ${l.imovelNome?`<div class="lead-imovel" style="margin-top:4px">🏠 ${l.imovelNome}${l.imovelPreco?' · '+l.imovelPreco:''}</div>`:''}
+          ${l.obs?`<div style="font-size:11px;color:rgba(255,255,255,.35);margin-top:3px">📝 ${l.obs}</div>`:''}
+          <div style="font-size:10px;color:rgba(255,255,255,.25);margin-top:4px">📅 ${formatarData(l.criadoEm)}</div>
+        </div>
+      </div>
+      <div class="lead-status">
+        ${STATUS.map(s=>`<span class="lstatus ${STATUS_CLS[s]}${l.status===s?' ativo':''}" onclick="setLeadStatus('${l.id}','${s}')">${STATUS_LABEL[s]}</span>`).join('')}
+      </div>
+      <div class="lead-btns">
+        ${l.tel?`<a class="lead-btn lbtn-wpp" href="tel:${l.tel}" style="text-align:center;text-decoration:none">📞 Ligar</a>`:''}
+        <button class="lead-btn lbtn-wpp" onclick="wppLead('${l.id}')">💬 WhatsApp</button>
+        <button class="lead-btn lbtn-edit" onclick="editarLead('${l.id}')">✏️ Editar</button>
+        <button class="lead-btn lbtn-del" onclick="excluirLead('${l.id}')">🗑️</button>
+      </div>
+    </div>`).join('');
+}
+
+function setLeadStatus(id,status){
+  const leads=getLeadsData();
+  const idx=leads.findIndex(l=>l.id===id);
+  if(idx>-1){leads[idx].status=status;saveLeads(leads);renderLeads();}
+}
+
+function abrirNovoLead(){
+  document.getElementById('modal-title').textContent='Novo Lead';
+  document.getElementById('modal-body').innerHTML=`
+    <div style="margin-bottom:10px"><label style="font-size:12px;color:rgba(255,255,255,.4);display:block;margin-bottom:5px">Nome *</label><input class="inp" id="nl-nome" placeholder="Ex: Carlos Silva" style="margin:0"/></div>
+    <div style="margin-bottom:10px"><label style="font-size:12px;color:rgba(255,255,255,.4);display:block;margin-bottom:5px">Telefone</label><input class="inp" id="nl-tel" type="tel" placeholder="(48) 99999-9999" style="margin:0"/></div>
+    <div style="margin-bottom:10px"><label style="font-size:12px;color:rgba(255,255,255,.4);display:block;margin-bottom:5px">Observação</label><textarea class="inp" id="nl-obs" rows="3" placeholder="Interesses, perfil..." style="resize:none;margin:0"></textarea></div>
+  `;
+  const btn=document.getElementById('modal-ok');
+  btn.className='mconfirm-g';btn.textContent='Criar Lead';
+  btn.onclick=criarLead;
+  document.getElementById('modal-btns').innerHTML=`
+    <button class="mcancel" onclick="closeModal()" style="flex:1;padding:14px;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer;border:none;background:rgba(255,255,255,.1);color:#fff">Cancelar</button>
+    <button class="mconfirm-g" onclick="criarLead()" style="flex:1;padding:14px;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer;border:none;background:var(--green);color:#fff">Criar Lead</button>
+  `;
+  document.getElementById('modalOv').classList.add('open');
+}
+
+function abrirNovoLeadComImovel(){
+  document.getElementById('modal-title').textContent='Criar Lead';
+  document.getElementById('modal-body').innerHTML=`
+    <div style="background:rgba(255,255,255,.06);border-radius:10px;padding:10px 12px;margin-bottom:12px;font-size:13px">
+      🏠 <b>${imovelAtual?.nome||'—'}</b> · ${imovelAtual?.preco||''}
+    </div>
+    <div style="margin-bottom:10px"><label style="font-size:12px;color:rgba(255,255,255,.4);display:block;margin-bottom:5px">Nome *</label><input class="inp" id="nl-nome" placeholder="Ex: Carlos Silva" style="margin:0"/></div>
+    <div style="margin-bottom:10px"><label style="font-size:12px;color:rgba(255,255,255,.4);display:block;margin-bottom:5px">Telefone</label><input class="inp" id="nl-tel" type="tel" placeholder="(48) 99999-9999" style="margin:0"/></div>
+    <div style="margin-bottom:10px"><label style="font-size:12px;color:rgba(255,255,255,.4);display:block;margin-bottom:5px">Observação</label><textarea class="inp" id="nl-obs" rows="3" placeholder="Interesses, perfil..." style="resize:none;margin:0"></textarea></div>
+  `;
+  document.getElementById('modal-btns').innerHTML=`
+    <button class="mcancel" onclick="closeModal()" style="flex:1;padding:14px;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer;border:none;background:rgba(255,255,255,.1);color:#fff">Cancelar</button>
+    <button class="mconfirm-g" onclick="criarLead()" style="flex:1;padding:14px;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer;border:none;background:var(--green);color:#fff">Criar Lead</button>
+  `;
+  document.getElementById('modalOv').classList.add('open');
+}
+
+function criarLead(){
+  const nome=document.getElementById('nl-nome')?.value.trim();
+  if(!nome){showToast('Digite o nome','err');return;}
+  const lead={
+    id:'l'+Date.now(),
+    nome,
+    tel:document.getElementById('nl-tel')?.value.trim()||'',
+    obs:document.getElementById('nl-obs')?.value.trim()||'',
+    imovelNome:imovelAtual?.nome||'',
+    imovelPreco:imovelAtual?.preco||'',
+    imovelBairro:imovelAtual?.bairro||'',
+    imovelCod:imovelAtual?.cod||'',
+    imovelLink:imovelAtual?.link||'',
+    status:'novo',
+    criadoEm:new Date().toISOString()
+  };
+  const leads=getLeadsData();leads.push(lead);saveLeads(leads);
+  closeModal();renderLeads();showToast('Lead criado!');
+}
+
+function editarLead(id){
+  const l=getLeadsData().find(x=>x.id===id);
+  if(!l)return;
+  document.getElementById('modal-title').textContent='Editar Lead';
+  document.getElementById('modal-body').innerHTML=`
+    <div style="margin-bottom:10px"><label style="font-size:12px;color:rgba(255,255,255,.4);display:block;margin-bottom:5px">Nome</label><input class="inp" id="el-nome" value="${l.nome||''}" style="margin:0"/></div>
+    <div style="margin-bottom:10px"><label style="font-size:12px;color:rgba(255,255,255,.4);display:block;margin-bottom:5px">Telefone</label><input class="inp" id="el-tel" value="${l.tel||''}" type="tel" style="margin:0"/></div>
+    <div style="margin-bottom:10px"><label style="font-size:12px;color:rgba(255,255,255,.4);display:block;margin-bottom:5px">Observação</label><textarea class="inp" id="el-obs" rows="3" style="resize:none;margin:0">${l.obs||''}</textarea></div>
+  `;
+  document.getElementById('modal-btns').innerHTML=`
+    <button class="mcancel" onclick="closeModal()" style="flex:1;padding:14px;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer;border:none;background:rgba(255,255,255,.1);color:#fff">Cancelar</button>
+    <button class="mconfirm-g" onclick="salvarEdicaoLead('${id}')" style="flex:1;padding:14px;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer;border:none;background:var(--green);color:#fff">Salvar</button>
+  `;
+  document.getElementById('modalOv').classList.add('open');
+}
+
+function salvarEdicaoLead(id){
+  const leads=getLeadsData();
+  const idx=leads.findIndex(l=>l.id===id);
+  if(idx>-1){
+    leads[idx].nome=document.getElementById('el-nome').value.trim()||leads[idx].nome;
+    leads[idx].tel=document.getElementById('el-tel').value.trim();
+    leads[idx].obs=document.getElementById('el-obs').value.trim();
+    saveLeads(leads);
+  }
+  closeModal();renderLeads();showToast('Lead atualizado!');
+}
+
+function excluirLead(id){
+  saveLeads(getLeadsData().filter(l=>l.id!==id));
+  renderLeads();showToast('Lead excluído');
+}
+
+function wppLead(id){
+  const l=getLeadsData().find(x=>x.id===id);
+  if(!l)return;
+  const msgs=getMsgs();
+  const msg=preencherMsg(msgs.msg1,{nome:l.nome,preco:l.imovelPreco,bairro:l.imovelBairro,nome_imovel:l.imovelNome},l.nome).replace(/{imovel}/g,l.imovelNome||'');
+  const tel=l.tel.replace(/\D/g,'');
+  if(tel)window.open(`https://wa.me/55${tel}?text=${encodeURIComponent(msg)}`,'_blank');
+  else window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`,'_blank');
+}
+
+// MENSAGENS
+function carregarMsgs(){
+  const m=getMsgs();
+  document.getElementById('msg1').value=m.msg1||MSGS_DEF.msg1;
+  document.getElementById('msg2').value=m.msg2||MSGS_DEF.msg2;
+  document.getElementById('msg3').value=m.msg3||MSGS_DEF.msg3;
+  document.getElementById('msg4').value=m.msg4||MSGS_DEF.msg4;
+}
+function salvarMsgs(){
+  saveMsgsData({msg1:document.getElementById('msg1').value,msg2:document.getElementById('msg2').value,msg3:document.getElementById('msg3').value,msg4:document.getElementById('msg4').value});
+  showToast('Mensagens salvas!');
+}
+function restaurarMsgs(){saveMsgsData({...MSGS_DEF});carregarMsgs();showToast('Restaurado!');}
+
+function formatarData(iso){if(!iso)return'';const d=new Date(iso);return d.toLocaleDateString('pt-BR');}
+
+// MODAL / TOAST
+function closeModal(){document.getElementById('modalOv').classList.remove('open');}
+function showToast(msg,tipo=''){const t=document.getElementById('toast');t.textContent=msg;t.className='toast show'+(tipo?' '+tipo:'');setTimeout(()=>t.className='toast',2500);}
+</script>
+</body>
+</html>
