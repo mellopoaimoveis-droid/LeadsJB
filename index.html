@@ -3,787 +3,1775 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
-<meta name="mobile-web-app-capable" content="yes"/>
 <meta name="apple-mobile-web-app-capable" content="yes"/>
-<title>Cockpit — João Batista da Controle</title>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="mobile-web-app-capable" content="yes"/>
+<meta name="theme-color" content="#c0392b"/>
+<title>Cockpit Controle</title>
 <style>
-*{box-sizing:border-box;margin:0;padding:0}
-:root{--red:#c0392b;--dark:#111;--gray:#1e1e1e;--gray2:#2a2a2a;--gray3:#333;--white:#fff;--green:#27ae60;--blue:#2980b9;--orange:#e67e22;--gold:#f1c40f}
-html,body{height:100%;width:100%;overflow:hidden;background:var(--dark);font-family:'Segoe UI',sans-serif;color:var(--white);position:fixed;inset:0}
-
-/* TELAS */
-.screen{position:fixed;inset:0;display:flex;flex-direction:column;background:var(--dark);z-index:10;transition:transform .3s ease}
-.screen.hidden{transform:translateX(100%);pointer-events:none}
-
-/* LOGIN */
-#loginScreen{z-index:500;align-items:center;justify-content:center;padding:24px;gap:0}
-.login-logo{font-size:28px;font-weight:800;text-align:center;margin-bottom:6px}
-.login-sub{font-size:13px;color:rgba(255,255,255,.4);text-align:center;margin-bottom:32px;letter-spacing:.5px}
-.login-card{background:var(--gray2);border-radius:18px;padding:26px;width:100%;max-width:340px}
-.inp{width:100%;background:rgba(255,255,255,.08);border:1.5px solid rgba(255,255,255,.12);border-radius:12px;padding:14px 16px;color:#fff;font-size:16px;margin-bottom:12px;outline:none;-webkit-appearance:none}
-.inp:focus{border-color:var(--red)}
-.btn-login{width:100%;background:var(--red);color:#fff;border:none;border-radius:12px;padding:16px;font-size:17px;font-weight:700;cursor:pointer;letter-spacing:.3px}
-.login-err{color:#e74c3c;font-size:13px;text-align:center;margin-top:10px;display:none}
-
-/* HEADER */
-.hdr{background:var(--red);padding:12px 16px;padding-top:max(12px,env(safe-area-inset-top));display:flex;align-items:center;justify-content:space-between;flex-shrink:0;z-index:100}
-.hdr-logo{font-size:16px;font-weight:800;color:#fff;line-height:1.2}
-.hdr-logo span{display:block;font-size:10px;font-weight:400;opacity:.8;letter-spacing:.8px;text-transform:uppercase}
-.hbtn{background:rgba(255,255,255,.2);border:none;color:#fff;padding:9px 14px;border-radius:9px;font-size:13px;cursor:pointer;font-weight:600}
-
-/* BOTTOM NAV */
-.bnav{position:fixed;bottom:0;left:0;right:0;background:var(--gray2);border-top:1px solid rgba(255,255,255,.08);display:flex;z-index:200;padding-bottom:env(safe-area-inset-bottom)}
-.nbtn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:10px 4px;cursor:pointer;border:none;background:transparent;color:rgba(255,255,255,.4);font-size:11px;font-weight:600;gap:4px;transition:color .2s}
-.nbtn.active{color:var(--red)}
-.nbtn-icon{font-size:22px}
-
-/* SCROLL AREA */
-.scroll{flex:1;overflow-y:auto;padding-bottom:70px}
-
-/* ── COCKPIT ── */
-.cockpit{padding:14px}
-
-/* BUSCA */
-.busca-card{background:var(--gray2);border-radius:16px;padding:16px;margin-bottom:14px}
-.busca-card h2{font-size:14px;font-weight:700;color:rgba(255,255,255,.5);text-transform:uppercase;letter-spacing:.5px;margin-bottom:12px}
-.busca-row{display:flex;gap:8px}
-.busca-inp{flex:1;background:rgba(255,255,255,.08);border:1.5px solid rgba(255,255,255,.15);border-radius:12px;padding:14px 16px;color:#fff;font-size:14px;outline:none}
-.busca-inp:focus{border-color:var(--red)}
-.busca-inp::placeholder{color:rgba(255,255,255,.3)}
-.btn-buscar{background:var(--red);border:none;color:#fff;border-radius:12px;padding:0 20px;font-size:20px;cursor:pointer;font-weight:700;flex-shrink:0}
-
-/* CARD IMÓVEL */
-.imovel-card{background:var(--gray2);border-radius:16px;padding:16px;margin-bottom:14px;border-left:4px solid var(--red)}
-.im-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:10px}
-.im-nome{font-size:16px;font-weight:800;line-height:1.3;margin-bottom:3px}
-.im-bairro{font-size:12px;color:rgba(255,255,255,.45)}
-.im-preco{font-size:24px;font-weight:800;color:var(--red);margin-bottom:12px}
-.im-tags{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:14px}
-.im-tag{background:rgba(255,255,255,.09);border:1px solid rgba(255,255,255,.12);color:rgba(255,255,255,.8);padding:6px 12px;border-radius:8px;font-size:12px;font-weight:600}
-.im-link{font-size:11px;color:rgba(255,255,255,.3);margin-bottom:14px;word-break:break-all}
-
-/* BOTÕES DE AÇÃO — GRANDES */
-.acoes-titulo{font-size:11px;font-weight:700;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px}
-.acoes-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}
-.acao{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:18px 10px;border-radius:14px;border:none;cursor:pointer;font-size:13px;font-weight:700;color:#fff;transition:opacity .15s;min-height:80px}
-.acao:active{opacity:.8}
-.acao-icon{font-size:26px}
-.acao-wpp{background:#25D366}
-.acao-sim{background:var(--blue)}
-.acao-comp{background:var(--orange)}
-.acao-share{background:var(--gray3);border:1px solid rgba(255,255,255,.15)}
-.acao-full{grid-column:1/-1;padding:16px;min-height:60px;flex-direction:row;gap:12px;font-size:15px}
-
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{--bg:#f0f0eb;--card:#fff;--bg2:#e8e8e3;--border:#e0e0d8;--text:#1a1a1a;--text2:#555;--text3:#999;--red:#c0392b;--or:#e8935a;--orl:rgba(232,147,90,.13);--orb:rgba(232,147,90,.32);--sh:0 2px 10px rgba(0,0,0,.08);--sh2:0 6px 24px rgba(0,0,0,.13)}
+html,body{height:100%;overflow:hidden;background:var(--bg);font-family:"Segoe UI",system-ui,sans-serif;color:var(--text);position:fixed;inset:0;width:100%;max-width:100vw}
+.app{position:fixed;inset:0;display:flex;flex-direction:column;overflow:hidden}
+.slides-wrap{flex:1;overflow:hidden;position:relative;width:100%}
+.slides{height:100%;width:100%;position:relative;}
+.slide{width:100%;height:100%;display:none;flex-direction:column;background:var(--bg);overflow:hidden;position:absolute;top:0;left:0;}
+.slide.ativa{display:flex;}
+.scroll{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding-bottom:72px}
+.hdr{background:var(--red);padding:13px 15px;padding-top:max(13px,env(safe-area-inset-top));display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.hnav{background:rgba(255,255,255,.2);border:none;color:#fff;width:30px;height:30px;border-radius:50%;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-weight:700}
+.ht{font-size:16px;font-weight:800;color:#fff}.hs{font-size:9px;opacity:.7;text-transform:uppercase;letter-spacing:1px;color:#fff;margin-top:1px}
+.hbts{display:flex;gap:5px}.hbtn{background:rgba(255,255,255,.2);border:none;color:#fff;padding:8px 11px;border-radius:8px;font-size:11px;cursor:pointer;font-weight:700;white-space:nowrap}
+.bbar{padding:9px 13px;background:var(--card);border-bottom:1px solid var(--border);flex-shrink:0;display:flex;gap:7px}
+.binp{flex:1;background:var(--bg);border:1.5px solid var(--border);border-radius:10px;padding:10px 13px;color:var(--text);font-size:14px;outline:none;-webkit-appearance:none;font-family:inherit}
+.binp::placeholder{color:var(--text3)}.binp:focus{border-color:rgba(192,57,43,.35)}
+.bclr{background:var(--bg2);border:1px solid var(--border);color:var(--text3);border-radius:8px;padding:0 11px;font-size:19px;cursor:pointer;flex-shrink:0}
+.bnav{background:var(--card);border-top:1px solid var(--border);height:54px;overflow-x:auto;overflow-y:hidden;scrollbar-width:none;-webkit-overflow-scrolling:touch;flex-shrink:0}
+.bnav::-webkit-scrollbar{display:none}
+.bnavt{display:flex;align-items:center;height:100%;padding:0 35vw}
+.nbi{flex-shrink:0;cursor:pointer;padding:4px 20px;position:relative;-webkit-tap-highlight-color:transparent}
+.nbi span{font-size:11px;font-weight:700;color:var(--text3);letter-spacing:.5px;text-transform:uppercase;white-space:nowrap}
+.nbi.on span{color:var(--text)}.nbi.on::after{content:"";position:absolute;bottom:-5px;left:50%;transform:translateX(-50%);width:22px;height:2px;background:var(--red);border-radius:2px}
+.sec{padding:13px}.lbl{font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;display:block;margin-bottom:5px}
+.inp{width:100%;background:var(--bg);border:1.5px solid var(--border);border-radius:10px;padding:12px 13px;color:var(--text);font-size:14px;outline:none;font-family:inherit}
+.inp::placeholder{color:var(--text3)}.inp:focus{border-color:rgba(192,57,43,.35)}
+.btn{border-radius:10px;padding:13px 15px;font-size:13px;font-weight:700;cursor:pointer;border:none;display:flex;align-items:center;justify-content:center;gap:7px;text-decoration:none;transition:opacity .15s}
+.btn:active{opacity:.75}.btnf{width:100%}.btnlg{padding:15px;font-size:15px;border-radius:12px}
+.btnor{background:var(--orl);border:1.5px solid var(--orb);color:var(--or)}
+.btnghost{background:var(--bg);border:1.5px solid var(--border);color:var(--text2)}
+.btnred{background:var(--red);color:#fff;border:none}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px}
+.card{background:var(--card);border-radius:14px;padding:15px;box-shadow:var(--sh);margin-bottom:11px}
+/* FAVS */
+.favscroll{overflow-x:auto;display:flex;gap:9px;padding:11px 13px;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+.favscroll::-webkit-scrollbar{display:none}
+.favc{min-width:170px;background:var(--card);border-radius:12px;padding:13px;scroll-snap-align:start;flex-shrink:0;box-shadow:var(--sh);border-left:3px solid var(--or);cursor:pointer}
+.favc-nome{font-size:14px;font-weight:800;color:var(--text);margin-bottom:2px}
+.favc-tel{font-size:12px;color:var(--text2);margin-bottom:5px}
+.favc-st{display:inline-block;font-size:10px;font-weight:700;padding:3px 8px;border-radius:5px;background:var(--orl);border:1px solid var(--orb);color:var(--or);text-transform:uppercase}
+/* LEAD MINI */
+.lmini{background:var(--card);border-radius:12px;padding:13px;box-shadow:var(--sh);margin-bottom:8px;display:flex;align-items:center;gap:11px;cursor:pointer}
+.lmini:active{opacity:.85}
+.lme{flex:1;min-width:0}.lmn{font-size:15px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lmi{font-size:12px;color:var(--text2);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lmd{display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex-shrink:0}
+.lmst{font-size:10px;font-weight:700;padding:4px 8px;border-radius:6px;background:var(--orl);border:1px solid var(--orb);color:var(--or);text-transform:uppercase}
+.lmdias{font-size:10px;color:var(--text3);font-weight:600}
+.badr{display:inline-block;background:rgba(192,57,43,.1);border:1px solid rgba(192,57,43,.2);color:var(--red);font-size:10px;font-weight:700;padding:2px 7px;border-radius:5px;margin-top:3px}
+.bador{display:inline-block;background:var(--orl);border:1px solid var(--orb);color:var(--or);font-size:10px;font-weight:700;padding:2px 7px;border-radius:5px;margin-top:3px}
+.fbtn{flex-shrink:0;padding:6px 13px;border-radius:20px;border:1.5px solid var(--border);background:var(--card);color:var(--text2);font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap}
+.fbtn.fativo{background:var(--red);border-color:var(--red);color:#fff}
+/* POPUP */
+.pov{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:5000;display:none;align-items:flex-end}
+.pov.on{display:flex}
+.pbox{background:var(--bg);border-radius:22px 22px 0 0;width:100%;max-height:93vh;overflow-y:auto;padding-bottom:max(20px,env(safe-area-inset-bottom))}
+.phdr{display:flex;align-items:center;justify-content:space-between;padding:16px 15px 0;margin-bottom:10px}
+.pnome{font-size:19px;font-weight:800}
+.px{background:var(--bg2);border:none;color:var(--text2);width:34px;height:34px;border-radius:50%;font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.psec{padding:0 15px;margin-bottom:13px}
+.pst{font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;margin-bottom:9px;padding-top:11px;border-top:1px solid var(--border)}
+/* STATUS */
+.stg{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}
+.stb{padding:13px 8px;border-radius:10px;border:1.5px solid var(--border);cursor:pointer;font-size:12px;font-weight:700;text-align:center;text-transform:uppercase;background:var(--bg);color:var(--text3)}
+.stb.on{background:var(--orl);border-color:var(--orb);color:var(--or)}
+/* IM LEAD */
+.imli{background:var(--card);border-radius:10px;padding:11px 13px;margin-bottom:7px;display:flex;align-items:center;gap:9px;box-shadow:0 1px 4px rgba(0,0,0,.06)}
+.imlin{flex:1;font-size:13px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.imlip{font-size:12px;color:var(--red);font-weight:700;margin-top:1px}
+.imlil{font-size:11px;color:var(--red);display:block;margin-top:1px}
+.imlix{background:none;border:none;color:var(--text3);font-size:18px;cursor:pointer;flex-shrink:0}
+/* AGENDA */
+.agi{background:var(--card);border-radius:10px;padding:10px 13px;margin-bottom:6px;display:flex;align-items:center;gap:9px;box-shadow:0 1px 4px rgba(0,0,0,.06)}
+.agi.hoje{border-left:3px solid var(--or)}.agi.atrasado{border-left:3px solid var(--red)}
+.agok{background:var(--orl);border:1px solid var(--orb);color:var(--or);border-radius:6px;padding:5px 9px;font-size:11px;font-weight:700;cursor:pointer}
+.aged{background:var(--bg);border:1px solid var(--border);color:var(--text2);border-radius:6px;padding:5px 9px;font-size:11px;font-weight:700;cursor:pointer}
+.agx{background:none;border:none;color:var(--text3);font-size:16px;cursor:pointer}
+/* NOTA */
+.notai{background:var(--card);border-radius:10px;padding:11px 13px;margin-bottom:7px;box-shadow:0 1px 4px rgba(0,0,0,.06);display:flex;gap:9px}
+.notat{flex:1;font-size:13px;color:var(--text);line-height:1.5}
+.notax{background:none;border:none;color:var(--text3);font-size:16px;cursor:pointer;flex-shrink:0}
+/* IM CARD (inicio) */
+.imc{background:var(--card);border-radius:14px;overflow:hidden;box-shadow:var(--sh);margin-bottom:11px}
+.imcimg{width:100%;height:175px;object-fit:cover;display:block;background:var(--bg2)}
+.imcbody{padding:14px}
+.imcnr{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.imcni{flex:1;background:var(--bg);border:1.5px solid var(--border);border-radius:8px;padding:10px 11px;color:var(--text);font-size:14px;font-weight:700;outline:none;font-family:inherit}
+.imcvb{background:var(--bg);border:1.5px solid var(--border);color:var(--text2);border-radius:8px;padding:10px 11px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;flex-shrink:0}
+.imcbairro{font-size:12px;color:var(--text2);margin-bottom:8px}
+.imcvi{width:100%;background:rgba(192,57,43,.05);border:1.5px solid rgba(192,57,43,.2);border-radius:10px;padding:11px 13px;color:var(--red);font-size:20px;font-weight:800;outline:none;margin-bottom:10px;font-family:inherit}
+.imctags{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px}
+.imctag{background:var(--bg);border:1px solid var(--border);color:var(--text2);padding:5px 9px;border-radius:6px;font-size:12px;font-weight:600}
 /* COMPARAR */
-.comp-slots{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px}
-.comp-slot{background:var(--gray2);border-radius:12px;padding:12px;min-height:100px;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;border:1.5px dashed rgba(255,255,255,.15);text-align:center}
-.comp-slot.filled{border-color:rgba(255,255,255,.2);align-items:flex-start;justify-content:flex-start;cursor:default}
-.comp-slot-add-icon{font-size:26px;color:rgba(255,255,255,.25);margin-bottom:4px}
-.comp-slot-add-txt{font-size:11px;color:rgba(255,255,255,.3)}
-.comp-slot-nome{font-size:11px;font-weight:700;margin-bottom:3px;line-height:1.3}
-.comp-slot-preco{font-size:13px;font-weight:800;color:var(--red)}
-.comp-slot-rem{background:rgba(192,57,43,.2);border:1px solid rgba(192,57,43,.3);color:#e74c3c;border-radius:6px;padding:3px 7px;font-size:10px;font-weight:700;cursor:pointer;margin-top:6px;width:100%;text-align:center}
-.comp-table{background:var(--gray2);border-radius:14px;overflow:hidden;margin-bottom:14px}
-.comp-row{display:flex;border-bottom:1px solid rgba(255,255,255,.05)}
-.comp-row:last-child{border:none}
-.comp-row div{padding:10px 12px;font-size:12px;flex:1}
-.comp-row div:first-child{color:rgba(255,255,255,.4);font-weight:600;background:rgba(255,255,255,.03);flex:0 0 80px}
-.comp-best{color:#27ae60!important;font-weight:700!important}
-.btn-big{width:100%;border:none;border-radius:14px;padding:18px;font-size:16px;font-weight:700;cursor:pointer;color:#fff;margin-bottom:10px;display:flex;align-items:center;justify-content:center;gap:10px}
-.btn-big-green{background:var(--green)}
-.btn-big-red{background:var(--red)}
-.btn-big-blue{background:var(--blue)}
-.btn-big-gray{background:var(--gray3);border:1px solid rgba(255,255,255,.12)}
-
-/* FINANCIAMENTO */
-.fin-card{background:var(--gray2);border-radius:14px;padding:14px;margin-bottom:12px}
-.fin-card h3{font-size:11px;font-weight:700;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:.5px;margin-bottom:12px}
-.fin-tabs{display:flex;gap:8px;margin-bottom:14px}
-.fin-tab{flex:1;background:rgba(255,255,255,.07);border:1.5px solid rgba(255,255,255,.12);color:rgba(255,255,255,.5);border-radius:12px;padding:12px;text-align:center;font-size:14px;font-weight:700;cursor:pointer}
-.fin-tab.active{background:var(--red);color:#fff;border-color:var(--red)}
-.fin-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
-.fin-field label{display:block;font-size:11px;color:rgba(255,255,255,.4);margin-bottom:5px;font-weight:600}
-.fin-field .inp{margin-bottom:0;padding:12px 14px;font-size:15px}
-.fin-result-card{background:var(--gray3);border-radius:14px;padding:16px;margin-bottom:12px}
-.fin-result-card h3{font-size:11px;font-weight:700;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:.5px;margin-bottom:12px}
-.fin-row{display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid rgba(255,255,255,.06)}
-.fin-row:last-child{border:none}
-.fin-row label{font-size:13px;color:rgba(255,255,255,.5)}
-.fin-row span{font-size:14px;font-weight:700}
-.fin-destaque{font-size:24px!important;font-weight:800!important;color:var(--red)!important}
-
-/* LEADS */
-.leads-card{background:var(--gray2);border-radius:16px;padding:14px;margin-bottom:10px}
-.leads-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
-.leads-header h2{font-size:16px;font-weight:800}
-.lead-item{background:var(--gray3);border-radius:12px;padding:14px;margin-bottom:8px;border-left:3px solid var(--red)}
-.lead-item-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:8px}
-.lead-nome{font-size:15px;font-weight:700;margin-bottom:2px}
-.lead-imovel{font-size:12px;color:rgba(255,255,255,.45)}
-.lead-btns{display:flex;gap:7px;margin-top:10px;flex-wrap:wrap}
-.lead-btn{flex:1;min-width:80px;border:none;border-radius:10px;padding:12px 8px;font-size:12px;font-weight:700;cursor:pointer;color:#fff;text-align:center}
-.lbtn-wpp{background:#25D366}
-.lbtn-edit{background:var(--gray2);border:1px solid rgba(255,255,255,.15)}
-.lbtn-del{background:rgba(192,57,43,.2);border:1px solid rgba(192,57,43,.3);color:#e74c3c}
-.lead-status{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
-.lstatus{font-size:10px;font-weight:700;padding:4px 9px;border-radius:6px;cursor:pointer;border:1px solid transparent}
-.lstatus-novo{background:rgba(52,152,219,.2);color:#3498db;border-color:rgba(52,152,219,.3)}
-.lstatus-contato{background:rgba(230,126,34,.2);color:#e67e22;border-color:rgba(230,126,34,.3)}
-.lstatus-visita{background:rgba(142,68,173,.2);color:#9b59b6;border-color:rgba(142,68,173,.3)}
-.lstatus-proposta{background:rgba(241,196,15,.2);color:#f1c40f;border-color:rgba(241,196,15,.3)}
-.lstatus-fechado{background:rgba(39,174,96,.2);color:#27ae60;border-color:rgba(39,174,96,.3)}
-.lstatus-perdido{background:rgba(192,57,43,.2);color:#e74c3c;border-color:rgba(192,57,43,.3)}
-.lstatus.ativo{filter:brightness(1.4);border-width:2px}
-.msgs-wrap{padding:14px}
-.msg-bloco{background:var(--gray2);border-radius:14px;padding:14px;margin-bottom:10px}
-.msg-bloco h3{font-size:11px;font-weight:700;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px}
-
+.cmpc{background:var(--card);border-radius:14px;padding:15px;box-shadow:var(--sh);margin-bottom:11px;border-left:3px solid var(--or)}
+/* FIN */
+.fttab{display:flex;gap:8px;margin-bottom:13px}
+.ftt{flex:1;background:var(--bg);border:1.5px solid var(--border);color:var(--text3);border-radius:10px;padding:12px;text-align:center;font-size:13px;font-weight:700;cursor:pointer}
+.ftt.on{background:var(--orl);border-color:var(--orb);color:var(--or)}
+/* MSG */
+.msgc{background:var(--card);border-radius:13px;padding:15px;box-shadow:var(--sh);margin-bottom:10px}
+.msgc h3{font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;margin-bottom:9px}
+.msga{width:100%;background:var(--bg);border:1.5px solid var(--border);border-radius:10px;padding:12px 13px;color:var(--text);font-size:13px;line-height:1.65;outline:none;resize:vertical;font-family:inherit}
 /* MODAL */
-.modal-ov{position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:9000;display:none;align-items:flex-end}
-.modal-ov.open{display:flex}
-.modal{background:var(--gray2);border-radius:20px 20px 0 0;padding:20px;width:100%;max-height:88vh;overflow-y:auto;padding-bottom:max(20px,env(safe-area-inset-bottom))}
-.modal h3{font-size:17px;font-weight:700;margin-bottom:14px}
-.modal .inp{margin-bottom:10px}
-.modal-btns{display:flex;gap:8px;margin-top:10px}
-.modal-btns button{flex:1;padding:14px;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer;border:none}
-.mcancel{background:rgba(255,255,255,.1);color:#fff}
-.mconfirm{background:var(--red);color:#fff}
-.mconfirm-g{background:var(--green);color:#fff}
-.toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#27ae60;color:#fff;padding:11px 22px;border-radius:11px;font-size:14px;font-weight:700;z-index:9999;opacity:0;transition:opacity .3s;pointer-events:none;white-space:nowrap;box-shadow:0 4px 16px rgba(0,0,0,.4)}
-.toast.show{opacity:1}
-.toast.err{background:#c0392b}
-.loading-txt{text-align:center;padding:20px;color:rgba(255,255,255,.4);font-size:14px}
-.empty-st{text-align:center;padding:30px 20px;color:rgba(255,255,255,.3);font-size:14px;line-height:1.8}
+.mov{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:7000;display:none;align-items:flex-end}
+.mov.on{display:flex}
+.mbox{background:var(--bg);border-radius:22px 22px 0 0;padding:20px;width:100%;max-height:85vh;overflow-y:auto;padding-bottom:max(20px,env(safe-area-inset-bottom))}
+.mbox h3{font-size:17px;font-weight:800;margin-bottom:13px}.mbox p{font-size:14px;color:var(--text2);margin-bottom:13px;line-height:1.6}.mbox .inp{margin-bottom:9px}
+.mbtns{display:flex;gap:8px;margin-top:8px}.mbtns button,.mbtns a{flex:1;padding:14px;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer;border:none;text-align:center;text-decoration:none;display:flex;align-items:center;justify-content:center}
+.mbc{background:var(--bg2);color:var(--text2)}.mbor{background:var(--or);color:#fff}.mbr{background:var(--red);color:#fff}
+/* ALERTAS */
+.pdov{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:8000;display:none;align-items:flex-end}
+.pdov.on{display:flex}
+.pdbox{background:var(--bg);border-radius:22px 22px 0 0;padding:20px;width:100%;max-height:75vh;overflow-y:auto;padding-bottom:max(20px,env(safe-area-inset-bottom))}
+.vov{position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:9000;display:none;align-items:center;justify-content:center;padding:24px}
+.vov.on{display:flex}
+.vbox{background:var(--card);border-radius:24px;padding:34px 26px;max-width:340px;width:100%;text-align:center;box-shadow:var(--sh2)}
+/* BDROP */
+.bdrop{position:fixed;left:0;right:0;background:var(--card);z-index:800;border-bottom:2px solid var(--border);max-height:50vh;overflow-y:auto;display:none;box-shadow:var(--sh2)}
+.bdrop.on{display:block}
+.bdi{padding:13px 15px;border-bottom:1px solid var(--border);cursor:pointer}.bdi:active{background:var(--bg)}
+/* TOAST */
+.toast{position:fixed;bottom:70px;left:50%;transform:translateX(-50%);background:var(--text);color:#fff;padding:11px 22px;border-radius:10px;font-size:13px;font-weight:700;z-index:9999;opacity:0;transition:opacity .3s;pointer-events:none;white-space:nowrap;box-shadow:var(--sh2)}
+.toast.on{opacity:1}.toast.err{background:var(--red)}.toast.ok{background:var(--or)}
+.div{height:1px;background:var(--border);margin:13px 0}
+.empty{text-align:center;color:var(--text3);padding:36px 20px;font-size:14px;line-height:2}
 </style>
 </head>
 <body>
 
-<!-- LOGIN -->
-<div class="screen" id="loginScreen">
-  <div class="login-logo">Controle Imóveis</div>
-  <div class="login-sub">Cockpit de Atendimento — João Batista</div>
-  <div class="login-card">
-    <input type="password" class="inp" id="senhaInput" placeholder="Senha de acesso" onkeydown="if(event.key==='Enter')login()"/>
-    <button class="btn-login" onclick="login()">🔐 Entrar</button>
-    <div class="login-err" id="loginErr">Senha incorreta.</div>
+<!-- VISTA -->
+<div class="vov" id="vov">
+  <div class="vbox">
+    <div style="font-size:50px;margin-bottom:14px">⚠️</div>
+    <div style="font-size:21px;font-weight:800;margin-bottom:10px;color:var(--text)">Atualize o Vista CRM!</div>
+    <div style="font-size:15px;color:var(--text2);margin-bottom:22px;line-height:1.7">Já se passaram 5 dias.<br>Atualize seus clientes no Vista para não perder leads.</div>
+    <button class="btn btnor btnf btnlg" style="margin-bottom:9px" onclick="okVista()">Já atualizei no Vista</button>
+    <button class="btn btnghost btnf" onclick="lembrarVista()">Lembrar em 1 hora</button>
   </div>
 </div>
 
-<!-- COCKPIT PRINCIPAL -->
-<div class="screen hidden" id="cockpitScreen">
-  <div class="hdr">
-    <div class="hdr-logo">Cockpit<span>João Batista da Controle</span></div>
-    <button class="hbtn" onclick="showScreen('leads')">👥 Leads</button>
-  </div>
-  <div class="scroll">
-    <div class="cockpit">
-
-      <!-- BUSCA -->
-      <div class="busca-card">
-        <h2>🔗 Cole o link do imóvel</h2>
-        <div class="busca-row">
-          <input class="busca-inp" id="link-input" placeholder="https://controleimoveis.com.br/imovel/..." onkeydown="if(event.key==='Enter')buscarImovel()"/>
-          <button class="btn-buscar" onclick="buscarImovel()">→</button>
-        </div>
-      </div>
-
-      <!-- RESULTADO -->
-      <div id="resultado"></div>
-
+<!-- AGENDA DIA -->
+<div class="pdov" id="pdov">
+  <div class="pdbox">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+      <div style="font-size:17px;font-weight:800">Agenda do dia</div>
+      <button onclick="document.getElementById('pdov').classList.remove('on')" style="background:var(--bg2);border:none;color:var(--text2);width:32px;height:32px;border-radius:50%;font-size:18px;cursor:pointer">×</button>
     </div>
-  </div>
-  <div class="bnav" id="bnav1">
-    <button class="nbtn active" onclick="showScreen('cockpit')"><span class="nbtn-icon">🏠</span>Início</button>
-    <button class="nbtn" onclick="showScreen('comparar')"><span class="nbtn-icon">⚖️</span>Comparar</button>
-    <button class="nbtn" onclick="showScreen('financ')"><span class="nbtn-icon">💰</span>Financ.</button>
-    <button class="nbtn" onclick="showScreen('leads')"><span class="nbtn-icon">👥</span>Leads</button>
-    <button class="nbtn" onclick="showScreen('msgs')"><span class="nbtn-icon">💬</span>Msgs</button>
+    <div id="pditems"></div>
+    <button class="btn btnghost btnf" style="margin-top:8px" onclick="document.getElementById('pdov').classList.remove('on')">Fechar</button>
   </div>
 </div>
 
-<!-- COMPARAR -->
-<div class="screen hidden" id="compararScreen">
-  <div class="hdr">
-    <div class="hdr-logo">Comparar<span>até 3 imóveis</span></div>
-    <button class="hbtn" onclick="showScreen('cockpit')">← Voltar</button>
-  </div>
-  <div class="scroll">
-    <div class="cockpit">
-      <div class="comp-slots" id="comp-slots"></div>
-      <div id="comp-table"></div>
-      <div id="comp-wpp"></div>
-    </div>
-  </div>
-  <div class="bnav" id="bnav2">
-    <button class="nbtn" onclick="showScreen('cockpit')"><span class="nbtn-icon">🏠</span>Início</button>
-    <button class="nbtn active" onclick="showScreen('comparar')"><span class="nbtn-icon">⚖️</span>Comparar</button>
-    <button class="nbtn" onclick="showScreen('financ')"><span class="nbtn-icon">💰</span>Financ.</button>
-    <button class="nbtn" onclick="showScreen('leads')"><span class="nbtn-icon">👥</span>Leads</button>
-    <button class="nbtn" onclick="showScreen('msgs')"><span class="nbtn-icon">💬</span>Msgs</button>
+<!-- POPUP ALARME -->
+<div id="alarmeov" style="position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:9999;display:none;align-items:center;justify-content:center">
+  <div style="background:#fff;border-radius:20px;padding:28px 24px;margin:20px;text-align:center;max-width:340px;width:100%;box-shadow:0 8px 40px rgba(0,0,0,.3)">
+    <div style="font-size:48px;margin-bottom:10px">🔔</div>
+    <div style="font-size:13px;font-weight:700;color:var(--or);text-transform:uppercase;margin-bottom:6px">Lembrete em 10 minutos</div>
+    <div id="alarmenome" style="font-size:18px;font-weight:800;color:var(--text);margin-bottom:6px"></div>
+    <div id="alarmetxt" style="font-size:15px;color:var(--text2);margin-bottom:6px"></div>
+    <div id="alarmehora" style="font-size:13px;color:var(--text3);margin-bottom:20px"></div>
+    <button onclick="fecharAlarme()" style="width:100%;padding:15px;background:var(--or);border:none;color:#fff;border-radius:12px;font-size:16px;font-weight:800;cursor:pointer">OK, entendi!</button>
   </div>
 </div>
 
-<!-- FINANCIAMENTO -->
-<div class="screen hidden" id="financScreen">
-  <div class="hdr">
-    <div class="hdr-logo">Simulação<span>Financiamento Imobiliário</span></div>
-    <button class="hbtn" onclick="showScreen('cockpit')">← Voltar</button>
-  </div>
-  <div class="scroll">
-    <div class="cockpit">
-      <div class="fin-card">
-        <h3>Sistema de Amortização</h3>
-        <div class="fin-tabs">
-          <button class="fin-tab active" id="tab-price" onclick="setFinTab('price',this)">Tabela Price</button>
-          <button class="fin-tab" id="tab-sac" onclick="setFinTab('sac',this)">SAC</button>
-        </div>
-        <div class="fin-grid">
-          <div class="fin-field"><label>Valor do Imóvel</label><input class="inp" id="fin-valor" placeholder="Ex: 500000" oninput="calcFin()"/></div>
-          <div class="fin-field"><label>Entrada</label><input class="inp" id="fin-entrada" placeholder="Ex: 100000" oninput="calcFin()"/></div>
-          <div class="fin-field"><label>Taxa anual (%)</label><input class="inp" id="fin-taxa" placeholder="Ex: 10.5" oninput="calcFin()"/></div>
-          <div class="fin-field"><label>Prazo (meses)</label><input class="inp" id="fin-prazo" placeholder="Ex: 360" oninput="calcFin()"/></div>
-          <div class="fin-field"><label>Renda familiar</label><input class="inp" id="fin-renda" placeholder="Ex: 10000" oninput="calcFin()"/></div>
-          <div class="fin-field"><label>FGTS</label><input class="inp" id="fin-fgts" placeholder="Ex: 0" oninput="calcFin()"/></div>
-        </div>
-      </div>
-      <div id="fin-result"></div>
-    </div>
-  </div>
-  <div class="bnav" id="bnav3">
-    <button class="nbtn" onclick="showScreen('cockpit')"><span class="nbtn-icon">🏠</span>Início</button>
-    <button class="nbtn" onclick="showScreen('comparar')"><span class="nbtn-icon">⚖️</span>Comparar</button>
-    <button class="nbtn active" onclick="showScreen('financ')"><span class="nbtn-icon">💰</span>Financ.</button>
-    <button class="nbtn" onclick="showScreen('leads')"><span class="nbtn-icon">👥</span>Leads</button>
-    <button class="nbtn" onclick="showScreen('msgs')"><span class="nbtn-icon">💬</span>Msgs</button>
-  </div>
-</div>
+<!-- BDROP -->
+<div class="bdrop" id="bdrop"></div>
 
-<!-- LEADS -->
-<div class="screen hidden" id="leadsScreen">
-  <div class="hdr">
-    <div class="hdr-logo">Leads<span>Atendimento rápido</span></div>
-    <button class="hbtn" onclick="abrirNovoLead()">+ Novo</button>
-  </div>
-  <div class="scroll">
-    <div class="cockpit">
-      <div id="lista-leads"></div>
-    </div>
-  </div>
-  <div class="bnav" id="bnav4">
-    <button class="nbtn" onclick="showScreen('cockpit')"><span class="nbtn-icon">🏠</span>Início</button>
-    <button class="nbtn" onclick="showScreen('comparar')"><span class="nbtn-icon">⚖️</span>Comparar</button>
-    <button class="nbtn" onclick="showScreen('financ')"><span class="nbtn-icon">💰</span>Financ.</button>
-    <button class="nbtn active" onclick="showScreen('leads')"><span class="nbtn-icon">👥</span>Leads</button>
-    <button class="nbtn" onclick="showScreen('msgs')"><span class="nbtn-icon">💬</span>Msgs</button>
-  </div>
-</div>
-
-<!-- MENSAGENS -->
-<div class="screen hidden" id="msgsScreen">
-  <div class="hdr">
-    <div class="hdr-logo">Mensagens<span>Templates editáveis</span></div>
-    <button class="hbtn" onclick="showScreen('cockpit')">← Voltar</button>
-  </div>
-  <div class="scroll">
-    <div class="msgs-wrap">
-      <p style="font-size:12px;color:rgba(255,255,255,.4);margin-bottom:14px;line-height:1.7">Variáveis: <b>{nome}</b> {imovel} {preco} {bairro} {area} {quartos} {cod}</p>
-      <div class="msg-bloco"><h3>1ª Abordagem</h3><textarea class="inp" id="msg1" rows="6" style="resize:vertical;font-size:13px;line-height:1.6;margin:0"></textarea></div>
-      <div class="msg-bloco"><h3>Follow-up</h3><textarea class="inp" id="msg2" rows="6" style="resize:vertical;font-size:13px;line-height:1.6;margin:0"></textarea></div>
-      <div class="msg-bloco"><h3>Após Visita</h3><textarea class="inp" id="msg3" rows="6" style="resize:vertical;font-size:13px;line-height:1.6;margin:0"></textarea></div>
-      <div class="msg-bloco"><h3>Proposta</h3><textarea class="inp" id="msg4" rows="6" style="resize:vertical;font-size:13px;line-height:1.6;margin:0"></textarea></div>
-      <button class="btn-big btn-big-green" onclick="salvarMsgs()">💾 Salvar mensagens</button>
-      <button class="btn-big btn-big-gray" onclick="restaurarMsgs()">🔄 Restaurar padrão</button>
-    </div>
-  </div>
-  <div class="bnav" id="bnav5">
-    <button class="nbtn" onclick="showScreen('cockpit')"><span class="nbtn-icon">🏠</span>Início</button>
-    <button class="nbtn" onclick="showScreen('comparar')"><span class="nbtn-icon">⚖️</span>Comparar</button>
-    <button class="nbtn" onclick="showScreen('financ')"><span class="nbtn-icon">💰</span>Financ.</button>
-    <button class="nbtn" onclick="showScreen('leads')"><span class="nbtn-icon">👥</span>Leads</button>
-    <button class="nbtn active" onclick="showScreen('msgs')"><span class="nbtn-icon">💬</span>Msgs</button>
-  </div>
-</div>
+<!-- POPUP LEAD -->
+<div class="pov" id="lpov"><div class="pbox" id="lpbox"></div></div>
 
 <!-- MODAL -->
-<div class="modal-ov" id="modalOv">
-  <div class="modal">
-    <h3 id="modal-title"></h3>
-    <div id="modal-body"></div>
-    <div class="modal-btns" id="modal-btns">
-      <button class="mcancel" onclick="closeModal()">Cancelar</button>
-      <button class="mconfirm" id="modal-ok">OK</button>
+<div class="mov" id="mov">
+  <div class="mbox">
+    <h3 id="mt"></h3>
+    <p id="mp" style="display:none"></p>
+    <div id="mb"></div>
+    <div class="mbtns" id="mbtns">
+      <button class="mbc" onclick="cM()">Cancelar</button>
+      <button class="mbor" id="mok">OK</button>
     </div>
   </div>
 </div>
 <div class="toast" id="toast"></div>
 
-<script>
-const SENHA='mello99100';
-const LK='cockpit_leads_v1';
-const MK='cockpit_msgs_v1';
-const CK='cockpit_comp_v1';
+<!-- APP -->
+<div class="app">
+<div class="slides-wrap">
+<div class="slides" id="slides">
 
-const MSGS_DEF={
-  msg1:`Aqui é o *João Batista da Controle!* 😊\n\nOlá, {nome}! Vi que você tem interesse no *{imovel}* em {bairro}.\n\nPosso te apresentar esse imóvel? 🏠`,
-  msg2:`Aqui é o *João Batista da Controle!*\n\nOlá, {nome}! Passando para saber se ainda tem interesse no *{imovel}*.\n\nEstou à disposição! 😊`,
-  msg3:`Aqui é o *João Batista da Controle!*\n\nOlá, {nome}! Foi um prazer mostrar o *{imovel}* para você!\n\nO que achou? Podemos avançar? 🏠`,
-  msg4:`Aqui é o *João Batista da Controle!*\n\nOlá, {nome}! Segue proposta para o *{imovel}*:\n\n💰 {preco} | {bairro}\n\nAguardo retorno! 😊`
-};
-
-function getLeads(){try{const s=localStorage.getItem(LK);if(s)return JSON.parse(s);}catch(e){}return[];}
-function saveLeads(d){localStorage.setItem(LK,JSON.stringify(d));}
-function getMsgs(){try{const s=localStorage.getItem(MK);if(s)return JSON.parse(s);}catch(e){}return{...MSGS_DEF};}
-function saveMsgsData(d){localStorage.setItem(MK,JSON.stringify(d));}
-function getComp(){try{const s=localStorage.getItem(CK);if(s)return JSON.parse(s);}catch(e){}return[null,null,null];}
-function saveComp(d){localStorage.setItem(CK,JSON.stringify(d));}
-
-// TELAS
-let telaAtual='cockpit';
-function showScreen(s){
-  document.querySelectorAll('.screen').forEach(el=>el.classList.add('hidden'));
-  document.getElementById(s+'Screen').classList.remove('hidden');
-  telaAtual=s;
-  if(s==='leads')renderLeads();
-  if(s==='comparar')renderComp();
-  if(s==='msgs')carregarMsgs();
-  document.querySelectorAll('.nbtn').forEach(b=>b.classList.remove('active'));
-  document.querySelectorAll(`[onclick="showScreen('${s}')"]`).forEach(b=>b.classList.add('active'));
-}
-
-// LOGIN
-function login(){
-  if(document.getElementById('senhaInput').value===SENHA){
-    document.getElementById('loginErr').style.display='none';
-    showScreen('cockpit');
-  } else {
-    document.getElementById('loginErr').style.display='block';
-    document.getElementById('senhaInput').value='';
-  }
-}
-document.getElementById('senhaInput').addEventListener('keydown',e=>{if(e.key==='Enter')login();});
-
-// IMÓVEL ATUAL
-let imovelAtual=null;
-
-// BUSCA
-async function buscarImovel(){
-  const link=document.getElementById('link-input').value.trim();
-  if(!link){showToast('Cole o link do imóvel','err');return;}
-  const el=document.getElementById('resultado');
-  el.innerHTML='<div class="loading-txt">⏳ Buscando imóvel...</div>';
-  try{
-    const r=await fetch(link);
-    const html=await r.text();
-    const parser=new DOMParser();
-    const doc=parser.parseFromString(html,'text/html');
-    const im=extrairDados(doc,link);
-    if(!im){el.innerHTML='<div class="empty-st">❌ Não foi possível extrair os dados.<br>Verifique o link e tente novamente.</div>';return;}
-    imovelAtual=im;
-    renderImovel(im,el);
-  }catch(e){
-    // Fallback: extrair do URL
-    const im=extrairDoURL(link);
-    if(im){imovelAtual=im;renderImovel(im,el);}
-    else el.innerHTML='<div class="empty-st">❌ Erro ao buscar.<br>Verifique sua conexão.</div>';
-  }
-}
-
-function extrairDados(doc,link){
-  try{
-    const precoEl=doc.querySelector('h2,h3,[class*="preco"],[class*="price"]');
-    const tituloEl=doc.querySelector('h1,[class*="titulo"],[class*="title"]');
-    const titulo=tituloEl?.textContent?.trim()||'';
-    const precoTexto=doc.body?.innerText||doc.body?.textContent||'';
-    const precoMatch=precoTexto.match(/R\$\s*[\d.,]+/);
-    const areaMatch=precoTexto.match(/(\d+(?:[.,]\d+)?)\s*m²/i);
-    const quartosMatch=precoTexto.match(/(\d+)\s*[Dd]ormit/);
-    const suitesMatch=precoTexto.match(/(\d+)\s*[Ss]uíte/);
-    const vagasMatch=precoTexto.match(/(\d+)\s*[Vv]aga/);
-    const codMatch=link.match(/-(\d{4,6})(?:$|\/)/);
-    const bairroMatch=link.match(/apartamento-([^-]+)-sao-jose/);
-    return{
-      nome:titulo.substring(0,60)||'Imóvel Controle',
-      preco:precoMatch?precoMatch[0]:'Consultar',
-      area:areaMatch?areaMatch[1]:'—',
-      quartos:quartosMatch?quartosMatch[1]:'—',
-      suites:suitesMatch?suitesMatch[1]:'0',
-      vagas:vagasMatch?vagasMatch[1]:'—',
-      bairro:bairroMatch?capitalize(bairroMatch[1]):'São José/SC',
-      cod:codMatch?codMatch[1]:'',
-      link
-    };
-  }catch(e){return null;}
-}
-
-function extrairDoURL(link){
-  try{
-    const cod=link.match(/-(\d{4,6})(?:$|\/)/)?.[1]||'';
-    const bairroM=link.match(/apartamento-([^-]+)-sao-jose/);
-    const areaM=link.match(/(\d+(?:\.\d+)?)m2/);
-    const quartosM=link.match(/(\d+)-quartos/);
-    return{
-      nome:`Imóvel Cód. ${cod}`,
-      preco:'Consultar no site',
-      area:areaM?areaM[1]:'—',
-      quartos:quartosM?quartosM[1]:'—',
-      suites:'—',vagas:'—',
-      bairro:bairroM?capitalize(bairroM[1]):'São José/SC',
-      cod,link
-    };
-  }catch(e){return null;}
-}
-
-function capitalize(s){return s.charAt(0).toUpperCase()+s.slice(1);}
-
-function renderImovel(im,el){
-  el.innerHTML=`
-    <div class="imovel-card">
-      <div class="im-header">
-        <div>
-          <div class="im-nome">${im.nome}</div>
-          <div class="im-bairro">📍 ${im.bairro}${im.cod?' · Cód. '+im.cod:''}</div>
-        </div>
-      </div>
-      <div class="im-preco">${im.preco}</div>
-      <div class="im-tags">
-        ${im.area!=='—'?`<span class="im-tag">📐 ${im.area}m²</span>`:''}
-        ${im.quartos!=='—'?`<span class="im-tag">🛏 ${im.quartos} quartos</span>`:''}
-        ${im.suites&&im.suites!=='0'&&im.suites!=='—'?`<span class="im-tag">✨ ${im.suites} suíte(s)</span>`:''}
-        ${im.vagas!=='—'?`<span class="im-tag">🚗 ${im.vagas} vaga(s)</span>`:''}
-      </div>
-      <div class="acoes-titulo">Ações rápidas</div>
-      <div class="acoes-grid">
-        <button class="acao acao-wpp" onclick="abrirWppMenu()">
-          <span class="acao-icon">💬</span>WhatsApp
-        </button>
-        <button class="acao acao-sim" onclick="simularFinanciamento()">
-          <span class="acao-icon">💰</span>Simular
-        </button>
-        <button class="acao acao-comp" onclick="adicionarComparativo()">
-          <span class="acao-icon">⚖️</span>Comparar
-        </button>
-        <button class="acao acao-share" onclick="compartilhar()">
-          <span class="acao-icon">📤</span>Compartilhar
-        </button>
-      </div>
-      <button class="acao acao-full" onclick="window.open('${im.link}','_blank')">
-        <span class="acao-icon">🔗</span>Ver imóvel no site
-      </button>
-      <button class="acao acao-full" style="background:rgba(39,174,96,.15);border:1px solid rgba(39,174,96,.3);color:#2ecc71;margin-top:0" onclick="abrirNovoLeadComImovel()">
-        <span class="acao-icon">👤</span>Criar lead com este imóvel
-      </button>
+<!-- S0: INÍCIO -->
+<div class="slide ativa">
+  <div class="hdr">
+    <div><div class="ht">Cockpit</div><div class="hs">Joao Batista · Controle</div></div>
+    <div class="hbts">
+      <button class="hbtn" onclick="window.open('https://claude.ai','_blank')">IA</button>
+      <button class="hbtn" onclick="window.open('https://controleimoveis.com.br','_blank')">CI</button>
+      <button class="hbtn" onclick="expBkp()">Exportar</button>
+      <button class="hbtn" onclick="document.getElementById('bkpf').click()">Importar</button>
+      <input type="file" id="bkpf" accept=".json" style="display:none" onchange="impBkp(event)"/>
     </div>
-  `;
+  </div>
+  <div class="bbar">
+    <input class="binp" id="gi0" placeholder="Buscar lead..." oninput="bG(this.value)" onblur="setTimeout(fBG,200)"/>
+    <button class="bclr" onclick="document.getElementById('gi0').value='';fBG()">×</button>
+  </div>
+  <div class="scroll">
+    <div id="favsec" style="display:none">
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:11px 13px 4px">
+        <span class="lbl" style="margin:0">Favoritos</span>
+        <span style="font-size:11px;color:var(--text3)">← deslize →</span>
+      </div>
+      <div class="favscroll" id="favw"></div>
+      <div class="div" style="margin:0 13px"></div>
+    </div>
+    <!-- AGENDA DO DIA NA TELA INÍCIO -->
+    <div id="agendahojesec" style="display:none;padding:0 13px;margin-bottom:4px">
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0 6px">
+        <span class="lbl" style="margin:0">Agenda do dia</span>
+        <span id="agendahoject" style="font-size:11px;color:var(--red);font-weight:700"></span>
+      </div>
+      <div id="agendahojelista"></div>
+      <div class="div" style="margin:0"></div>
+    </div>
+    <div class="sec">
+      <!-- PAINEL DE RESUMO -->
+      <div id="painelResumo" style="margin-bottom:13px"></div>
+      <!-- TOP 3 IMÓVEIS -->
+      <div id="top3sec" style="display:none;margin-bottom:13px">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+          <span class="lbl" style="margin:0">Mais procurados</span>
+          <button onclick="gT(1);setTimeout(abrirRelatorio,400)" style="font-size:11px;color:var(--red);background:none;border:none;font-weight:700;cursor:pointer">Ver relatório →</button>
+        </div>
+        <div id="top3lista"></div>
+        <div class="div" style="margin:0"></div>
+      </div>
+      <span class="lbl">Imóvel</span>
+      <div style="display:flex;gap:8px;margin-bottom:6px">
+        <input class="binp" id="linki" ontouchstart="event.stopPropagation()" placeholder="Cole o link da Controle..." onkeydown="if(event.key==='Enter')buscarIm()" style="flex:1"/>
+        <button onclick="buscarIm()" style="background:var(--red);border:none;color:#fff;border-radius:10px;padding:0 17px;font-size:19px;cursor:pointer;font-weight:700">→</button>
+      </div>
+      <div id="imst" style="font-size:12px;color:var(--text3);min-height:16px;margin-bottom:7px"></div>
+      <div id="imres"></div>
+    </div>
+  </div>
+</div>
+
+<!-- S1: LEADS -->
+<div class="slide">
+  <div class="hdr">
+    <div><div class="ht">Leads</div><div class="hs">Atendimento rápido</div></div>
+    <div class="hbts">
+      <button class="hbtn" onclick="window.open('https://claude.ai','_blank')">IA</button>
+      <button class="hbtn" onclick="window.open('https://controleimoveis.com.br','_blank')">CI</button>
+      <button class="hbtn" onclick="abrirRelatorio()">Rel.</button>
+      <button class="hbtn" onclick="novoLead()">+ Novo</button>
+    </div>
+  </div>
+  <div class="bbar">
+    <input class="binp" id="lbusca" ontouchstart="event.stopPropagation()" placeholder="Buscar por nome ou telefone..." oninput="setFiltro('busca');rLeads(this.value)" style="flex:1"/>
+    <button class="bclr" onclick="document.getElementById('lbusca').value='';setFiltro('todos');rLeads('')">×</button>
+  </div>
+  <!-- FILTROS RÁPIDOS -->
+  <div style="display:flex;gap:6px;padding:6px 13px;overflow-x:auto;flex-shrink:0;scrollbar-width:none">
+    <button id="fb0" class="fbtn fativo" onclick="setFiltro('todos')">Todos</button>
+    <button id="fb1" class="fbtn" onclick="setFiltro('atrasados')">⚠️ Atrasados</button>
+    <button id="fb2" class="fbtn" onclick="setFiltro('seisdays')">🕐 5+ dias</button>
+    <button id="fb3" class="fbtn" onclick="setFiltro('lembrete')">📅 Lembrete</button>
+    <button id="fb4" class="fbtn" onclick="setFiltro('favoritos')">⭐ Favoritos</button>
+  </div>
+  <div class="scroll"><div class="sec" style="padding-top:8px"><div id="llista"></div></div></div>
+</div>
+
+<!-- S2: FINANCIAMENTO -->
+<div class="slide">
+  <div class="hdr">
+    <div><div class="ht">Financiamento</div><div class="hs">Simulação imobiliária</div></div>
+    <div class="hbts">
+      <button class="hbtn" onclick="window.open('https://claude.ai','_blank')">IA</button>
+      <button class="hbtn" onclick="window.open('https://controleimoveis.com.br','_blank')">CI</button>
+    </div>
+  </div>
+  <div class="bbar">
+    <input class="binp" id="gi2" ontouchstart="event.stopPropagation()" placeholder="Buscar lead..." oninput="bG(this.value)" onblur="setTimeout(fBG,200)" style="flex:1"/>
+    <button class="bclr" onclick="document.getElementById('gi2').value='';fBG()">×</button>
+  </div>
+  <div class="scroll"><div class="sec">
+    <div class="fttab">
+      <button class="ftt on" id="ftprice" onclick="setFT('price',this)">Tabela Price</button>
+      <button class="ftt" id="ftsac" onclick="setFT('sac',this)">SAC</button>
+    </div>
+    <div class="g2" style="margin-bottom:11px">
+      <div><label class="lbl">Valor do imóvel</label><input class="inp" id="fv" placeholder="R$ 0" oninput="mM(this);cFin()"/></div>
+      <div><label class="lbl">Entrada</label><input class="inp" id="fe" placeholder="R$ 0" oninput="mM(this);cFin()"/></div>
+      <div><label class="lbl">Taxa anual (%)</label><input class="inp" id="ftx" placeholder="10.5" oninput="cFin()"/></div>
+      <div><label class="lbl">Prazo (meses)</label><input class="inp" id="fp" placeholder="360" oninput="cFin()"/></div>
+      <div><label class="lbl">Renda familiar</label><input class="inp" id="fr" placeholder="R$ 0" oninput="mM(this);cFin()"/></div>
+      <div><label class="lbl">FGTS</label><input class="inp" id="ff" placeholder="R$ 0" oninput="mM(this);cFin()"/></div>
+    </div>
+    <div id="finres"></div>
+    <button class="btn btnor btnf btnlg" onclick="window.open('https://www8.caixa.gov.br/siopiinternet-web/','_blank')">Simular na Caixa (oficial)</button>
+  </div></div>
+</div>
+
+<!-- S3: COMPARAR -->
+<div class="slide">
+  <div class="hdr">
+    <div><div class="ht">Comparar</div><div class="hs">Até 3 imóveis</div></div>
+    <div class="hbts">
+      <button class="hbtn" onclick="window.open('https://claude.ai','_blank')">IA</button>
+      <button class="hbtn" onclick="window.open('https://controleimoveis.com.br','_blank')">CI</button>
+      <button class="hbtn" onclick="limparComp()">Limpar</button>
+    </div>
+  </div>
+  <div class="bbar">
+    <input class="binp" id="gi3" ontouchstart="event.stopPropagation()" placeholder="Buscar lead..." oninput="bG(this.value)" onblur="setTimeout(fBG,200)" style="flex:1"/>
+    <button class="bclr" onclick="document.getElementById('gi3').value='';fBG()">×</button>
+  </div>
+  <div class="scroll"><div class="sec">
+    <div style="display:flex;gap:8px;margin-bottom:6px">
+      <input class="binp" id="complink" ontouchstart="event.stopPropagation()" placeholder="Cole o link do imóvel..." onkeydown="if(event.key==='Enter')buscarComp()" style="flex:1"/>
+      <button onclick="buscarComp()" style="background:var(--or);border:none;color:#fff;border-radius:10px;padding:0 16px;font-size:19px;cursor:pointer;font-weight:700">+</button>
+    </div>
+    <div id="compst" style="font-size:12px;color:var(--text3);min-height:16px;margin-bottom:9px"></div>
+    <div id="compslots"></div><div id="comptbl"></div><div id="compwpp"></div>
+  </div></div>
+</div>
+
+<!-- S4: MENSAGENS -->
+<div class="slide">
+  <div class="hdr">
+    <div><div class="ht">Mensagens</div><div class="hs">Templates editáveis</div></div>
+    <div class="hbts">
+      <button class="hbtn" onclick="window.open('https://claude.ai','_blank')">IA</button>
+      <button class="hbtn" onclick="window.open('https://controleimoveis.com.br','_blank')">CI</button>
+    </div>
+  </div>
+  <div class="bbar">
+    <input class="binp" id="gi4" ontouchstart="event.stopPropagation()" placeholder="Buscar lead..." oninput="bG(this.value)" onblur="setTimeout(fBG,200)" style="flex:1"/>
+    <button class="bclr" onclick="document.getElementById('gi4').value='';fBG()">×</button>
+  </div>
+  <div class="scroll"><div class="sec">
+    <p style="font-size:12px;color:var(--text3);margin-bottom:13px;line-height:1.8">Variáveis: <b style="color:var(--text)">{nome}</b> {imóvel} {valor} {bairro} {área} {quartos} {cod}</p>
+    <div class="msgc"><h3>1ª Abordagem</h3><textarea class="msga" id="msg1" rows="7"></textarea></div>
+    <div class="msgc"><h3>Follow-up</h3><textarea class="msga" id="msg2" rows="7"></textarea></div>
+    <div class="msgc">
+      <h3>Mensagem Livre 1</h3>
+      <textarea class="msga" id="ml1" rows="6" placeholder="Digite sua mensagem..."></textarea>
+      <button class="btn btnor btnf" style="margin-top:9px" onclick="envML('ml1')">Enviar no WhatsApp</button>
+    </div>
+    <div class="msgc">
+      <h3>Mensagem Livre 2</h3>
+      <textarea class="msga" id="ml2" rows="6" placeholder="Digite sua mensagem..."></textarea>
+      <button class="btn btnor btnf" style="margin-top:9px" onclick="envML('ml2')">Enviar no WhatsApp</button>
+    </div>
+    <button class="btn btnor btnf btnlg" onclick="saveMsgs()" style="margin-bottom:8px">Salvar mensagens</button>
+    <button class="btn btnghost btnf" onclick="restMsgs()">Restaurar padrão</button>
+  </div></div>
+</div>
+
+<!-- S5: IMÓVEIS EM DESTAQUE / MEUS AGÊS -->
+<div class="slide">
+  <div class="hdr">
+    <div><div class="ht" id="priTitulo">Imóveis em Destaque</div><div class="hs" id="priSub">Patrocinados e prioritários</div></div>
+    <div class="hbts">
+      <button class="hbtn" onclick="window.open('https://claude.ai','_blank')">IA</button>
+      <button class="hbtn" onclick="window.open('https://controleimoveis.com.br','_blank')">CI</button>
+    </div>
+  </div>
+  <!-- ABAS -->
+  <div style="display:flex;gap:0;padding:0 13px;flex-shrink:0;border-bottom:2px solid var(--border);background:var(--bg)">
+    <button id="abaDestaque" onclick="setAba('destaque')" style="flex:1;padding:10px 0;border:none;border-bottom:3px solid var(--red);background:none;font-size:13px;font-weight:800;color:var(--red);cursor:pointer;margin-bottom:-2px">Imóveis em Destaque</button>
+    <button id="abaMeusAges" onclick="setAba('meusages')" style="flex:1;padding:10px 0;border:none;border-bottom:3px solid transparent;background:none;font-size:13px;font-weight:700;color:var(--text3);cursor:pointer;margin-bottom:-2px">Meus Agês</button>
+  </div>
+  <div class="bbar">
+    <input class="binp" id="pribusca" ontouchstart="event.stopPropagation()" placeholder="Buscar por nome ou bairro..." oninput="rPri(this.value)" style="flex:1"/>
+    <button class="bclr" onclick="document.getElementById('pribusca').value='';rPri('')">×</button>
+  </div>
+  <div style="padding:6px 13px;flex-shrink:0">
+    <button id="btnPatroc" onclick="toggleFiltroPatroc()" style="padding:6px 14px;border-radius:20px;border:1.5px solid var(--border);background:var(--card);color:var(--text2);font-size:12px;font-weight:700;cursor:pointer">⭐ Só patrocinados</button>
+  </div>
+  <!-- INPUT FIXO -->
+  <div style="display:flex;gap:8px;padding:6px 13px 8px;flex-shrink:0;border-bottom:1px solid var(--border);background:var(--bg)">
+    <input class="binp" id="prilink" placeholder="Cole o link do imóvel..." onkeydown="event.stopPropagation();if(event.key==='Enter')addPri()" ontouchstart="event.stopPropagation()" style="flex:1"/>
+    <button onclick="addPri()" style="background:var(--red);border:none;color:#fff;border-radius:10px;padding:0 17px;font-size:19px;cursor:pointer;font-weight:700;flex-shrink:0">+</button>
+  </div>
+  <div id="prist" style="font-size:12px;color:var(--text3);min-height:16px;padding:3px 13px;flex-shrink:0"></div>
+  <div class="scroll">
+    <div class="sec">
+      <div id="agendahoje" style="margin-bottom:10px"></div>
+      <div id="prilist"></div>
+    </div>
+  </div>
+</div>
+
+</div></div>
+<div class="bnav" id="bnav">
+  <div class="bnavt">
+    <div class="nbi on" id="nb0" onclick="gT(0)"><span>Início</span></div>
+    <div class="nbi" id="nb1" onclick="gT(1)"><span>Leads</span></div>
+    <div class="nbi" id="nb2" onclick="gT(2)"><span>Financ.</span></div>
+    <div class="nbi" id="nb3" onclick="gT(3)"><span>Comparar</span></div>
+    <div class="nbi" id="nb4" onclick="gT(4)"><span>Msgs</span></div>
+    <div class="nbi" id="nb5" onclick="gT(5)"><span>Destaque</span></div>
+  </div>
+</div>
+</div>
+
+<script>
+'use strict';
+// STORAGE
+var LK='ck_l4',MK='ck_m4',CK='ck_c4',AK='ck_a4',VK='ck_v4',PK='ck_p4',AGK='ck_ag4';
+function gL(){try{return JSON.parse(localStorage.getItem(LK)||'[]')}catch(e){return[]}}
+function sL(d){localStorage.setItem(LK,JSON.stringify(d))}
+function gMs(){try{return JSON.parse(localStorage.getItem(MK)||'null')||cMD()}catch(e){return cMD()}}
+function sMs(d){localStorage.setItem(MK,JSON.stringify(d))}
+function gC(){try{return JSON.parse(localStorage.getItem(CK)||'null')||[null,null,null]}catch(e){return[null,null,null]}}
+function sC(d){localStorage.setItem(CK,JSON.stringify(d))}
+function gAA(){try{return JSON.parse(localStorage.getItem(AK)||'{}')}catch(e){return{}}}
+function sAA(d){localStorage.setItem(AK,JSON.stringify(d))}
+function gAL(id){return gAA()[id]||[]}
+function sAL(id,v){var a=gAA();a[id]=v;sAA(a)}
+function cMD(){return{msg1:'Olá, {nome}! Aqui é o *João Batista da Controle Imóveis* 😊\n\nTenho uma ótima opção para você:\n\n🏠 *{imóvel}*\n📍 {bairro} | 💰 {valor}\n📐 {área}m²\n\nPosso te contar mais?',msg2:'Olá, {nome}! Aqui é o *João Batista da Controle* novamente 😊\n\nPassando para saber se ainda tem interesse no *{imóvel}*.\n\nEstou à disposição!'}}
+
+// NAVEGAÇÃO
+var tA=0,iA=null,cS=[null,null,null];
+var NTELAS=6;
+var sl=null;
+
+function gT(i){
+  if(i===undefined)i=0;
+  if(i<0||i>=NTELAS)return;
+  document.querySelectorAll('.slide').forEach(function(s,j){
+    s.classList.toggle('ativa',j===i);
+  });
+  document.querySelectorAll('.nbi').forEach(function(b,j){b.classList.toggle('on',j===i)});
+  setTimeout(function(){
+    var nav=document.getElementById('bnav');
+    var it=document.getElementById('nb'+i);
+    if(nav&&it)nav.scrollTo({left:it.offsetLeft+it.offsetWidth/2-nav.offsetWidth/2,behavior:'smooth'});
+  },50);
+  tA=i;
+  if(i===0){rFavs();rAgendaHoje();rPainelResumo();}
+  if(i===1)rLeads(document.getElementById('lbusca')?document.getElementById('lbusca').value:'');
+  if(i===3){cS=gC();rComp();}
+  if(i===4)loadMsgs();
+  if(i===5)rPri('');
+}
+
+window.addEventListener('load',function(){
+  // MIGRAÇÃO: converter leads do formato antigo para novo
+  var leads=gL();
+  var migrado=false;
+  leads.forEach(function(l){
+    if(!l.imoveis){
+      l.imoveis=[];
+      if(l.imovelNome||l.imovelLink){
+        l.imoveis.push({
+          nome:l.imovelNome||'Imóvel vinculado',
+          preco:l.imovelPreco||'',
+          link:l.imovelLink||'',
+          id:'im'+Date.now()
+        });
+      }
+      migrado=true;
+    }
+  });
+  if(migrado){sL(leads);}
+  gT(0);rLeads();rAgendaHoje();rPainelResumo();
+  setTimeout(chkAgenda,800);
+  setTimeout(chkVista,1500);
+});
+
+// PAINEL RESUMO + TOP 3
+function rPainelResumo(){
+  var leads=gL();
+  var hoje=new Date().toISOString().split('T')[0];
+  var agAll=gAA();
+  var total=leads.length;
+  var atrasados=leads.filter(function(l){
+    return(agAll[l.id]||[]).some(function(a){return !a.concluido&&a.data<hoje;});
+  }).length;
+  var semContato=leads.filter(function(l){return dSC(l)>=5;}).length;
+  var lembreteHoje=leads.filter(function(l){
+    return(agAll[l.id]||[]).some(function(a){return !a.concluido&&a.data===hoje;});
+  }).length;
+
+  var el=document.getElementById('painelResumo');
+  if(!el)return;
+  var h='<div style="display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:13px">';
+  h+=painelCard('Leads',total,'var(--text2)','todos');
+  h+=painelCard('Atrasados',atrasados,'var(--red)','atrasados');
+  h+=painelCard('5+ dias',semContato,'var(--or)','seisdays');
+  h+=painelCard('Hoje',lembreteHoje,'#2c78c8','lembrete');
+  h+='</div>';
+  el.innerHTML=h;
+
+  // TOP 3
+  var mapa={};
+  leads.forEach(function(l){
+    // Só conta o imóvel de entrada — marcado com entradaLead:true
+    // Para leads antigos sem marcação, usa o primeiro imóvel
+    var ims=l.imoveis||[];
+    var imEntrada=ims.find(function(im){return im.entradaLead;});
+    if(!imEntrada&&ims.length)imEntrada=ims[0]; // fallback leads antigos
+    if(!imEntrada)return;
+    var chave=imEntrada.nome||'Sem nome';
+    if(!mapa[chave])mapa[chave]={nome:chave,link:imEntrada.link||'',count:0};
+    mapa[chave].count++;
+  });
+  var top3=Object.values(mapa).filter(function(x){return x.nome!=='Sem nome';}).sort(function(a,b){return b.count-a.count;}).slice(0,3);
+  var sec=document.getElementById('top3sec');
+  var lista=document.getElementById('top3lista');
+  if(!sec||!lista)return;
+  if(!top3.length){sec.style.display='none';return;}
+  sec.style.display='block';
+  var ranks=['1º','2º','3º'];
+  var h2='';
+  top3.forEach(function(item,i){
+    h2+='<div style="display:flex;align-items:center;background:var(--card);border-radius:10px;padding:9px 12px;margin-bottom:5px;box-shadow:var(--sh)">';
+    h2+='<span style="font-size:11px;font-weight:800;color:var(--text3);width:22px;flex-shrink:0">'+ranks[i]+'</span>';
+    h2+='<div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+esc(item.nome)+'</div>';
+    if(item.link)h2+='<a href="'+item.link+'" target="_blank" style="font-size:11px;color:var(--red);text-decoration:none">Ver no site</a>';
+    h2+='</div>';
+    h2+='<span style="background:var(--orl);border:1px solid var(--orb);color:var(--or);font-size:12px;font-weight:800;padding:2px 8px;border-radius:6px;flex-shrink:0;margin-left:8px">'+item.count+'x</span>';
+    h2+='</div>';
+  });
+  lista.innerHTML=h2;
+}
+
+function painelCard(label,valor,cor,filtro){
+  var h='<div onclick="gT(1);setTimeout(function(){setFiltro(\''+filtro+'\')},400)" style="background:var(--card);border-radius:10px;padding:10px 12px;box-shadow:var(--sh);cursor:pointer;border-left:3px solid '+cor+'">';
+  h+='<div style="font-size:22px;font-weight:900;color:'+cor+';line-height:1.1">'+valor+'</div>';
+  h+='<div style="font-size:11px;color:var(--text3);font-weight:700;margin-top:3px;text-transform:uppercase;letter-spacing:.3px">'+label+'</div>';
+  h+='</div>';
+  return h;
+}
+
+// AGENDA DO DIA — tela Início
+function rAgendaHoje(){
+  var leads=gL();var hoje=new Date().toISOString().split('T')[0];var agAll=gAA();var items=[];
+  leads.forEach(function(l){
+    (agAll[l.id]||[]).filter(function(a){return !a.concluido&&a.data<=hoje}).forEach(function(a){
+      items.push({lead:l.nome,desc:a.texto,data:a.data,atrasado:a.data<hoje,lid:l.id});
+    });
+  });
+  var sec=document.getElementById('agendahojesec');
+  var lista=document.getElementById('agendahojelista');
+  var ct=document.getElementById('agendahoject');
+  if(!sec||!lista)return;
+  if(!items.length){sec.style.display='none';return;}
+  sec.style.display='block';
+  if(ct)ct.textContent=items.length+' item(s)';
+  var h='';
+  items.forEach(function(it){
+    var cor=it.atrasado?'var(--red)':'var(--or)';
+    h+='<div style="background:var(--card);border-radius:10px;padding:10px 12px;margin-bottom:7px;border-left:3px solid '+cor+';cursor:pointer;box-shadow:var(--sh)" onclick="gT(1);setTimeout(function(){aLP(\''+it.lid+'\')},400)">';
+    h+='<div style="font-size:13px;font-weight:700">'+esc(it.lead)+'</div>';
+    h+='<div style="font-size:12px;color:var(--text2);margin-top:1px">'+esc(it.desc)+'</div>';
+    if(it.data)h+='<div style="font-size:10px;color:var(--text3);margin-top:2px">'+fmtD(it.data)+(it.atrasado?' · <span style="color:var(--red)">Atrasado</span>':'')+'</div>';
+    h+='</div>';
+  });
+  lista.innerHTML=h;
+}
+
+// FAVORITOS
+function rFavs(){
+  var favs=gL().filter(function(l){return l.favorito});
+  var sec=document.getElementById('favsec'),wrap=document.getElementById('favw');
+  if(!favs.length){sec.style.display='none';return;}
+  sec.style.display='block';
+  var h='';
+  favs.forEach(function(l){
+    var im=l.imoveis&&l.imoveis.length?l.imoveis[0].nome:'';
+    h+='<div class="favc" onclick="aLP(\''+l.id+'\')">';
+    h+='<div class="favc-nome">'+esc(l.nome)+'</div>';
+    h+='<div class="favc-tel">'+(l.tel||'—')+'</div>';
+    h+='<span class="favc-st">'+(l.status||'novo')+'</span>';
+    if(im)h+='<div style="font-size:11px;color:var(--text3);margin-top:6px;padding-top:6px;border-top:1px solid var(--border)">'+esc(im)+'</div>';
+    h+='</div>';
+  });
+  wrap.innerHTML=h;
+}
+
+// BUSCA IMÓVEL
+function buscarIm(){
+  var inp=document.getElementById('linki');
+  var link=inp.value.trim();
+  if(!link){toast('Cole o link do imóvel','err');return;}
+  var st=document.getElementById('imst');
+  st.textContent='Buscando...';inp.value='';
+  fetch(link).then(function(r){return r.text()}).then(function(h){
+    var doc=new DOMParser().parseFromString(h,'text/html');
+    var im=extrDados(doc,link)||extrURL(link);
+    if(im){iA=im;rIm(im);st.textContent='';}
+    else st.textContent='Não foi possível extrair os dados.';
+  }).catch(function(){
+    var im=extrURL(link);
+    if(im){iA=im;rIm(im);st.textContent='Dados parciais — complete abaixo.';}
+    else st.textContent='Erro. Verifique sua conexão.';
+  });
+}
+
+function extrDados(doc,link){
+  try{
+    var txt=doc.body?doc.body.textContent:'';
+    var codM=link.match(/-(\d{4,6})(?:$|\/|\?)/);var cod=codM?codM[1]:'';
+    var precos=txt.match(/R\$\s*[\d.]+(?:,\d{2})?/g);var preco=precos?precos[0]:'';
+    var areaM1=link.match(/(\d+(?:[.,]\d+)?)m2/);var areaM2=txt.match(/(\d+(?:[.,]\d+)?)\s*m²/i);
+    var area=areaM1?areaM1[1]:(areaM2?areaM2[1]:'');
+    var qM1=link.match(/(\d+)-quartos/);var qM2=txt.match(/(\d+)\s*[Dd]ormit/);
+    var quartos=qM1?qM1[1]:(qM2?qM2[1]:'');
+    var suiM=txt.match(/(\d+)\s*[Ss]u[ií]te/);var suites=suiM?suiM[1]:'';
+    var vagM=txt.match(/(\d+)\s*[Vv]aga/);var vagas=vagM?vagM[1]:'';
+    var bM=link.match(/apartamento-([^-]+)-sao-jose/);var bairro=bM?cap(bM[1]):'São José/SC';
+    var nome='Imóvel Cód. '+cod;
+    var hs=doc.querySelectorAll('h1,h2');
+    for(var i=0;i<hs.length;i++){var t=hs[i].textContent.trim();if(t.length>8){nome=t.substring(0,60);break;}}
+    var foto='';
+    var imgs=doc.querySelectorAll('img');
+    for(var j=0;j<imgs.length;j++){var s=imgs[j].src||imgs[j].getAttribute('src')||'';if(s.indexOf('vistahost')>-1&&cod&&s.indexOf(cod)>-1){foto=s;break;}}
+    return{nome:nome,preco:preco,area:area,quartos:quartos,suites:suites,vagas:vagas,bairro:bairro,cod:cod,foto:foto,link:link};
+  }catch(e){return null;}
+}
+
+function extrURL(link){
+  var codM=link.match(/-(\d{4,6})(?:$|\/|\?)/);var cod=codM?codM[1]:'';
+  var bM=link.match(/apartamento-([^-]+)-sao-jose/);
+  var aM=link.match(/(\d+(?:\.\d+)?)m2/);
+  var qM=link.match(/(\d+)-quartos/);
+  return{nome:'Imóvel Cód. '+cod,preco:'',area:aM?aM[1]:'',quartos:qM?qM[1]:'',suites:'',vagas:'',bairro:bM?cap(bM[1]):'São José/SC',cod:cod,foto:'',link:link};
+}
+
+function cap(s){return s?s.charAt(0).toUpperCase()+s.slice(1):s;}
+
+function rIm(im){
+  var h='<div class="imc">';
+  if(im.foto)h+='<img class="imcimg" src="'+im.foto+'" onerror="this.style.display=\'none\'">';
+  h+='<div class="imcbody">';
+  h+='<div class="imcnr">';
+  h+='<input class="imcni" id="imni" value="'+esc(im.nome||'')+'" onchange="iA.nome=this.value" placeholder="Nome do imóvel"/>';
+  h+='<button class="imcvb" onclick="window.open(\''+im.link+'\',\'_blank\')">Ver no site</button>';
+  h+='</div>';
+  h+='<div class="imcbairro">'+esc(im.bairro)+(im.cod?' — Cód. '+im.cod:'')+'</div>';
+  h+='<input class="imcvi" id="imvi" value="'+esc(im.preco||'')+'" onchange="iA.preco=this.value" placeholder="R$ 0,00"/>';
+  h+='<div class="imctags">';
+  if(im.area)h+='<span class="imctag">'+im.area+'m²</span>';
+  if(im.quartos)h+='<span class="imctag">'+im.quartos+' quartos</span>';
+  if(im.suites&&im.suites!=='0')h+='<span class="imctag">'+im.suites+' suíte(s)</span>';
+  if(im.vagas)h+='<span class="imctag">'+im.vagas+' vaga(s)</span>';
+  h+='</div>';
+  h+='<div class="g2" style="margin-bottom:0">';
+  h+='<button class="btn btnor btnf btnlg" onclick="novoLeadComIm()">Criar lead</button>';
+  h+='<button class="btn btnghost btnf btnlg" onclick="document.getElementById(\'imres\').innerHTML=\'\';document.getElementById(\'imst\').textContent=\'\'">Fechar</button>';
+  h+='</div>';
+  h+='</div></div>';
+  document.getElementById('imres').innerHTML=h;
+}
+
+// LEADS
+var STL={novo:'Novo',contato:'Contato',visita:'Visita',proposta:'Proposta'};
+var STS=['novo','contato','visita','proposta'];
+
+function dSC(l){var r=l.atualizadoEm||l.criadoEm;if(!r)return 0;return Math.floor((Date.now()-new Date(r).getTime())/864e5);}
+function dST(l){var r=l.stAtuEm||l.criadoEm;if(!r)return 0;return Math.floor((Date.now()-new Date(r).getTime())/864e5);}
+
+var filtroAtivo='todos';
+function setFiltro(f){
+  filtroAtivo=f;
+  // Atualizar botões
+  var mapa={todos:'fb0',atrasados:'fb1',seisdays:'fb2',lembrete:'fb3',favoritos:'fb4'};
+  Object.values(mapa).forEach(function(id){var b=document.getElementById(id);if(b)b.classList.remove('fativo');});
+  if(mapa[f]){var b=document.getElementById(mapa[f]);if(b)b.classList.add('fativo');}
+  var inp=document.getElementById('lbusca');
+  rLeads(inp?inp.value:'');
+}
+
+function rLeads(busca){
+  if(busca===undefined)busca='';
+  var hoje=new Date().toISOString().split('T')[0];
+  var agAll=gAA();
+  var leads=gL();
+
+  // FILTRO POR BUSCA
+  if(busca){
+    var q=busca.toLowerCase();
+    leads=leads.filter(function(l){return(l.nome||'').toLowerCase().indexOf(q)>-1||(l.tel||'').indexOf(q)>-1;});
+  }
+
+  // FILTRO POR CATEGORIA
+  if(filtroAtivo==='atrasados'){
+    leads=leads.filter(function(l){
+      return (agAll[l.id]||[]).some(function(a){return !a.concluido&&a.data<hoje;});
+    });
+  } else if(filtroAtivo==='seisdays'){
+    leads=leads.filter(function(l){return dSC(l)>=5;});
+  } else if(filtroAtivo==='lembrete'){
+    leads=leads.filter(function(l){
+      return (agAll[l.id]||[]).some(function(a){return !a.concluido&&a.data<=hoje;});
+    });
+  } else if(filtroAtivo==='favoritos'){
+    leads=leads.filter(function(l){return l.favorito;});
+  }
+
+  // ORDENAÇÃO INTELIGENTE
+  leads.sort(function(a,b){
+    function prioridade(l){
+      var ags=agAll[l.id]||[];
+      var temAtrasado=ags.some(function(a){return !a.concluido&&a.data<hoje;});
+      var temHoje=ags.some(function(a){return !a.concluido&&a.data===hoje;});
+      var ds=dSC(l);
+      if(temAtrasado)return 0;
+      if(ds>=5)return 1;
+      if(temHoje)return 2;
+      return 3;
+    }
+    var pa=prioridade(a),pb=prioridade(b);
+    if(pa!==pb)return pa-pb;
+    // Mesmo grupo: mais dias sem contato primeiro
+    return dSC(b)-dSC(a);
+  });
+
+  var el=document.getElementById('llista');
+  if(!leads.length){
+    var msgs={todos:'Nenhum lead.<br>Toque em <b>+ Novo</b>.',atrasados:'Nenhum lembrete atrasado! ✅',seisdays:'Nenhum lead com 5+ dias sem contato! ✅',lembrete:'Nenhum lembrete para hoje.',favoritos:'Nenhum lead favorito ainda.'};
+    el.innerHTML='<div class="empty">'+(msgs[filtroAtivo]||'Nenhum resultado.')+'</div>';return;
+  }
+  var h='';
+  var grpAtual=-1;
+  var grpNomes=['⚠️ Lembrete atrasado','🕐 5+ dias sem contato','📅 Lembrete hoje','✅ Em dia'];
+  leads.forEach(function(l){
+    var ds=dSC(l),dst=dST(l);
+    var ags=(agAll[l.id]||[]).filter(function(a){return !a.concluido&&a.data<=hoje});
+    var temAtrasado=(agAll[l.id]||[]).some(function(a){return !a.concluido&&a.data<hoje;});
+    var temHoje=(agAll[l.id]||[]).some(function(a){return !a.concluido&&a.data===hoje;});
+    var grp=temAtrasado?0:ds>=5?1:temHoje?2:3;
+    // Separador de grupo
+    if(filtroAtivo==='todos'&&grp!==grpAtual){
+      grpAtual=grp;
+      h+='<div style="font-size:11px;font-weight:800;color:var(--text3);text-transform:uppercase;padding:10px 2px 5px;letter-spacing:.5px">'+grpNomes[grp]+'</div>';
+    }
+    var imObj=l.imoveis&&l.imoveis.length?l.imoveis[0]:null;
+    var im1=imObj?imObj.nome:'';
+    var ultC='';
+    if(l.atualizadoEm){var dC=new Date(l.atualizadoEm);ultC=dC.toLocaleDateString('pt-BR')+' '+dC.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});}
+    h+='<div class="lmini" onclick="aLP(\''+l.id+'\')">';
+    h+='<div class="lme">';
+    h+='<div class="lmn">'+(l.favorito?'★ ':'')+esc(l.nome)+'</div>';
+    h+='<div class="lmi">'+(l.tel||'')+(im1?' · '+esc(im1):'')+'</div>';
+    if(imObj&&imObj.link)h+='<a href="'+imObj.link+'" target="_blank" style="font-size:11px;color:var(--red);text-decoration:none;margin-top:2px;display:block" onclick="event.stopPropagation()">Ver imóvel no site</a>';
+    if(ultC)h+='<div style="font-size:10px;color:var(--text3);margin-top:2px">Último contato: '+ultC+'</div>';
+    if(ds>=5)h+='<span class="badr">'+ds+'d sem contato</span>';
+    if(ags.length)h+='<span class="bador">'+ags.length+' lembrete(s)</span>';
+    h+='</div>';
+    h+='<div class="lmd">';
+    h+='<span class="lmst">'+(STL[l.status]||l.status)+'</span>';
+    h+='<span class="lmdias">'+dst+'d no status</span>';
+    h+='</div></div>';
+  });
+  el.innerHTML=h;
+}
+
+// POPUP LEAD
+var lAid=null;
+
+function aLP(id){lAid=id;rLP(id);document.getElementById('lpov').classList.add('on');}
+
+function rLP(id){
+  var l=gL().find(function(x){return x.id===id});
+  if(!l)return;
+  var hoje=new Date().toISOString().split('T')[0];
+  var ag=gAL(id),hist=l.historico||[],notas=l.notas||[],ims=l.imoveis||[];
+  var ds=dSC(l),dst=dST(l);
+  var h='';
+  h+='<div class="phdr">';
+  h+='<div><div class="pnome">'+(l.favorito?'★ ':'')+esc(l.nome)+'</div>';
+  h+='<div style="font-size:13px;color:var(--text2);margin-top:2px">'+(l.tel||'')+(dst?' · '+dst+'d no status':'')+'</div></div>';
+  h+='<button class="px" onclick="fLP()">×</button></div>';
+  if(ds>=5)h+='<div style="padding:0 15px;margin-bottom:7px"><span class="badr">'+ds+' dias sem contato</span></div>';
+  // STATUS
+  h+='<div class="psec"><div class="pst">Etapa</div><div class="stg">';
+  STS.forEach(function(s){h+='<button class="stb'+(l.status===s?' on':'')+' btnst" onclick="setST(\''+id+'\',\''+s+'\')">'+STL[s]+'</button>';});
+  h+='</div></div>';
+  // AÇÕES
+  h+='<div class="psec"><div class="pst">Ações</div>';
+  h+='<div class="g2">';
+  h+='<button class="btn btnor btnf" onclick="abrirWpp(\''+id+'\')">WhatsApp</button>';
+  if(l.tel)h+='<a class="btn btnor btnf" href="tel:'+l.tel+'">Ligar</a>';
+  else h+='<button class="btn btnghost btnf" onclick="editL(\''+id+'\')">Editar</button>';
+  h+='</div>';
+  h+='<div class="g2">';
+  h+='<button class="btn btnghost btnf" onclick="editL(\''+id+'\')">Editar lead</button>';
+  h+='<button class="btn btnghost btnf" onclick="notaVoz(\''+id+'\')">Nota de voz</button>';
+  h+='</div>';
+  h+='<div class="g2">';
+  h+='<button class="btn btnghost btnf'+(l.favorito?' btnor':'')+'" onclick="togFav(\''+id+'\')">★ '+(l.favorito?'Favoritado':'Favoritar')+'</button>';
+  h+='<button class="btn btnghost btnf" style="color:var(--red)" onclick="confExcL(\''+id+'\',\''+esc(l.nome||'')+'\')">Excluir</button>';
+  h+='</div></div>';
+  // IMÓVEIS
+  h+='<div class="psec"><div class="pst">Imóveis vinculados</div>';
+  if(!ims.length)h+='<div style="font-size:13px;color:var(--text3);margin-bottom:9px">Nenhum imóvel vinculado.</div>';
+  ims.forEach(function(im,i){
+    h+='<div class="imli">';
+    h+='<div style="flex:1;min-width:0"><div class="imlin">'+esc(im.nome||'Imóvel '+(i+1))+'</div>';
+    if(im.preco)h+='<div class="imlip">'+esc(im.preco)+'</div>';
+    if(im.condominio)h+='<div style="font-size:11px;color:var(--text2)">🏢 '+esc(im.condominio)+'</div>';
+    if(im.agenciador)h+='<div style="font-size:11px;color:var(--text2)">👤 '+esc(im.agenciador)+'</div>';
+    h+='</div>';
+    h+='<button class="imlix" style="margin-right:4px;background:rgba(44,120,200,.1);border:1px solid rgba(44,120,200,.3);color:#2c78c8;border-radius:7px;padding:5px 9px;font-size:13px" onclick="verIm(\''+id+'\','+i+')">👁</button>';
+    h+='<button class="imlix" style="margin-right:4px;background:rgba(232,147,90,.1);border:1px solid rgba(232,147,90,.3);color:var(--or);border-radius:7px;padding:5px 9px;font-size:13px" onclick="editIm(\''+id+'\','+i+')">✎</button>';
+    h+='<button class="imlix" style="border-radius:7px;padding:5px 9px;font-size:13px" onclick="remIm(\''+id+'\','+i+')">×</button>';
+    h+='</div>';
+  });
+  h+='<button class="btn btnghost btnf" style="margin-top:3px" onclick="addImL(\''+id+'\')">+ Adicionar imóvel</button>';
+  h+='</div>';
+  // AGENDA
+  h+='<div class="psec"><div class="pst">Agenda / Lembretes</div>';
+  h+='<div style="display:flex;flex-direction:column;gap:7px;margin-bottom:9px">';
+  h+='<input class="binp" id="agtxt" placeholder="Ex: Retorno, visita..."/>';
+  h+='<div style="display:flex;gap:7px">';
+  h+='<input class="binp" id="agdata" type="date" value="'+hoje+'" style="flex:1"/>';
+  h+='<input class="binp" id="aghora" type="time" value="" style="width:100px"/>';
+  h+='<button onclick="addAg(\''+id+'\')" style="background:var(--or);border:none;color:#fff;border-radius:8px;padding:0 18px;font-size:18px;cursor:pointer;flex-shrink:0">+</button>';
+  h+='</div></div>';
+  ag.filter(function(a){return !a.concluido}).forEach(function(a){
+    var cls=a.data<hoje?'atrasado':a.data===hoje?'hoje':'';
+    h+='<div class="agi '+cls+'">';
+    h+='<div style="flex:1"><div style="font-size:13px;font-weight:600">'+esc(a.texto)+'</div>';
+    h+='<div style="font-size:11px;color:var(--text3)">'+fmtD(a.data)+(a.hora?' às '+a.hora:'')+'</div></div>';
+    h+='<button class="agok" onclick="okAg(\''+id+'\',\''+a.id+'\')">OK</button>';
+    h+='<button class="aged" onclick="editAg(\''+id+'\',\''+a.id+'\')">Editar</button>';
+    h+='<button class="agx" onclick="delAg(\''+id+'\',\''+a.id+'\')">×</button>';
+    h+='</div>';
+  });
+  h+='</div>';
+  // NOTAS
+  h+='<div class="psec"><div class="pst">Notas</div>';
+  var notasRev=notas.slice().reverse();
+  notasRev.forEach(function(n,i){
+    var realIdx=notas.length-1-i;
+    h+='<div class="notai">';
+    h+='<div style="flex:1"><div class="notat">'+esc(n.texto)+'</div>';
+    h+='<div style="font-size:10px;color:var(--text3);margin-top:3px">'+fmtD(n.data)+'</div></div>';
+    h+='<button class="notax" onclick="delNota(\''+id+'\','+realIdx+')">×</button>';
+    h+='</div>';
+  });
+  h+='<textarea class="msga" id="notarap" rows="3" placeholder="Anotação rápida..." style="margin-bottom:8px"></textarea>';
+  h+='<button class="btn btnghost btnf" onclick="saveNota(\''+id+'\')">Salvar nota</button>';
+  h+='</div>';
+  // HISTÓRICO
+  if(hist.length){
+    h+='<div class="psec"><div class="pst">Histórico de contatos</div>';
+    hist.slice(-5).reverse().forEach(function(hh){
+      h+='<div style="padding:8px 0;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:9px">';
+      h+='<span style="font-size:13px;font-weight:700">'+esc(hh.tipo)+'</span>';
+      h+='<span style="font-size:11px;color:var(--text3);margin-left:auto">'+fmtD(hh.data)+'</span>';
+      h+='</div>';
+    });
+    h+='</div>';
+  }
+  h+='<div style="height:20px"></div>';
+  document.getElementById('lpbox').innerHTML=h;
+}
+
+function fLP(){document.getElementById('lpov').classList.remove('on');lAid=null;rLeads(document.getElementById('lbusca')?document.getElementById('lbusca').value:'');rFavs();}
+
+function setST(id,status){
+  var ls=gL(),i=ls.findIndex(function(l){return l.id===id});
+  if(i>-1){ls[i].status=status;ls[i].stAtuEm=new Date().toISOString();ls[i].atualizadoEm=new Date().toISOString();sL(ls);rLP(id);}
+}
+
+function togFav(id){
+  var ls=gL(),i=ls.findIndex(function(l){return l.id===id});
+  if(i>-1){ls[i].favorito=!ls[i].favorito;sL(ls);rLP(id);}
+}
+
+// IMÓVEIS DO LEAD
+function addImL(lid){
+  document.getElementById('mt').textContent='Adicionar imóvel';
+  document.getElementById('mp').style.display='none';
+  document.getElementById('mb').innerHTML=
+    '<div style="margin-bottom:9px"><label class="lbl">Link do imóvel</label><input class="inp" id="illink" placeholder="https://controleimoveis.com.br/..."/></div>'+
+    '<div style="margin-bottom:9px"><label class="lbl">Nome (opcional)</label><input class="inp" id="ilnome" placeholder="Ex: Apartamento Kobrasol"/></div>'+
+    '<div style="margin-bottom:9px"><label class="lbl">Valor (opcional)</label><input class="inp" id="ilpreco" placeholder="R$ 0,00"/></div>'+
+    '<div style="margin-bottom:9px"><label class="lbl">Condomínio (opcional)</label><input class="inp" id="ilcond" placeholder="Ex: Residencial das Flores"/></div>'+
+    '<div style="margin-bottom:9px"><label class="lbl">Agenciador (opcional)</label><input class="inp" id="ilagenc" placeholder="Ex: João Batista"/></div>'+
+    '<div style="margin-bottom:9px"><label class="lbl">Proprietário (opcional)</label><input class="inp" id="ilprop" placeholder="Ex: Maria Silva"/></div>'+
+    '<div><label class="lbl">Fone proprietário (opcional)</label><input class="inp" id="ilfone" type="tel" placeholder="(48) 99999-9999" oninput="mT(this)"/></div>';
+  document.getElementById('mbtns').innerHTML='<button class="mbc" onclick="cM()">Cancelar</button><button class="mbor" onclick="saveImL(\''+lid+'\')">Adicionar</button>';
+  document.getElementById('mov').classList.add('on');
+}
+function saveImL(lid){
+  var link=document.getElementById('illink').value.trim();
+  var codM=link.match(/-(\d{4,6})(?:$|\/|\?)/);
+  var nome=document.getElementById('ilnome').value.trim()||('Imóvel '+(codM?codM[1]:''));
+  var preco=document.getElementById('ilpreco').value.trim();
+  var cond=document.getElementById('ilcond').value.trim();
+  var agenc=document.getElementById('ilagenc').value.trim();
+  var prop=document.getElementById('ilprop').value.trim();
+  var fone=document.getElementById('ilfone').value.trim();
+  var ls=gL(),i=ls.findIndex(function(l){return l.id===lid});
+  if(i>-1){if(!ls[i].imoveis)ls[i].imoveis=[];ls[i].imoveis.push({nome:nome,preco:preco,link:link,condominio:cond,agenciador:agenc,proprietario:prop,fone:fone,id:'im'+Date.now()});sL(ls);}
+  cM();rLP(lid);toast('Imóvel adicionado!','ok');
+}
+function remIm(lid,idx){
+  var ls=gL(),i=ls.findIndex(function(l){return l.id===lid});
+  var nome=i>-1&&ls[i].imoveis[idx]?ls[i].imoveis[idx].nome||'este imóvel':'este imóvel';
+  if(!confirm('Remover "'+nome+'" do lead?'))return;
+  if(i>-1){ls[i].imoveis.splice(idx,1);sL(ls);}rLP(lid);
+}
+
+function verIm(lid,idx){
+  var ls=gL(),i=ls.findIndex(function(l){return l.id===lid});
+  if(i===-1)return;
+  var im=ls[i].imoveis[idx];if(!im)return;
+  var h='<div style="background:var(--bg);border-radius:12px;padding:14px;line-height:2">';
+  h+='<div style="font-size:15px;font-weight:800;margin-bottom:6px">'+esc(im.nome||'Imóvel')+'</div>';
+  if(im.preco)h+='<div><span style="font-size:11px;color:var(--text3);font-weight:700">VALOR</span><br><span style="font-size:16px;font-weight:800;color:var(--red)">'+esc(im.preco)+'</span></div>';
+  if(im.condominio)h+='<div><span style="font-size:11px;color:var(--text3);font-weight:700">CONDOMÍNIO</span><br>🏢 '+esc(im.condominio)+'</div>';
+  if(im.agenciador)h+='<div><span style="font-size:11px;color:var(--text3);font-weight:700">AGENCIADOR</span><br>👤 '+esc(im.agenciador)+'</div>';
+  if(im.proprietario)h+='<div><span style="font-size:11px;color:var(--text3);font-weight:700">PROPRIETÁRIO</span><br>'+esc(im.proprietario)+'</div>';
+  if(im.fone)h+='<div><span style="font-size:11px;color:var(--text3);font-weight:700">FONE</span><br><a href="tel:'+im.fone.replace(/\D/g,'')+'" style="color:var(--red);text-decoration:none">📞 '+esc(im.fone)+'</a></div>';
+  if(im.link)h+='<div style="margin-top:8px"><a href="'+im.link+'" target="_blank" style="color:var(--red);font-size:13px;font-weight:700;text-decoration:none">🔗 Ver no site</a></div>';
+  h+='</div>';
+  document.getElementById('mt').textContent='Informações do imóvel';
+  document.getElementById('mp').style.display='none';
+  document.getElementById('mb').innerHTML=h;
+  document.getElementById('mbtns').innerHTML='<button class="mbc" style="flex:1" onclick="cM()">Fechar</button><button class="mbor" onclick="cM();editIm(\''+lid+'\','+idx+')">✎ Editar</button>';
+  document.getElementById('mov').classList.add('on');
+}
+
+function editIm(lid,idx){
+  var ls=gL(),i=ls.findIndex(function(l){return l.id===lid});
+  if(i===-1)return;
+  var im=ls[i].imoveis[idx];if(!im)return;
+  document.getElementById('mt').textContent='Editar imóvel';
+  document.getElementById('mp').style.display='none';
+  document.getElementById('mb').innerHTML=
+    '<div style="margin-bottom:9px"><label class="lbl">Nome</label><input class="inp" id="einome" value="'+esc(im.nome||'')+'"/></div>'+
+    '<div style="margin-bottom:9px"><label class="lbl">Valor</label><input class="inp" id="eipreco" value="'+esc(im.preco||'')+'" placeholder="R$ 0,00"/></div>'+
+    '<div style="margin-bottom:9px"><label class="lbl">Condomínio</label><input class="inp" id="eicond" value="'+esc(im.condominio||'')+'" placeholder="Ex: Residencial das Flores"/></div>'+
+    '<div style="margin-bottom:9px"><label class="lbl">Agenciador</label><input class="inp" id="eiagenc" value="'+esc(im.agenciador||'')+'" placeholder="Ex: João Batista"/></div>'+
+    '<div style="margin-bottom:9px"><label class="lbl">Proprietário</label><input class="inp" id="eiprop" value="'+esc(im.proprietario||'')+'" placeholder="Ex: Maria Silva"/></div>'+
+    '<div style="margin-bottom:9px"><label class="lbl">Fone proprietário</label><input class="inp" id="eifone" type="tel" value="'+esc(im.fone||'')+'" placeholder="(48) 99999-9999" oninput="mT(this)"/></div>'+
+    '<div><label class="lbl">Link</label><input class="inp" id="eilink" value="'+esc(im.link||'')+'" placeholder="https://..."/></div>';
+  document.getElementById('mbtns').innerHTML=
+    '<button class="mbc" onclick="cM()">Cancelar</button>'+
+    '<button class="mbor" onclick="saveIm(\''+lid+'\','+idx+')">Salvar</button>';
+  document.getElementById('mov').classList.add('on');
+}
+
+function saveIm(lid,idx){
+  var ls=gL(),i=ls.findIndex(function(l){return l.id===lid});
+  if(i===-1)return;
+  var n=document.getElementById('einome'),p=document.getElementById('eipreco'),l=document.getElementById('eilink');
+  var c=document.getElementById('eicond'),ag=document.getElementById('eiagenc');
+  var pr=document.getElementById('eiprop'),fn=document.getElementById('eifone');
+  if(n)ls[i].imoveis[idx].nome=n.value.trim();
+  if(p)ls[i].imoveis[idx].preco=p.value.trim();
+  if(l)ls[i].imoveis[idx].link=l.value.trim();
+  if(c)ls[i].imoveis[idx].condominio=c.value.trim();
+  if(ag)ls[i].imoveis[idx].agenciador=ag.value.trim();
+  if(pr)ls[i].imoveis[idx].proprietario=pr.value.trim();
+  if(fn)ls[i].imoveis[idx].fone=fn.value.trim();
+  sL(ls);cM();rLP(lid);toast('Imóvel atualizado!','ok');
+}
+
+// CRIAR LEAD
+function novoLead(){
+  document.getElementById('mt').textContent='Novo Lead';
+  document.getElementById('mp').style.display='none';
+  document.getElementById('mb').innerHTML='<div style="margin-bottom:9px"><label class="lbl">Nome *</label><input class="inp" id="nlnome" placeholder="Ex: Carlos Silva"/></div><div style="margin-bottom:9px"><label class="lbl">Telefone</label><input class="inp" id="nltel" type="tel" placeholder="(48) 99999-9999" oninput="mT(this)"/></div><div><label class="lbl">Observação</label><textarea class="msga" id="nlobs" rows="3" placeholder="Perfil, interesses..."></textarea></div>';
+  document.getElementById('mbtns').innerHTML='<button class="mbc" onclick="cM()">Cancelar</button><button class="mbor" onclick="criarL(false)">Criar</button>';
+  document.getElementById('mov').classList.add('on');
+  setTimeout(function(){var el=document.getElementById('nlnome');if(el)el.focus();},300);
+}
+
+function novoLeadComIm(){
+  var im=iA;
+  document.getElementById('mt').textContent='Criar lead';
+  document.getElementById('mp').style.display='none';
+  var imBox=im?('<div style="background:var(--bg);border-radius:10px;padding:11px;margin-bottom:11px;border-left:3px solid var(--or)"><div style="font-size:13px;font-weight:700">'+esc(im.nome)+'</div><div style="font-size:12px;color:var(--text2)">'+(im.preco||'')+'</div></div>'):'';
+  document.getElementById('mb').innerHTML=imBox+'<div style="margin-bottom:9px"><label class="lbl">Nome *</label><input class="inp" id="nlnome" placeholder="Ex: Carlos Silva"/></div><div style="margin-bottom:9px"><label class="lbl">Telefone</label><input class="inp" id="nltel" type="tel" placeholder="(48) 99999-9999" oninput="mT(this)"/></div><div><label class="lbl">Observação</label><textarea class="msga" id="nlobs" rows="3" placeholder="Perfil, interesses..."></textarea></div>';
+  document.getElementById('mbtns').innerHTML='<button class="mbc" onclick="cM()">Cancelar</button><button class="mbor" onclick="criarL(true)">Criar lead</button>';
+  document.getElementById('mov').classList.add('on');
+  setTimeout(function(){var el=document.getElementById('nlnome');if(el)el.focus();},300);
+}
+
+function criarL(comIm){
+  var nome=document.getElementById('nlnome')?document.getElementById('nlnome').value.trim():'';
+  if(!nome){toast('Digite o nome','err');return;}
+  var im=null;
+  if(comIm&&iA){
+    var ni=document.getElementById('imni');var vi=document.getElementById('imvi');
+    im={nome:ni?ni.value:(iA.nome||''),preco:vi?vi.value:(iA.preco||''),link:iA.link,id:'im'+Date.now()};
+  }
+  var nltel=document.getElementById('nltel');var nlobs=document.getElementById('nlobs');
+  var telVal=nltel?nltel.value.trim():'';
+  // Verificar telefone duplicado
+  if(telVal){
+    var telLimpo=telVal.replace(/\D/g,'');
+    var dup=gL().find(function(x){return x.tel&&x.tel.replace(/\D/g,'')===telLimpo;});
+    if(dup){
+      if(!confirm('⚠️ O telefone '+telVal+' já está cadastrado para "'+dup.nome+'". Deseja criar mesmo assim?'))return;
+    }
+  }
+  var l={id:'l'+Date.now(),nome:nome,tel:telVal,obs:nlobs?nlobs.value.trim():'',imoveis:im?[Object.assign({},im,{entradaLead:true})]:[],status:'novo',favorito:false,historico:[],notas:[],criadoEm:new Date().toISOString(),atualizadoEm:new Date().toISOString(),stAtuEm:new Date().toISOString()};
+  var ls=gL();ls.push(l);sL(ls);
+  cM();toast('Lead criado!','ok');rLeads();rFavs();
+}
+
+function editL(id){
+  var l=gL().find(function(x){return x.id===id});if(!l)return;
+  document.getElementById('mt').textContent='Editar lead';
+  document.getElementById('mp').style.display='none';
+  document.getElementById('mb').innerHTML='<div style="margin-bottom:9px"><label class="lbl">Nome</label><input class="inp" id="elnome" value="'+esc(l.nome||'')+'"/></div><div style="margin-bottom:9px"><label class="lbl">Telefone</label><input class="inp" id="eltel" value="'+(l.tel||'')+'" type="tel" oninput="mT(this)"/></div><div><label class="lbl">Observação</label><textarea class="msga" id="elobs" rows="3">'+esc(l.obs||'')+'</textarea></div>';
+  document.getElementById('mbtns').innerHTML='<button class="mbc" onclick="cM()">Cancelar</button><button class="mbor" onclick="saveEL(\''+id+'\')">Salvar</button>';
+  document.getElementById('mov').classList.add('on');
+}
+function saveEL(id){
+  var ls=gL(),i=ls.findIndex(function(l){return l.id===id});
+  if(i>-1){
+    var n=document.getElementById('elnome');var t=document.getElementById('eltel');var o=document.getElementById('elobs');
+    if(n)ls[i].nome=n.value.trim()||ls[i].nome;
+    if(t)ls[i].tel=t.value.trim();
+    if(o)ls[i].obs=o.value.trim();
+    sL(ls);
+  }
+  cM();rLP(id);toast('Atualizado!','ok');
+}
+
+function confExcL(id,nome){
+  window._dli=id;
+  document.getElementById('mt').textContent='Excluir lead?';
+  document.getElementById('mp').style.display='block';
+  document.getElementById('mp').textContent=(nome||'')+' será removido.';
+  document.getElementById('mb').innerHTML='';
+  document.getElementById('mbtns').innerHTML='<button class="mbc" onclick="cM()">Cancelar</button><button class="mbr" onclick="sL(gL().filter(function(l){return l.id!==window._dli}));fLP();cM();toast(\'Excluído\')">Excluir</button>';
+  document.getElementById('mov').classList.add('on');
 }
 
 // WHATSAPP
-function abrirWppMenu(){
-  const msgs=getMsgs();
-  const nomes={msg1:'1ª Abordagem',msg2:'Follow-up',msg3:'Após visita',msg4:'Proposta'};
-  document.getElementById('modal-title').textContent='Enviar WhatsApp';
-  document.getElementById('modal-body').innerHTML=`
-    <p style="font-size:13px;color:rgba(255,255,255,.4);margin-bottom:12px">Escolha o template:</p>
-    ${Object.entries(msgs).map(([k,v])=>`
-      <button onclick="enviarWppTemplate('${k}')" style="width:100%;background:rgba(37,211,102,.1);border:1px solid rgba(37,211,102,.2);color:#fff;border-radius:12px;padding:14px;font-size:13px;font-weight:600;cursor:pointer;margin-bottom:8px;text-align:left;line-height:1.5">
-        💬 <b>${nomes[k]}</b><br><span style="font-size:11px;color:rgba(255,255,255,.4)">${v.substring(0,60)}...</span>
-      </button>`).join('')}
-    <button onclick="wppPersonalizado()" style="width:100%;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);color:#fff;border-radius:12px;padding:14px;font-size:14px;font-weight:600;cursor:pointer">✏️ Mensagem personalizada</button>
-  `;
-  document.getElementById('modal-btns').innerHTML=`<button class="mcancel" onclick="closeModal()" style="flex:1;padding:14px;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer;border:none;background:rgba(255,255,255,.1);color:#fff">Fechar</button>`;
-  document.getElementById('modalOv').classList.add('open');
+function wppUrl(tel,msg,business){
+  var t=(tel||'').replace(/\D/g,'');
+  var txt=encodeURIComponent(msg||'');
+  if(t)return 'https://api.whatsapp.com/send?phone=55'+t+'&text='+txt;
+  return 'https://api.whatsapp.com/send?text='+txt;
 }
 
-function preencherMsg(t,im,nomeCliente=''){
-  return t.replace(/{nome}/g,nomeCliente||'').replace(/{imovel}/g,im?.nome||'').replace(/{preco}/g,im?.preco||'').replace(/{bairro}/g,im?.bairro||'').replace(/{area}/g,im?.area||'').replace(/{quartos}/g,im?.quartos||'').replace(/{cod}/g,im?.cod||'');
-}
-
-function enviarWppTemplate(key){
-  const msgs=getMsgs();
-  const msg=preencherMsg(msgs[key],imovelAtual);
-  closeModal();
-  window.open('https://wa.me/?text='+encodeURIComponent(msg),'_blank');
-}
-
-function wppPersonalizado(){
-  closeModal();
-  document.getElementById('modal-title').textContent='Mensagem Personalizada';
-  document.getElementById('modal-body').innerHTML=`<textarea class="inp" id="wpp-custom" rows="7" placeholder="Digite a mensagem..." style="resize:vertical;margin:0"></textarea>`;
-  document.getElementById('modal-btns').innerHTML=`
-    <button class="mcancel" onclick="closeModal()" style="flex:1;padding:14px;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer;border:none;background:rgba(255,255,255,.1);color:#fff">Cancelar</button>
-    <button class="mconfirm-g" onclick="enviarWppCustom()" style="flex:1;padding:14px;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer;border:none;background:var(--green);color:#fff">Enviar</button>
-  `;
-  document.getElementById('modalOv').classList.add('open');
-}
-
-function enviarWppCustom(){
-  const msg=document.getElementById('wpp-custom').value.trim();
-  if(!msg)return;
-  closeModal();
-  window.open('https://wa.me/?text='+encodeURIComponent(msg),'_blank');
-}
-
-function compartilhar(){
-  if(!imovelAtual)return;
-  const txt=`🏠 *${imovelAtual.nome}*\n📍 ${imovelAtual.bairro}\n💰 ${imovelAtual.preco}\n📐 ${imovelAtual.area}m² | ${imovelAtual.quartos} quartos\n\n🔗 ${imovelAtual.link}\n\n_João Batista da Controle_`;
-  if(navigator.share){navigator.share({title:imovelAtual.nome,text:txt,url:imovelAtual.link});}
-  else{navigator.clipboard.writeText(txt);showToast('Copiado!');}
-}
-
-// SIMULAÇÃO
-function simularFinanciamento(){
-  if(imovelAtual?.preco){
-    const v=imovelAtual.preco.replace(/[^\d]/g,'');
-    if(v){document.getElementById('fin-valor').value=v;calcFin();}
+function abrirWpp(id){
+  var l=gL().find(function(x){return x.id===id});if(!l)return;
+  var msgs=gMs();var tel=(l.tel||'').replace(/\D/g,'');
+  var h='';
+  if(tel){
+    h+='<a href="https://api.whatsapp.com/send?phone=55'+tel+'" target="_blank" class="btn btnor btnf" style="display:flex;padding:14px;border-radius:12px;font-size:14px;font-weight:700;margin-bottom:11px;align-items:center;justify-content:center;text-decoration:none">Ir para conversa aberta</a>';
+    h+='<div style="height:1px;background:var(--border);margin-bottom:11px"></div>';
   }
-  showScreen('financ');
+  h+='<div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:9px">Enviar mensagem:</div>';
+  h+='<button onclick="envWpp(\''+id+'\',\'msg1\')" style="width:100%;background:var(--bg);border:1.5px solid var(--border);color:var(--text);border-radius:12px;padding:13px;font-size:14px;font-weight:700;cursor:pointer;margin-bottom:8px;text-align:left"><div style="color:var(--or);margin-bottom:2px">1ª Abordagem</div><div style="font-size:12px;color:var(--text3);font-weight:400">'+(msgs.msg1||'').substring(0,55)+'...</div></button>';
+  h+='<button onclick="envWpp(\''+id+'\',\'msg2\')" style="width:100%;background:var(--bg);border:1.5px solid var(--border);color:var(--text);border-radius:12px;padding:13px;font-size:14px;font-weight:700;cursor:pointer;margin-bottom:8px;text-align:left"><div style="color:var(--or);margin-bottom:2px">Follow-up</div><div style="font-size:12px;color:var(--text3);font-weight:400">'+(msgs.msg2||'').substring(0,55)+'...</div></button>';
+  h+='<button onclick="wppLivre(\''+id+'\')" style="width:100%;background:var(--bg);border:1.5px solid var(--border);color:var(--text2);border-radius:12px;padding:13px;font-size:14px;font-weight:700;cursor:pointer;text-align:left">Mensagem livre</button>';
+  document.getElementById('mt').textContent='WhatsApp — '+l.nome;
+  document.getElementById('mp').style.display='none';
+  document.getElementById('mb').innerHTML=h;
+  document.getElementById('mbtns').innerHTML='<button class="mbc" onclick="cM()" style="flex:1;padding:14px;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer;border:none;background:var(--bg2);color:var(--text2)">Fechar</button>';
+  document.getElementById('mov').classList.add('on');
 }
 
-let tipoFin='price';
-function setFinTab(t,el){
-  tipoFin=t;
-  document.querySelectorAll('.fin-tab').forEach(b=>b.classList.remove('active'));
-  el.classList.add('active');
-  calcFin();
+function fillMsg(t,l){
+  var im=l.imoveis&&l.imoveis.length?l.imoveis[0]:{};
+  return t.replace(/{nome}/g,l.nome||'').replace(/{imóvel}/g,im.nome||'').replace(/{valor}/g,im.preco||'').replace(/{bairro}/g,im.bairro||'').replace(/{área}/g,im.area||'').replace(/{quartos}/g,im.quartos||'').replace(/{cod}/g,im.cod||'');
 }
-function calcFin(){
-  const valor=parseFloat(document.getElementById('fin-valor').value.replace(/\D/g,''))||0;
-  const entrada=parseFloat(document.getElementById('fin-entrada').value.replace(/\D/g,''))||0;
-  const fgts=parseFloat(document.getElementById('fin-fgts').value.replace(/\D/g,''))||0;
-  const taxa=parseFloat(document.getElementById('fin-taxa').value)||10.5;
-  const prazo=parseInt(document.getElementById('fin-prazo').value)||360;
-  const renda=parseFloat(document.getElementById('fin-renda').value.replace(/\D/g,''))||0;
-  const el=document.getElementById('fin-result');
-  if(!valor||!entrada){el.innerHTML='';return;}
-  const fin=valor-entrada-fgts;
-  if(fin<=0){el.innerHTML='<div class="fin-result-card"><p style="color:rgba(255,255,255,.5)">Entrada cobre o valor total!</p></div>';return;}
-  const taxaM=taxa/100/12;
-  let p1,total,juros;
-  if(tipoFin==='price'){
-    p1=fin*(taxaM*Math.pow(1+taxaM,prazo))/(Math.pow(1+taxaM,prazo)-1);
-    total=p1*prazo;juros=total-fin;
-  } else {
-    const amort=fin/prazo;p1=amort+fin*taxaM;
-    total=prazo*amort+(fin*(1+prazo)*taxaM/2);juros=total-fin;
+
+function envWpp(id,key){
+  var l=gL().find(function(x){return x.id===id});if(!l)return;
+  var msg=fillMsg(gMs()[key]||'',l);
+  var tel=(l.tel||'').replace(/\D/g,'');
+  var ls=gL(),i=ls.findIndex(function(x){return x.id===id});
+  if(i>-1){if(!ls[i].historico)ls[i].historico=[];ls[i].historico.push({tipo:key==='msg1'?'1ª Abordagem':'Follow-up',data:new Date().toISOString()});ls[i].atualizadoEm=new Date().toISOString();sL(ls);}
+  cM();
+  var url=tel?'https://api.whatsapp.com/send?phone=55'+tel+'&text='+encodeURIComponent(msg):'https://api.whatsapp.com/send?text='+encodeURIComponent(msg);
+  window.open(url,'_blank');
+}
+
+function wppLivre(id){
+  var l=gL().find(function(x){return x.id===id});if(!l)return;
+  cM();var tel=(l.tel||'').replace(/\D/g,'');
+  document.getElementById('mt').textContent='Mensagem livre';
+  document.getElementById('mp').style.display='none';
+  document.getElementById('mb').innerHTML='<textarea class="msga" id="wltxt" rows="7" placeholder="Digite a mensagem..."></textarea>';
+  document.getElementById('mbtns').innerHTML='<button class="mbc" onclick="cM()">Cancelar</button><button class="mbor" onclick="envLivre(\''+tel+'\')">Enviar</button>';
+  document.getElementById('mov').classList.add('on');
+}
+function envLivre(tel){
+  var msg=document.getElementById('wltxt')?document.getElementById('wltxt').value.trim():'';
+  if(!msg){toast('Digite a mensagem','err');return;}cM();
+  var url=tel?('https://api.whatsapp.com/send?phone=55'+tel+'&text='+encodeURIComponent(msg)):('https://api.whatsapp.com/send?text='+encodeURIComponent(msg));
+  window.open(url,'_blank');
+}
+
+// AGENDA
+function addAg(lid){
+  var txt=document.getElementById('agtxt')?document.getElementById('agtxt').value.trim():'';
+  var data=document.getElementById('agdata')?document.getElementById('agdata').value:'';
+  var hora=document.getElementById('aghora')?document.getElementById('aghora').value:'';
+  if(!txt){toast('Digite o lembrete','err');return;}
+  var ag=gAL(lid);ag.push({id:'a'+Date.now(),texto:txt,data:data,hora:hora,concluido:false});sAL(lid,ag);
+  var ls=gL(),i=ls.findIndex(function(l){return l.id===lid});
+  if(i>-1){ls[i].atualizadoEm=new Date().toISOString();sL(ls);}
+  rLP(lid);toast('Lembrete adicionado!','ok');
+}
+function okAg(lid,aid){var ag=gAL(lid),i=ag.findIndex(function(a){return a.id===aid});if(i>-1){ag[i].concluido=true;sAL(lid,ag);}rLP(lid);}
+function delAg(lid,aid){sAL(lid,gAL(lid).filter(function(a){return a.id!==aid}));rLP(lid);}
+function editAg(lid,aid){
+  var a=gAL(lid).find(function(x){return x.id===aid});if(!a)return;
+  document.getElementById('mt').textContent='Editar lembrete';
+  document.getElementById('mp').style.display='none';
+  document.getElementById('mb').innerHTML='<div style="margin-bottom:9px"><label class="lbl">Lembrete</label><input class="inp" id="aetxt" value="'+esc(a.texto)+'"/></div><div style="margin-bottom:9px"><label class="lbl">Data</label><input class="inp" id="aedata" type="date" value="'+a.data+'"/></div><div><label class="lbl">Horário (opcional)</label><input class="inp" id="aehora" type="time" value="'+(a.hora||'')+'"/></div>';
+  document.getElementById('mbtns').innerHTML='<button class="mbc" onclick="cM()">Cancelar</button><button class="mbor" onclick="saveAg(\''+lid+'\',\''+aid+'\')">Salvar</button>';
+  document.getElementById('mov').classList.add('on');
+}
+function saveAg(lid,aid){
+  var ag=gAL(lid),i=ag.findIndex(function(a){return a.id===aid});
+  if(i>-1){
+    var t=document.getElementById('aetxt');var d=document.getElementById('aedata');var h=document.getElementById('aehora');
+    if(t)ag[i].texto=t.value.trim();if(d)ag[i].data=d.value;if(h)ag[i].hora=h.value;
   }
-  el.innerHTML=`
-    <div class="fin-result-card">
-      <h3>${tipoFin==='price'?'Tabela Price':'SAC'}</h3>
-      <div class="fin-row"><label>Financiado</label><span>${fmt(fin)}</span></div>
-      <div class="fin-row"><label>${tipoFin==='price'?'Parcela mensal':'1ª parcela'}</label><span class="fin-destaque">${fmt(p1)}</span></div>
-      ${tipoFin==='sac'?`<div class="fin-row"><label>Última parcela</label><span>${fmt(fin/prazo*(1+taxaM))}</span></div>`:''}
-      <div class="fin-row"><label>Prazo</label><span>${prazo} meses (${(prazo/12).toFixed(0)} anos)</span></div>
-      <div class="fin-row"><label>Total de juros</label><span style="color:#e74c3c">${fmt(juros)}</span></div>
-      <div class="fin-row"><label>Total pago</label><span>${fmt(total)}</span></div>
-      ${renda?`<div class="fin-row"><label>Comprometimento</label><span style="color:${(p1/renda)>.3?'#e74c3c':'#27ae60'}">${((p1/renda)*100).toFixed(1)}% ${(p1/renda)>.3?'⚠️':'✅'}</span></div>`:''}
-    </div>
-    <button class="btn-big btn-big-green" onclick="enviarSimulacaoWpp(${fin.toFixed(0)},${p1.toFixed(2)},${prazo},${taxa},'${tipoFin}')">📤 Enviar simulação no WhatsApp</button>
-  `;
+  sAL(lid,ag);cM();rLP(lid);toast('Atualizado!','ok');
 }
-function fmt(v){return'R$ '+v.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});}
-function enviarSimulacaoWpp(fin,parc,prazo,taxa,tipo){
-  const im=imovelAtual;
-  const msg=`*Simulação de Financiamento — ${tipo==='price'?'Tabela Price':'SAC'}*\n\n${im?`🏠 ${im.nome}\n💰 ${im.preco}\n\n`:''}📊 Financiado: ${fmt(fin)}\n📋 ${tipo==='price'?'Parcela':'1ª parcela'}: ${fmt(parseFloat(parc))}\n📅 Prazo: ${prazo} meses\n📈 Taxa: ${taxa}% a.a.\n\n_João Batista da Controle_`;
-  window.open('https://wa.me/?text='+encodeURIComponent(msg),'_blank');
+
+// NOTAS
+function saveNota(id){
+  var txt=document.getElementById('notarap')?document.getElementById('notarap').value.trim():'';
+  if(!txt){toast('Digite uma nota','err');return;}
+  var ls=gL(),i=ls.findIndex(function(l){return l.id===id});
+  if(i>-1){if(!ls[i].notas)ls[i].notas=[];ls[i].notas.push({texto:txt,data:new Date().toISOString()});ls[i].atualizadoEm=new Date().toISOString();sL(ls);}
+  rLP(id);toast('Nota salva!','ok');
 }
+function delNota(lid,idx){
+  var ls=gL(),i=ls.findIndex(function(l){return l.id===lid});
+  if(i>-1&&ls[i].notas){ls[i].notas.splice(idx,1);sL(ls);}rLP(lid);
+}
+
+// NOTA VOZ
+var recog=null;
+function notaVoz(id){
+  var l=gL().find(function(x){return x.id===id});if(!l)return;
+  document.getElementById('mt').textContent='Nota — '+l.nome;
+  document.getElementById('mp').style.display='none';
+  document.getElementById('mb').innerHTML='<div id="vozst" style="text-align:center;font-size:14px;color:var(--text2);margin-bottom:13px">Toque no microfone para falar</div><div style="text-align:center;margin-bottom:13px"><button id="btnmic" onclick="togVoz()" style="width:70px;height:70px;border-radius:50%;background:var(--bg);border:2px solid var(--border);font-size:26px;cursor:pointer">🎤</button></div><textarea class="msga" id="voztxt" rows="5" placeholder="Ou digite aqui..."></textarea>';
+  document.getElementById('mbtns').innerHTML='<button class="mbc" onclick="stopVoz();cM()">Cancelar</button><button class="mbor" onclick="saveNV(\''+id+'\')">Salvar</button>';
+  document.getElementById('mov').classList.add('on');
+}
+function togVoz(){if(recog){stopVoz();return;}var SR=window.SpeechRecognition||window.webkitSpeechRecognition;if(!SR){toast('Voz disponível apenas online','err');return;}recog=new SR();recog.lang='pt-BR';recog.continuous=true;recog.interimResults=true;var btn=document.getElementById('btnmic'),st=document.getElementById('vozst');if(btn){btn.style.background='rgba(192,57,43,.1)';btn.style.borderColor='var(--red)';btn.textContent='⏹';}if(st)st.textContent='Ouvindo...';recog.onresult=function(e){var t='';for(var i=0;i<e.results.length;i++)t+=e.results[i][0].transcript;var f=document.getElementById('voztxt');if(f)f.value=t;};recog.onend=function(){var b=document.getElementById('btnmic'),s=document.getElementById('vozst');if(b){b.style.background='';b.style.borderColor='';b.textContent='🎤';}if(s)s.textContent='Pronto! Revise e salve.';recog=null;};recog.onerror=function(e){stopVoz();if(e.error==='not-allowed')toast('Permita o microfone','err');};recog.start();}
+function stopVoz(){if(recog){try{recog.stop();}catch(e){}recog=null;}}
+function saveNV(id){var txt=document.getElementById('voztxt')?document.getElementById('voztxt').value.trim():'';if(!txt){toast('Fale ou digite','err');return;}stopVoz();var ls=gL(),i=ls.findIndex(function(l){return l.id===id});if(i>-1){if(!ls[i].notas)ls[i].notas=[];ls[i].notas.push({texto:txt,data:new Date().toISOString()});ls[i].atualizadoEm=new Date().toISOString();sL(ls);}cM();rLP(id);toast('Nota salva!','ok');}
 
 // COMPARAR
-let compSlots=[null,null,null];
-function adicionarComparativo(){
-  if(!imovelAtual){showToast('Busque um imóvel primeiro','err');return;}
-  const idx=compSlots.findIndex(s=>s===null);
-  if(idx===-1){showToast('Máximo 3 imóveis','err');return;}
-  compSlots[idx]=imovelAtual;
-  saveComp(compSlots);
-  showToast('Adicionado ao comparativo!');
-  showScreen('comparar');
-}
-function renderComp(){
-  compSlots=getComp();
-  const slotsEl=document.getElementById('comp-slots');
-  slotsEl.innerHTML=compSlots.map((s,i)=>`
-    <div class="comp-slot${s?' filled':''}">
-      ${s?`<div class="comp-slot-nome">${s.nome}</div>
-        <div class="comp-slot-preco">${s.preco}</div>
-        <button class="comp-slot-rem" onclick="removerComp(${i})">Remover</button>`
-      :`<div class="comp-slot-add-icon">+</div><div class="comp-slot-add-txt">Adicionar do cockpit</div>`}
-    </div>`).join('');
-  const filled=compSlots.filter(Boolean);
-  const table=document.getElementById('comp-table');
-  const wpp=document.getElementById('comp-wpp');
-  if(filled.length<2){table.innerHTML='<div class="empty-st">Cole links no cockpit e toque em ⚖️ Comparar para adicionar imóveis aqui.</div>';wpp.innerHTML='';return;}
-  const campos=[{l:'Bairro',k:'bairro'},{l:'Área',k:'area',s:'m²'},{l:'Quartos',k:'quartos'},{l:'Suítes',k:'suites'},{l:'Vagas',k:'vagas'},{l:'Preço',k:'preco'}];
-  table.innerHTML=`<div class="comp-table">
-    <div class="comp-row"><div></div>${filled.map(s=>`<div style="font-weight:700;font-size:11px">${s.nome.substring(0,20)}</div>`).join('')}</div>
-    ${campos.map(c=>{
-      const vals=filled.map(s=>s[c.k]||'—');
-      const nums=vals.map(v=>parseFloat(v.replace(/[^\d.,]/g,'').replace(',','.'))||null);
-      const maxN=Math.max(...nums.filter(Boolean));
-      const minN=Math.min(...nums.filter(Boolean));
-      return`<div class="comp-row"><div>${c.l}</div>${vals.map((v,i)=>{
-        let cls='';
-        if(c.k==='preco'&&nums[i]===minN&&filled.length>1)cls='comp-best';
-        if((c.k==='area'||c.k==='quartos')&&nums[i]===maxN&&filled.length>1)cls='comp-best';
-        return`<div class="${cls}">${v}${c.s||''}</div>`;
-      }).join('')}</div>`;
-    }).join('')}
-  </div>`;
-  const msg=`*Comparativo de Imóveis*\n_João Batista da Controle_\n\n${filled.map(s=>`🏠 *${s.nome}*\n💰 ${s.preco} | 📍 ${s.bairro}\n📐 ${s.area||'—'}m² | 🛏 ${s.quartos||'—'} quartos\n🔗 ${s.link}`).join('\n\n')}`;
-  wpp.innerHTML=`<button class="btn-big btn-big-green" onclick="window.open('https://wa.me/?text='+encodeURIComponent(${JSON.stringify(msg)}),'_blank')">📤 Enviar comparativo no WhatsApp</button>
-  <button class="btn-big btn-big-gray" onclick="limparComp()">🗑️ Limpar comparativo</button>`;
-}
-function removerComp(i){compSlots[i]=null;saveComp(compSlots);renderComp();}
-function limparComp(){compSlots=[null,null,null];saveComp(compSlots);renderComp();}
-
-// LEADS
-function getLeadsData(){try{const s=localStorage.getItem(LK);if(s)return JSON.parse(s);}catch(e){}return[];}
-const STATUS=['novo','contato','visita','proposta','fechado','perdido'];
-const STATUS_LABEL={novo:'Novo',contato:'Contato',visita:'Visita',proposta:'Proposta',fechado:'Fechado',perdido:'Perdido'};
-const STATUS_CLS={novo:'lstatus-novo',contato:'lstatus-contato',visita:'lstatus-visita',proposta:'lstatus-proposta',fechado:'lstatus-fechado',perdido:'lstatus-perdido'};
-
-function renderLeads(){
-  const leads=getLeadsData();
-  const el=document.getElementById('lista-leads');
-  if(!leads.length){el.innerHTML='<div class="empty-st">👥 Nenhum lead ainda.<br>Toque em <b>+ Novo</b> para adicionar.</div>';return;}
-  el.innerHTML=leads.map(l=>`
-    <div class="lead-item" style="border-left-color:${l.status==='fechado'?'#27ae60':l.status==='perdido'?'#e74c3c':'var(--red)'}">
-      <div class="lead-item-top">
-        <div>
-          <div class="lead-nome">${l.nome}</div>
-          <div class="lead-imovel">${l.imovelNome||'—'} ${l.imovelPreco?'· '+l.imovelPreco:''}</div>
-          ${l.obs?`<div style="font-size:11px;color:rgba(255,255,255,.35);margin-top:3px">📝 ${l.obs}</div>`:''}
-        </div>
-      </div>
-      <div class="lead-status">
-        ${STATUS.map(s=>`<span class="lstatus ${STATUS_CLS[s]}${l.status===s?' ativo':''}" onclick="setLeadStatus('${l.id}','${s}')">${STATUS_LABEL[s]}</span>`).join('')}
-      </div>
-      <div class="lead-btns">
-        <button class="lead-btn lbtn-wpp" onclick="wppLead('${l.id}')">💬 WhatsApp</button>
-        <button class="lead-btn lbtn-edit" onclick="editarLead('${l.id}')">✏️ Editar</button>
-        <button class="lead-btn lbtn-del" onclick="excluirLead('${l.id}')">🗑️</button>
-      </div>
-    </div>`).join('');
+function buscarComp(){
+  var inp=document.getElementById('complink');var link=inp?inp.value.trim():'';
+  if(!link){toast('Cole o link','err');return;}
+  var idx=cS.findIndex(function(s){return s===null});
+  if(idx===-1){toast('Máximo 3 imóveis','err');return;}
+  var st=document.getElementById('compst');if(st)st.textContent='Buscando...';if(inp)inp.value='';
+  fetch(link).then(function(r){return r.text()}).then(function(h){
+    var doc=new DOMParser().parseFromString(h,'text/html');
+    var im=extrDados(doc,link)||extrURL(link);
+    if(im){cS[idx]=im;sC(cS);rComp();if(st)st.textContent='Adicionado!';}
+    else if(st)st.textContent='Não encontrado.';
+  }).catch(function(){
+    var im=extrURL(link);
+    if(im){cS[idx]=im;sC(cS);rComp();if(st)st.textContent='Dados parciais.';}
+    else if(st)st.textContent='Erro.';
+  });
+  setTimeout(function(){var s=document.getElementById('compst');if(s)s.textContent='';},3000);
 }
 
-function setLeadStatus(id,status){
-  const leads=getLeadsData();
-  const idx=leads.findIndex(l=>l.id===id);
-  if(idx>-1){leads[idx].status=status;saveLeads(leads);renderLeads();}
+function rComp(){
+  var sEl=document.getElementById('compslots');if(!sEl)return;
+  var is='width:100%;background:var(--bg);border:1.5px solid var(--border);border-radius:9px;padding:11px 12px;color:var(--text);font-size:14px;outline:none;font-family:inherit';
+  var iv='width:100%;background:rgba(192,57,43,.05);border:1.5px solid rgba(192,57,43,.2);border-radius:9px;padding:11px 12px;color:var(--red);font-size:17px;font-weight:800;outline:none;font-family:inherit';
+  var h='';
+  cS.forEach(function(s,i){
+    if(!s)return;
+    h+='<div class="cmpc">';
+    h+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:11px">';
+    h+='<span style="font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase">Imóvel '+(i+1)+'</span>';
+    h+='<button onclick="confRemC('+i+')" style="background:rgba(192,57,43,.08);border:1px solid rgba(192,57,43,.15);color:var(--red);border-radius:7px;padding:6px 11px;font-size:12px;font-weight:700;cursor:pointer">Remover</button>';
+    h+='</div>';
+    h+='<div style="margin-bottom:9px"><label class="lbl">Nome</label><input id="cn'+i+'" value="'+esc(s.nome||'')+'" onchange="sCF('+i+')" style="'+is+';font-weight:700"/></div>';
+    h+='<div style="margin-bottom:9px"><label class="lbl">Valor</label><input id="cv'+i+'" value="'+esc(s.preco||'')+'" onchange="sCF('+i+')" style="'+iv+'" placeholder="R$ 0,00"/></div>';
+    h+='<div class="g2" style="margin-bottom:0">';
+    h+='<div><label class="lbl">Área m²</label><input id="ca'+i+'" value="'+(s.area||'')+'" onchange="sCF('+i+')" style="'+is+'" type="number"/></div>';
+    h+='<div><label class="lbl">Quartos</label><input id="cq'+i+'" value="'+(s.quartos||'')+'" onchange="sCF('+i+')" style="'+is+'" type="number"/></div>';
+    h+='<div><label class="lbl">Suítes</label><input id="cs'+i+'" value="'+(s.suites||'')+'" onchange="sCF('+i+')" style="'+is+'" type="number"/></div>';
+    h+='<div><label class="lbl">Vagas</label><input id="cvg'+i+'" value="'+(s.vagas||'')+'" onchange="sCF('+i+')" style="'+is+'" type="number"/></div>';
+    h+='</div>';
+    if(s.link)h+='<a href="'+s.link+'" target="_blank" style="font-size:11px;color:var(--red);display:block;margin-top:10px;word-break:break-all;text-decoration:none">🔗 Ver no site</a>';
+    h+='</div>';
+  });
+  sEl.innerHTML=h;
+  aTComp();
 }
 
-function abrirNovoLead(){
-  document.getElementById('modal-title').textContent='Novo Lead';
-  document.getElementById('modal-body').innerHTML=`
-    <div style="margin-bottom:10px"><label style="font-size:12px;color:rgba(255,255,255,.4);display:block;margin-bottom:5px">Nome *</label><input class="inp" id="nl-nome" placeholder="Ex: Carlos Silva" style="margin:0"/></div>
-    <div style="margin-bottom:10px"><label style="font-size:12px;color:rgba(255,255,255,.4);display:block;margin-bottom:5px">Telefone</label><input class="inp" id="nl-tel" type="tel" placeholder="(48) 99999-9999" style="margin:0"/></div>
-    <div style="margin-bottom:10px"><label style="font-size:12px;color:rgba(255,255,255,.4);display:block;margin-bottom:5px">Observação</label><textarea class="inp" id="nl-obs" rows="3" placeholder="Interesses, perfil..." style="resize:none;margin:0"></textarea></div>
-  `;
-  const btn=document.getElementById('modal-ok');
-  btn.className='mconfirm-g';btn.textContent='Criar Lead';
-  btn.onclick=criarLead;
-  document.getElementById('modal-btns').innerHTML=`
-    <button class="mcancel" onclick="closeModal()" style="flex:1;padding:14px;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer;border:none;background:rgba(255,255,255,.1);color:#fff">Cancelar</button>
-    <button class="mconfirm-g" onclick="criarLead()" style="flex:1;padding:14px;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer;border:none;background:var(--green);color:#fff">Criar Lead</button>
-  `;
-  document.getElementById('modalOv').classList.add('open');
+function sCF(i){
+  if(!cS[i])return;
+  var n=document.getElementById('cn'+i),v=document.getElementById('cv'+i),a=document.getElementById('ca'+i),q=document.getElementById('cq'+i),s=document.getElementById('cs'+i),vg=document.getElementById('cvg'+i);
+  if(n)cS[i].nome=n.value;if(v)cS[i].preco=v.value;if(a)cS[i].area=a.value;if(q)cS[i].quartos=q.value;if(s)cS[i].suites=s.value;if(vg)cS[i].vagas=vg.value;
+  // link é preservado automaticamente — não tem campo de edição
+  sC(cS);aTComp();
 }
 
-function abrirNovoLeadComImovel(){
-  document.getElementById('modal-title').textContent='Criar Lead';
-  document.getElementById('modal-body').innerHTML=`
-    <div style="background:rgba(255,255,255,.06);border-radius:10px;padding:10px 12px;margin-bottom:12px;font-size:13px">
-      🏠 <b>${imovelAtual?.nome||'—'}</b> · ${imovelAtual?.preco||''}
-    </div>
-    <div style="margin-bottom:10px"><label style="font-size:12px;color:rgba(255,255,255,.4);display:block;margin-bottom:5px">Nome *</label><input class="inp" id="nl-nome" placeholder="Ex: Carlos Silva" style="margin:0"/></div>
-    <div style="margin-bottom:10px"><label style="font-size:12px;color:rgba(255,255,255,.4);display:block;margin-bottom:5px">Telefone</label><input class="inp" id="nl-tel" type="tel" placeholder="(48) 99999-9999" style="margin:0"/></div>
-    <div style="margin-bottom:10px"><label style="font-size:12px;color:rgba(255,255,255,.4);display:block;margin-bottom:5px">Observação</label><textarea class="inp" id="nl-obs" rows="3" placeholder="Interesses, perfil..." style="resize:none;margin:0"></textarea></div>
-  `;
-  document.getElementById('modal-btns').innerHTML=`
-    <button class="mcancel" onclick="closeModal()" style="flex:1;padding:14px;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer;border:none;background:rgba(255,255,255,.1);color:#fff">Cancelar</button>
-    <button class="mconfirm-g" onclick="criarLead()" style="flex:1;padding:14px;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer;border:none;background:var(--green);color:#fff">Criar Lead</button>
-  `;
-  document.getElementById('modalOv').classList.add('open');
+function aTComp(){
+  var filled=cS.filter(Boolean);
+  var tEl=document.getElementById('comptbl'),wEl=document.getElementById('compwpp');
+  if(!tEl||!wEl)return;
+  if(filled.length<2){tEl.innerHTML='';wEl.innerHTML='';return;}
+  var campos=[{l:'Área',k:'area',s:'m²',mx:true},{l:'Quartos',k:'quartos',mx:true},{l:'Suítes',k:'suites',mx:true},{l:'Vagas',k:'vagas',mx:true},{l:'Valor',k:'preco',mx:false}];
+  var cols='65px '+filled.map(function(){return'1fr'}).join(' ');
+  var h='<div style="background:var(--card);border-radius:12px;overflow:hidden;margin-bottom:11px;box-shadow:var(--sh)">';
+  h+='<div style="display:grid;grid-template-columns:'+cols+';border-bottom:1px solid var(--border)">';
+  h+='<div style="padding:10px 12px;background:var(--bg)"></div>';
+  filled.forEach(function(s){h+='<div style="padding:10px 12px;font-size:12px;font-weight:800">'+esc((s.nome||'').substring(0,15))+'</div>';});
+  h+='</div>';
+  campos.forEach(function(c){
+    var vals=filled.map(function(s){return s[c.k]||'—'});
+    var nums=vals.map(function(v){return parseFloat((v+'').replace(/[^\d.,]/g,'').replace(',','.'))||null});
+    var vld=nums.filter(Boolean);
+    var best=vld.length?(c.mx?Math.max.apply(null,vld):Math.min.apply(null,vld)):null;
+    h+='<div style="display:grid;grid-template-columns:'+cols+';border-bottom:1px solid var(--border)">';
+    h+='<div style="padding:10px 12px;font-size:11px;font-weight:700;color:var(--text3);background:var(--bg)">'+c.l+'</div>';
+    vals.forEach(function(v,j){
+      var isBest=nums[j]===best&&best!==null&&vld.length>1;
+      h+='<div style="padding:10px 12px;font-size:13px;'+(isBest?'color:var(--or);font-weight:800':'color:var(--text)')+'">';
+      h+=v+(c.s&&v!=='—'?c.s:'');
+      h+='</div>';
+    });
+    h+='</div>';
+  });
+  h+='</div>';
+  tEl.innerHTML=h;
+  // Cada imóvel em bloco separado — WhatsApp gera preview com foto automaticamente
+  var msgParts=filled.map(function(s,i){
+    var bloco='*'+(i+1)+'. '+s.nome+'*\n';
+    if(s.preco&&s.preco!=='—')bloco+='💰 '+s.preco+'\n';
+    bloco+='📐 '+(s.area||'—')+'m² | '+(s.quartos||'—')+' quartos';
+    if(s.suites&&s.suites!=='0'&&s.suites!=='—')bloco+=' | '+s.suites+' suíte(s)';
+    if(s.vagas&&s.vagas!=='—')bloco+=' | '+s.vagas+' vaga(s)';
+    if(s.link){
+      // Link encurtado visualmente
+      try{var u=new URL(s.link);var partes=u.pathname.split('/').filter(Boolean);var curto=u.hostname+(partes.length?'/'+partes[partes.length-1]:'');bloco+='\n\n'+curto+'\n'+s.link.trim();}
+      catch(e){bloco+='\n\n'+s.link.trim();}
+    }
+    return bloco;
+  });
+  window._msgC='*Comparativo de Imóveis*\nJoão Batista · Controle Imóveis\n\n'
+    +msgParts.join('\n\n─────────────────\n\n');
+  wEl.innerHTML='<button class="btn btnor btnf btnlg" onclick="window.open(\'https://api.whatsapp.com/send?text=\'+encodeURIComponent(window._msgC),\'_blank\')">Enviar comparativo no WhatsApp</button>';
 }
 
-function criarLead(){
-  const nome=document.getElementById('nl-nome')?.value.trim();
-  if(!nome){showToast('Digite o nome','err');return;}
-  const lead={
-    id:'l'+Date.now(),
-    nome,
-    tel:document.getElementById('nl-tel')?.value.trim()||'',
-    obs:document.getElementById('nl-obs')?.value.trim()||'',
-    imovelNome:imovelAtual?.nome||'',
-    imovelPreco:imovelAtual?.preco||'',
-    imovelBairro:imovelAtual?.bairro||'',
-    imovelCod:imovelAtual?.cod||'',
-    imovelLink:imovelAtual?.link||'',
-    status:'novo',
-    criadoEm:new Date().toISOString()
-  };
-  const leads=getLeadsData();leads.push(lead);saveLeads(leads);
-  closeModal();renderLeads();showToast('Lead criado!');
+function confRemC(i){
+  window._ci=i;
+  document.getElementById('mt').textContent='Remover imóvel?';
+  document.getElementById('mp').style.display='block';
+  document.getElementById('mp').textContent=(cS[i]?cS[i].nome||'':'Imóvel '+(i+1));
+  document.getElementById('mb').innerHTML='';
+  document.getElementById('mbtns').innerHTML='<button class="mbc" onclick="cM()">Cancelar</button><button class="mbr" onclick="cS[window._ci]=null;sC(cS);rComp();cM()">Remover</button>';
+  document.getElementById('mov').classList.add('on');
+}
+function limparComp(){
+  document.getElementById('mt').textContent='Limpar comparativo?';
+  document.getElementById('mp').style.display='block';
+  document.getElementById('mp').textContent='Todos os imóveis serão removidos.';
+  document.getElementById('mb').innerHTML='';
+  document.getElementById('mbtns').innerHTML='<button class="mbc" onclick="cM()">Cancelar</button><button class="mbr" onclick="cS=[null,null,null];sC(cS);rComp();cM()">Limpar</button>';
+  document.getElementById('mov').classList.add('on');
 }
 
-function editarLead(id){
-  const l=getLeadsData().find(x=>x.id===id);
-  if(!l)return;
-  document.getElementById('modal-title').textContent='Editar Lead';
-  document.getElementById('modal-body').innerHTML=`
-    <div style="margin-bottom:10px"><label style="font-size:12px;color:rgba(255,255,255,.4);display:block;margin-bottom:5px">Nome</label><input class="inp" id="el-nome" value="${l.nome||''}" style="margin:0"/></div>
-    <div style="margin-bottom:10px"><label style="font-size:12px;color:rgba(255,255,255,.4);display:block;margin-bottom:5px">Telefone</label><input class="inp" id="el-tel" value="${l.tel||''}" type="tel" style="margin:0"/></div>
-    <div style="margin-bottom:10px"><label style="font-size:12px;color:rgba(255,255,255,.4);display:block;margin-bottom:5px">Observação</label><textarea class="inp" id="el-obs" rows="3" style="resize:none;margin:0">${l.obs||''}</textarea></div>
-  `;
-  document.getElementById('modal-btns').innerHTML=`
-    <button class="mcancel" onclick="closeModal()" style="flex:1;padding:14px;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer;border:none;background:rgba(255,255,255,.1);color:#fff">Cancelar</button>
-    <button class="mconfirm-g" onclick="salvarEdicaoLead('${id}')" style="flex:1;padding:14px;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer;border:none;background:var(--green);color:#fff">Salvar</button>
-  `;
-  document.getElementById('modalOv').classList.add('open');
+// FINANCIAMENTO
+var tipoF='price';
+function setFT(t,el){tipoF=t;document.querySelectorAll('.ftt').forEach(function(b){b.classList.remove('on')});el.classList.add('on');cFin();}
+function mM(el){var v=el.value.replace(/\D/g,'');if(!v){el.value='';return;}el.value='R$ '+(parseInt(v)/100).toLocaleString('pt-BR',{minimumFractionDigits:2});}
+function mT(el){var v=el.value.replace(/\D/g,'');if(!v){el.value='';return;}if(v.length<=2)el.value='('+v;else if(v.length<=6)el.value='('+v.substring(0,2)+') '+v.substring(2);else if(v.length<=10)el.value='('+v.substring(0,2)+') '+v.substring(2,6)+'-'+v.substring(6);else el.value='('+v.substring(0,2)+') '+v.substring(2,7)+'-'+v.substring(7,11);}
+function lM(id){return parseFloat((document.getElementById(id)?document.getElementById(id).value:0).toString().replace(/[R$\s.]/g,'').replace(',','.'))||0;}
+function fmt(v){return'R$ '+v.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});}
+function cFin(){
+  var val=lM('fv'),ent=lM('fe'),fg=lM('ff');
+  var ftx=document.getElementById('ftx'),fp=document.getElementById('fp'),fr=document.getElementById('fr');
+  var taxa=parseFloat(ftx?ftx.value:0)||10.5;var prazo=parseInt(fp?fp.value:0)||360;var renda=lM('fr');
+  var el=document.getElementById('finres');if(!el)return;
+  if(!val||!ent){el.innerHTML='';return;}
+  var fin=val-ent-fg;
+  if(fin<=0){el.innerHTML='<div style="color:var(--text2);font-size:13px;margin-bottom:11px">Entrada cobre o valor total!</div>';return;}
+  var tm=taxa/100/12;var p1,total,juros;
+  if(tipoF==='price'){p1=fin*(tm*Math.pow(1+tm,prazo))/(Math.pow(1+tm,prazo)-1);total=p1*prazo;juros=total-fin;}
+  else{var a=fin/prazo;p1=a+fin*tm;total=prazo*a+fin*(1+prazo)*tm/2;juros=total-fin;}
+  var h='<div style="background:var(--card);border-radius:13px;padding:15px;box-shadow:var(--sh);margin-bottom:11px">';
+  function fr2(l,v,big,cor){return'<div style="display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid var(--border)"><label style="font-size:13px;color:var(--text2)">'+l+'</label><span style="font-size:'+(big?'24px;font-weight:800':'14px;font-weight:700')+';color:'+(cor||'var(--text)')+'">'+v+'</span></div>';}
+  h+=fr2('Financiado',fmt(fin));
+  h+=fr2(tipoF==='price'?'Parcela mensal':'1ª parcela',fmt(p1),true,'var(--red)');
+  if(tipoF==='sac')h+=fr2('Última parcela',fmt(fin/prazo*(1+tm)));
+  h+=fr2('Prazo',prazo+' meses · '+(prazo/12).toFixed(0)+' anos');
+  h+=fr2('Total de juros',fmt(juros),false,'var(--red)');
+  h+='<div style="display:flex;justify-content:space-between;align-items:center;padding:9px 0'+(renda?';border-bottom:1px solid var(--border)':'')+'"><label style="font-size:13px;color:var(--text2)">Total pago</label><span style="font-size:14px;font-weight:700">'+fmt(total)+'</span></div>';
+  if(renda){var pct=(p1/renda)*100;var cor2=pct>30?'var(--red)':'var(--or)';h+='<div style="display:flex;justify-content:space-between;align-items:center;padding:9px 0"><label style="font-size:13px;color:var(--text2)">Comprometimento</label><span style="font-size:14px;font-weight:700;color:'+cor2+'">'+pct.toFixed(1)+'% '+(pct>30?'⚠️ acima de 30%':'✓ OK')+'</span></div>';}
+  h+='</div>';
+  var envBtn='<button class="btn btnor btnf" style="margin-bottom:9px" onclick="envFin('+fin.toFixed(0)+','+p1.toFixed(2)+','+prazo+','+taxa+')">Enviar simulação no WhatsApp</button>';
+  el.innerHTML=h+envBtn;
 }
-
-function salvarEdicaoLead(id){
-  const leads=getLeadsData();
-  const idx=leads.findIndex(l=>l.id===id);
-  if(idx>-1){
-    leads[idx].nome=document.getElementById('el-nome').value.trim()||leads[idx].nome;
-    leads[idx].tel=document.getElementById('el-tel').value.trim();
-    leads[idx].obs=document.getElementById('el-obs').value.trim();
-    saveLeads(leads);
-  }
-  closeModal();renderLeads();showToast('Lead atualizado!');
-}
-
-function excluirLead(id){
-  saveLeads(getLeadsData().filter(l=>l.id!==id));
-  renderLeads();showToast('Lead excluído');
-}
-
-function wppLead(id){
-  const l=getLeadsData().find(x=>x.id===id);
-  if(!l)return;
-  const msgs=getMsgs();
-  const msg=preencherMsg(msgs.msg1,{nome:l.nome,preco:l.imovelPreco,bairro:l.imovelBairro,nome_imovel:l.imovelNome},l.nome).replace(/{imovel}/g,l.imovelNome||'');
-  const tel=l.tel.replace(/\D/g,'');
-  if(tel)window.open(`https://wa.me/55${tel}?text=${encodeURIComponent(msg)}`,'_blank');
-  else window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`,'_blank');
+function envFin(fin,p,pr,tx){
+  var tipo=tipoF==='price'?'Price':'SAC';
+  var msg='*Simulação de Financiamento*\nTabela '+tipo+'\n\nFinanciado: '+fmt(fin)+'\nParcela: '+fmt(parseFloat(p))+'\nPrazo: '+pr+' meses ('+(pr/12).toFixed(0)+' anos)\nTaxa: '+tx+'% ao ano\n\n_João Batista · Controle Imóveis_\n_Simulação estimada_';
+  window.open('https://api.whatsapp.com/send?text='+encodeURIComponent(msg),'_blank');
 }
 
 // MENSAGENS
-function carregarMsgs(){
-  const m=getMsgs();
-  document.getElementById('msg1').value=m.msg1||MSGS_DEF.msg1;
-  document.getElementById('msg2').value=m.msg2||MSGS_DEF.msg2;
-  document.getElementById('msg3').value=m.msg3||MSGS_DEF.msg3;
-  document.getElementById('msg4').value=m.msg4||MSGS_DEF.msg4;
+function loadMsgs(){
+  var m=gMs();
+  var def=cMD();
+  // Se as mensagens salvas não têm acentos (versão antiga), restaurar o padrão
+  var msg1=m.msg1||def.msg1;
+  var msg2=m.msg2||def.msg2;
+  if(msg1.indexOf('Ol')===-1||msg1.indexOf('Ol\u00e1')===-1){msg1=def.msg1;}
+  if(msg2.indexOf('Ol\u00e1')===-1){msg2=def.msg2;}
+  var m1=document.getElementById('msg1'),m2=document.getElementById('msg2');
+  var ml1=document.getElementById('ml1'),ml2=document.getElementById('ml2');
+  if(m1)m1.value=msg1;
+  if(m2)m2.value=msg2;
+  if(ml1)ml1.value=m.ml1||'';
+  if(ml2)ml2.value=m.ml2||'';
 }
-function salvarMsgs(){
-  saveMsgsData({msg1:document.getElementById('msg1').value,msg2:document.getElementById('msg2').value,msg3:document.getElementById('msg3').value,msg4:document.getElementById('msg4').value});
-  showToast('Mensagens salvas!');
+function saveMsgs(){
+  var m1=document.getElementById('msg1'),m2=document.getElementById('msg2');
+  var ml1=document.getElementById('ml1'),ml2=document.getElementById('ml2');
+  sMs({msg1:m1?m1.value:'',msg2:m2?m2.value:'',ml1:ml1?ml1.value:'',ml2:ml2?ml2.value:''});
+  toast('Mensagens salvas!','ok');
 }
-function restaurarMsgs(){saveMsgsData({...MSGS_DEF});carregarMsgs();showToast('Restaurado!');}
+function restMsgs(){sMs(cMD());loadMsgs();toast('Restaurado!','ok');}
+function envML(id){var el=document.getElementById(id);var msg=el?el.value.trim():'';if(!msg){toast('Digite a mensagem','err');return;}window.open('https://api.whatsapp.com/send?text='+encodeURIComponent(msg),'_blank');}
 
-// MODAL / TOAST
-function closeModal(){document.getElementById('modalOv').classList.remove('open');}
-function showToast(msg,tipo=''){const t=document.getElementById('toast');t.textContent=msg;t.className='toast show'+(tipo?' '+tipo:'');setTimeout(()=>t.className='toast',2500);}
+// PRIORITÁRIOS / MEUS AGÊS
+var abaAtiva='destaque';
+var filtroPatroc=false;
+
+function toggleFiltroPatroc(){
+  filtroPatroc=!filtroPatroc;
+  var btn=document.getElementById('btnPatroc');
+  if(btn){
+    btn.style.background=filtroPatroc?'var(--or)':'var(--card)';
+    btn.style.borderColor=filtroPatroc?'var(--or)':'var(--border)';
+    btn.style.color=filtroPatroc?'#fff':'var(--text2)';
+  }
+  rPri(document.getElementById('pribusca')?document.getElementById('pribusca').value:'');
+}
+
+function setAba(aba){
+  abaAtiva=aba;
+  var btnD=document.getElementById('abaDestaque'),btnA=document.getElementById('abaMeusAges');
+  var tit=document.getElementById('priTitulo'),sub=document.getElementById('priSub');
+  if(aba==='destaque'){
+    if(btnD){btnD.style.color='var(--red)';btnD.style.borderBottomColor='var(--red)';}
+    if(btnA){btnA.style.color='var(--text3)';btnA.style.borderBottomColor='transparent';}
+    if(tit)tit.textContent='Imóveis em Destaque';
+    if(sub)sub.textContent='Patrocinados e prioritários';
+    var inp=document.getElementById('prilink');if(inp)inp.placeholder='Cole o link do imóvel em destaque...';
+  } else {
+    if(btnA){btnA.style.color='var(--red)';btnA.style.borderBottomColor='var(--red)';}
+    if(btnD){btnD.style.color='var(--text3)';btnD.style.borderBottomColor='transparent';}
+    if(tit)tit.textContent='Meus Agês';
+    if(sub)sub.textContent='Meus agenciamentos';
+    var inp=document.getElementById('prilink');if(inp)inp.placeholder='Cole o link do meu agenciamento...';
+  }
+  document.getElementById('pribusca').value='';
+  filtroPatroc=false;
+  var btn=document.getElementById('btnPatroc');
+  if(btn){btn.style.background='var(--card)';btn.style.borderColor='var(--border)';btn.style.color='var(--text2)';}
+  gT(5,false);
+  rPri('');
+}
+
+function gPri(){try{var k=abaAtiva==='destaque'?PK:AGK;return JSON.parse(localStorage.getItem(k)||'[]');}catch(e){return[];}}
+function sPri(d){var k=abaAtiva==='destaque'?PK:AGK;localStorage.setItem(k,JSON.stringify(d));}
+
+async function addPri(){
+  var inp=document.getElementById('prilink');
+  var link=inp?inp.value.trim():'';
+  if(!link){toast('Cole o link do imóvel','err');return;}
+  var st=document.getElementById('prist');
+  if(st)st.textContent='Processando...';
+  if(inp)inp.value='';
+  // Usa extrURL — sem fetch para não interferir no carrossel
+  var im=extrURL(link);
+  if(!im){if(st)st.textContent='Link inválido.';setTimeout(function(){if(st)st.textContent='';},2500);return;}
+  im.id='p'+Date.now();
+  var lista=gPri();
+  if(lista.some(function(p){return p.link===im.link;})){
+    if(st)st.textContent='Imóvel já está na lista.';
+    setTimeout(function(){if(st)st.textContent='';},2500);
+    return;
+  }
+  lista.unshift(im);
+  sPri(lista);
+  if(st)st.textContent='';
+  rPri('');
+  toast('Adicionado! Complete as informações em Editar.','ok');
+}
+
+function rPri(busca){
+  var lista=gPri();
+  var q=(busca||'').toLowerCase();
+  var el=document.getElementById('prilist');
+  if(!el)return;
+
+  // Busca por imóvel (nome/bairro/condomínio/agenciador)
+  var imoveis=lista;
+  if(filtroPatroc)imoveis=imoveis.filter(function(p){return p.patrocinado;});
+  if(q)imoveis=imoveis.filter(function(p){
+    return(p.nome||'').toLowerCase().includes(q)
+      ||(p.bairro||'').toLowerCase().includes(q)
+      ||(p.condominio||'').toLowerCase().includes(q)
+      ||(p.agenciador||'').toLowerCase().includes(q)
+      ||(p.cod||'').toLowerCase().includes(q);
+  });
+
+  // Busca por leads vinculados ao imóvel
+  var leadsMatch=[];
+  if(q){
+    var todos=gL().filter(function(l){
+      return(l.nome||'').toLowerCase().includes(q)||(l.tel||'').toLowerCase().includes(q);
+    });
+    if(todos.length){
+      leadsMatch=todos;
+      // Também mostrar imóveis vinculados a esses leads
+      todos.forEach(function(l){
+        (l.imoveis||[]).forEach(function(im){
+          var jaExiste=imoveis.some(function(p){return p.link&&p.link===im.link;});
+          if(!jaExiste&&im.link){
+            var deLista=lista.find(function(p){return p.link===im.link;});
+            if(deLista&&!imoveis.find(function(p){return p.id===deLista.id;}))imoveis.push(deLista);
+          }
+        });
+      });
+    }
+  }
+
+  var h='';
+
+  // Seção de leads encontrados
+  if(leadsMatch.length){
+    h+='<div style="font-size:11px;font-weight:800;color:var(--text3);text-transform:uppercase;padding:4px 2px 6px">👤 Leads encontrados</div>';
+    leadsMatch.forEach(function(l){
+      var im1=l.imoveis&&l.imoveis.length?l.imoveis[0].nome:'';
+      h+='<div class="card" style="margin-bottom:8px;cursor:pointer;border-left:4px solid var(--red)" onclick="gT(1);setTimeout(function(){aLP(\''+l.id+'\')},400)">';
+      h+='<div style="font-size:14px;font-weight:800">'+esc(l.nome)+'</div>';
+      h+='<div style="font-size:12px;color:var(--text3)">'+(l.tel||'')+(im1?' · '+esc(im1):'')+'</div>';
+      h+='<div style="font-size:11px;color:var(--or);margin-top:4px;font-weight:700">Toque para abrir o lead →</div>';
+      h+='</div>';
+    });
+    if(imoveis.length)h+='<div style="font-size:11px;font-weight:800;color:var(--text3);text-transform:uppercase;padding:8px 2px 6px">🏠 Imóveis relacionados</div>';
+  }
+
+  if(!imoveis.length&&!leadsMatch.length){
+    el.innerHTML='<div class="empty">'+(q?'Nenhum resultado.':'Nenhum imóvel cadastrado.<br>Cole um link acima para adicionar.')+'</div>';
+    return;
+  }
+  var h2='';
+  imoveis.forEach(function(p){
+    var patrocinado=p.patrocinado?true:false;
+    h2+='<div class="card" style="margin-bottom:11px;border-left:4px solid '+(patrocinado?'var(--or)':'var(--border)')+'">'; 
+    if(patrocinado)h2+='<div style="font-size:11px;font-weight:800;color:var(--or);margin-bottom:6px;text-transform:uppercase">⭐ Patrocinado</div>';
+    if(p.foto)h2+='<img src="'+p.foto+'" style="width:100%;height:160px;object-fit:cover;border-radius:10px;margin-bottom:10px" onerror="this.style.display=\'none\'"/>';
+    h2+='<div style="font-size:15px;font-weight:800;margin-bottom:3px">'+esc(p.nome||'Imóvel')+'</div>';
+    h2+='<div style="font-size:12px;color:var(--text3);margin-bottom:4px">'+esc(p.bairro||'')+(p.cod?' · Cód. '+p.cod:'')+'</div>';
+    if(p.preco)h2+='<div style="font-size:18px;font-weight:800;color:var(--red);margin-bottom:8px">'+esc(p.preco)+'</div>';
+    var tags='';
+    if(p.area)tags+='<span class="imtag">'+p.area+'m²</span>';
+    if(p.quartos)tags+='<span class="imtag">'+p.quartos+' quartos</span>';
+    if(p.suites&&p.suites!=='0')tags+='<span class="imtag">'+p.suites+' suíte(s)</span>';
+    if(p.vagas)tags+='<span class="imtag">'+p.vagas+' vaga(s)</span>';
+    if(tags)h2+='<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px">'+tags+'</div>';
+    if(p.condominio)h2+='<div style="font-size:12px;color:var(--text2);margin-bottom:3px">🏢 '+esc(p.condominio)+'</div>';
+    if(p.agenciador)h2+='<div style="font-size:12px;color:var(--text2);margin-bottom:3px">👤 '+esc(p.agenciador)+'</div>';
+    if(p.proprietario)h2+='<div style="font-size:12px;color:var(--text2);margin-bottom:3px">🏠 '+esc(p.proprietario)+'</div>';
+    if(p.fone)h2+='<div style="font-size:12px;color:var(--text2);margin-bottom:10px"><a href="tel:'+p.fone.replace(/\D/g,'')+'" style="color:var(--red);text-decoration:none">📞 '+esc(p.fone)+'</a></div>';
+    h2+='<div class="g2">';
+    h2+='<button class="btn btnwpp" onclick="wppPri(\''+p.id+'\')">WhatsApp</button>';
+    h2+='<button class="btn btnor" onclick="addPriToComp(\''+p.id+'\')">Comparar</button>';
+    h2+='<button class="btn btnghost" onclick="novoLeadPri(\''+p.id+'\')">Criar lead</button>';
+    if(p.link)h2+='<button class="btn btnghost" onclick="window.open(\''+p.link+'\',\'_blank\')">Ver no site</button>';
+    h2+='</div>';
+    h2+='<button onclick="editPri(\''+p.id+'\')" style="width:100%;margin-top:9px;background:rgba(232,147,90,.08);border:1px solid rgba(232,147,90,.3);color:var(--or);border-radius:9px;padding:10px;font-size:12px;font-weight:700;cursor:pointer">✎ Editar informações</button>';
+    h2+='<button onclick="remPri(\''+p.id+'\')" style="width:100%;margin-top:6px;background:rgba(192,57,43,.07);border:1px solid rgba(192,57,43,.15);color:var(--red);border-radius:9px;padding:10px;font-size:12px;font-weight:700;cursor:pointer">Remover</button>';
+    h2+='<button onclick="togglePatrocinado(\''+p.id+'\')" style="width:100%;margin-top:6px;background:'+(patrocinado?'rgba(232,147,90,.15)':'var(--bg2)')+';border:1px solid '+(patrocinado?'var(--orb)':'var(--border)')+';color:'+(patrocinado?'var(--or)':'var(--text3)')+';border-radius:9px;padding:9px;font-size:12px;font-weight:700;cursor:pointer">'+(patrocinado?'⭐ Patrocinado':'Marcar como patrocinado')+'</button>';
+    h2+='</div>';
+  });
+  el.innerHTML=h+h2;
+}
+
+function editPri(id){
+  var lista=gPri();
+  var p=lista.find(function(x){return x.id===id;});
+  if(!p)return;
+  document.getElementById('mt').textContent='Editar imóvel';
+  document.getElementById('mp').style.display='none';
+  document.getElementById('mb').innerHTML=
+    '<div style="margin-bottom:9px"><label class="lbl">Valor</label><input class="inp" id="epreco" value="'+esc(p.preco||'')+'" placeholder="R$ 0,00"/></div>'+
+    '<div style="margin-bottom:9px"><label class="lbl">Condomínio</label><input class="inp" id="epcond" value="'+esc(p.condominio||'')+'" placeholder="Ex: Residencial das Flores"/></div>'+
+    '<div style="margin-bottom:9px"><label class="lbl">Agenciador</label><input class="inp" id="epagenc" value="'+esc(p.agenciador||'')+'" placeholder="Ex: João Batista"/></div>'+
+    '<div style="margin-bottom:9px"><label class="lbl">Proprietário</label><input class="inp" id="epprop" value="'+esc(p.proprietario||'')+'" placeholder="Ex: Maria Silva"/></div>'+
+    '<div><label class="lbl">Fone proprietário</label><input class="inp" id="epfone" type="tel" value="'+esc(p.fone||'')+'" placeholder="(48) 99999-9999" oninput="mT(this)"/></div>';
+  document.getElementById('mbtns').innerHTML=
+    '<button class="mbc" onclick="cM()">Cancelar</button>'+
+    '<button class="mbor" onclick="savePri(\''+id+'\')">Salvar</button>';
+  document.getElementById('mov').classList.add('on');
+}
+
+function savePri(id){
+  var lista=gPri();
+  var p=lista.find(function(x){return x.id===id;});
+  if(!p)return;
+  var pr=document.getElementById('epreco'),c=document.getElementById('epcond'),ag=document.getElementById('epagenc');
+  var pp=document.getElementById('epprop'),fn=document.getElementById('epfone');
+  if(pr)p.preco=pr.value.trim();
+  if(c)p.condominio=c.value.trim();
+  if(ag)p.agenciador=ag.value.trim();
+  if(pp)p.proprietario=pp.value.trim();
+  if(fn)p.fone=fn.value.trim();
+  sPri(lista);cM();
+  rPri(document.getElementById('pribusca')?document.getElementById('pribusca').value:'');
+  toast('Atualizado!','ok');
+}
+
+function togglePatrocinado(id){
+  var lista=gPri();
+  var p=lista.find(function(x){return x.id===id;});
+  if(!p)return;
+  p.patrocinado=!p.patrocinado;
+  sPri(lista);
+  rPri(document.getElementById('pribusca')?document.getElementById('pribusca').value:'');
+  toast(p.patrocinado?'Marcado como patrocinado':'Removido patrocinado','ok');
+}
+
+function remPri(id){
+  var p=gPri().find(function(x){return x.id===id;});
+  var nome=p?p.nome||'este imóvel':'este imóvel';
+  if(!confirm('Remover "'+nome+'" da lista?'))return;
+  sPri(gPri().filter(function(p){return p.id!==id;}));
+  rPri(document.getElementById('pribusca')?document.getElementById('pribusca').value:'');
+  toast('Removido','ok');
+}
+
+function wppPri(id){
+  var p=gPri().find(function(x){return x.id===id;});
+  if(!p)return;
+  var msg=esc(p.nome||'Imóvel')+(p.preco?'\n💰 '+p.preco:'')+(p.area?'\n📐 '+p.area+'m²':'')+(p.link?'\n'+p.link:'');
+  window.open('https://api.whatsapp.com/send?text='+encodeURIComponent(msg),'_blank');
+}
+
+function addPriToComp(id){
+  var p=gPri().find(function(x){return x.id===id;});
+  if(!p)return;
+  cS=gC();
+  var idx=-1;
+  for(var i=0;i<cS.length;i++){if(!cS[i]){idx=i;break;}}
+  if(idx===-1){toast('Máximo 3 imóveis no comparativo','err');return;}
+  cS[idx]=p;sC(cS);
+  toast('Adicionado ao comparativo!','ok');
+  gT(3);
+}
+
+function novoLeadPri(id){
+  var p=gPri().find(function(x){return x.id===id;});
+  if(!p)return;
+  iA=p;
+  novoLead();
+}
+
+// RELATÓRIO DE IMÓVEIS
+function abrirRelatorio(){
+  var leads=gL();
+  var mapa={};
+  leads.forEach(function(l){
+    // Só conta o imóvel de entrada
+    var ims=l.imoveis||[];
+    var imEntrada=ims.find(function(im){return im.entradaLead;});
+    if(!imEntrada&&ims.length)imEntrada=ims[0]; // fallback leads antigos
+    if(imEntrada){
+      var chave=imEntrada.nome||'Sem nome';
+      if(!mapa[chave])mapa[chave]={nome:chave,link:imEntrada.link||'',count:0,status:{novo:0,contato:0,visita:0,proposta:0}};
+      mapa[chave].count++;
+      if(mapa[chave].status[l.status]!==undefined)mapa[chave].status[l.status]++;
+    }
+    // Lead sem imóvel
+    if(!ims.length){
+      if(!mapa['_semImovel'])mapa['_semImovel']={nome:'Sem imóvel vinculado',link:'',count:0,status:{}};
+      mapa['_semImovel'].count++;
+    }
+  });
+  var lista=Object.values(mapa).sort(function(a,b){return b.count-a.count});
+  var h='';
+  if(!lista.length){h='<div style="text-align:center;padding:20px;color:var(--text3)">Nenhum lead cadastrado ainda.</div>';}
+  else{
+    lista.forEach(function(item){
+      h+='<div style="background:var(--card);border-radius:12px;padding:13px;margin-bottom:9px;box-shadow:var(--sh)">';
+      h+='<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">';
+      h+='<div style="font-size:14px;font-weight:700;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+esc(item.nome)+'</div>';
+      h+='<span style="background:var(--orl);border:1px solid var(--orb);color:var(--or);font-size:13px;font-weight:800;padding:4px 10px;border-radius:8px;flex-shrink:0;margin-left:8px">'+item.count+' lead'+(item.count>1?'s':'')+'</span>';
+      h+='</div>';
+      if(item.link)h+='<a href="'+item.link+'" target="_blank" style="font-size:11px;color:var(--red);text-decoration:none;display:block;margin-bottom:6px">Ver no site</a>';
+      var sts=[];
+      if(item.status.novo)sts.push('Novo: '+item.status.novo);
+      if(item.status.contato)sts.push('Contato: '+item.status.contato);
+      if(item.status.visita)sts.push('Visita: '+item.status.visita);
+      if(item.status.proposta)sts.push('Proposta: '+item.status.proposta);
+      if(sts.length)h+='<div style="font-size:11px;color:var(--text3)">'+sts.join(' · ')+'</div>';
+      h+='</div>';
+    });
+  }
+  document.getElementById('mt').textContent='Imóveis mais procurados';
+  document.getElementById('mp').style.display='block';
+  document.getElementById('mp').textContent=leads.length+' lead(s) · '+lista.filter(function(i){return i.nome!=='Sem imóvel vinculado'}).length+' imóvel(is)';
+  document.getElementById('mb').innerHTML=h;
+  document.getElementById('mbtns').innerHTML='<button class="mbc" onclick="cM()" style="flex:1;padding:14px;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer;border:none;background:var(--bg2);color:var(--text2)">Fechar</button>';
+  document.getElementById('mov').classList.add('on');
+}
+function bG(q){
+  var drop=document.getElementById('bdrop');if(!drop)return;
+  if(!q||q.length<2){drop.classList.remove('on');return;}
+  var leads=gL().filter(function(l){var b=q.toLowerCase();return(l.nome||'').toLowerCase().indexOf(b)>-1||(l.tel||'').indexOf(b)>-1;}).slice(0,6);
+  if(!leads.length){drop.innerHTML='<div style="padding:13px 15px;font-size:13px;color:var(--text3)">Nenhum lead encontrado.</div>';drop.style.top='120px';drop.classList.add('on');return;}
+  var h='';
+  leads.forEach(function(l){
+    h+='<div class="bdi" onclick="fBG();gT(1);setTimeout(function(){aLP(\''+l.id+'\')},400)">';
+    h+='<div><div style="font-size:14px;font-weight:700;color:var(--text)">'+esc(l.nome)+'</div>';
+    h+='<div style="font-size:12px;color:var(--text3);margin-top:2px">'+(l.tel||'')+(l.status?' · '+(STL[l.status]||l.status):'')+'</div></div></div>';
+  });
+  drop.innerHTML=h;drop.style.top='120px';drop.classList.add('on');
+}
+function fBG(){var d=document.getElementById('bdrop');if(d)d.classList.remove('on');}
+
+// BACKUP
+function expBkp(){
+  var d={leads:gL(),msgs:gMs(),comp:gC(),agenda:gAA(),data:new Date().toISOString()};
+  var blob=new Blob([JSON.stringify(d,null,2)],{type:'application/json'});
+  var url=URL.createObjectURL(blob);var a=document.createElement('a');a.href=url;a.download='backup-cockpit-'+new Date().toISOString().split('T')[0]+'.json';a.click();URL.revokeObjectURL(url);
+  toast('Backup exportado!','ok');
+}
+function impBkp(e){
+  var f=e.target.files[0];if(!f)return;
+  var r=new FileReader();
+  r.onload=function(ev){
+    try{
+      var d=JSON.parse(ev.target.result);
+      if(d.leads){
+        // Migrar leads do formato antigo (imovelNome/imovelLink) para novo (imoveis:[])
+        d.leads.forEach(function(l){
+          if(!l.imoveis){
+            l.imoveis=[];
+            if(l.imovelNome||l.imovelLink){
+              l.imoveis.push({
+                nome:l.imovelNome||'Imóvel vinculado',
+                preco:l.imovelPreco||'',
+                link:l.imovelLink||'',
+                id:'im'+Date.now()
+              });
+            }
+          }
+        });
+        localStorage.setItem(LK,JSON.stringify(d.leads));
+      }
+      if(d.msgs)localStorage.setItem(MK,JSON.stringify(d.msgs));
+      if(d.agenda)localStorage.setItem(AK,JSON.stringify(d.agenda));
+      toast('Importado! '+(d.leads?d.leads.length:0)+' leads.','ok');
+      rLeads();rFavs();
+    }catch(err){toast('Arquivo inválido','err');}
+  };
+  r.readAsText(f);e.target.value='';
+}
+
+// ALERTAS VISTA
+function chkVista(){var u=localStorage.getItem(VK);if(!u){localStorage.setItem(VK,new Date().toISOString());return;}if(Math.floor((Date.now()-new Date(u).getTime())/864e5)>=5)document.getElementById('vov').classList.add('on');}
+function okVista(){localStorage.setItem(VK,new Date().toISOString());document.getElementById('vov').classList.remove('on');toast('Vista atualizado! Próximo aviso em 5 dias.','ok');}
+function lembrarVista(){document.getElementById('vov').classList.remove('on');setTimeout(function(){document.getElementById('vov').classList.add('on');},36e5);toast('Lembrete em 1 hora.','ok');}
+
+// AGENDA DO DIA
+function chkAgenda(){
+  var leads=gL();var hoje=new Date().toISOString().split('T')[0];var agAll=gAA();var items=[];
+  leads.forEach(function(l){
+    (agAll[l.id]||[]).filter(function(a){return !a.concluido&&a.data<=hoje}).forEach(function(a){items.push({lead:l.nome,desc:a.texto,data:a.data,at:a.data<hoje,lid:l.id});});
+    var ds=dSC(l);if(ds>=5&&l.status!=='fechado'&&l.status!=='perdido')items.push({lead:l.nome,desc:ds+' dias sem contato',data:'',at:true,lid:l.id});
+  });
+  if(!items.length)return;
+  var h='';
+  items.forEach(function(it){
+    var cor=it.at?'var(--red)':'var(--or)';
+    h+='<div style="background:var(--card);border-radius:10px;padding:12px 13px;margin-bottom:8px;border-left:3px solid '+cor+';cursor:pointer;box-shadow:var(--sh)" onclick="document.getElementById(\'pdov\').classList.remove(\'on\');gT(1);setTimeout(function(){aLP(\''+it.lid+'\')},400)">';
+    h+='<div style="font-size:14px;font-weight:700">'+esc(it.lead)+'</div>';
+    h+='<div style="font-size:13px;color:var(--text2);margin-top:2px">'+esc(it.desc)+'</div>';
+    if(it.data)h+='<div style="font-size:11px;color:var(--text3);margin-top:2px">'+fmtD(it.data)+'</div>';
+    h+='</div>';
+  });
+  document.getElementById('pditems').innerHTML=h;
+  document.getElementById('pdov').classList.add('on');
+}
+
+// SISTEMA DE ALARME
+var alarmeAtivo=null;
+var alarmesSoados={};
+
+function tocarSom(){
+  try{
+    var ctx=new(window.AudioContext||window.webkitAudioContext)();
+    // Campainha suave — 3 bips curtos
+    [0,0.35,0.7].forEach(function(t){
+      var o=ctx.createOscillator();var g=ctx.createGain();
+      o.connect(g);g.connect(ctx.destination);
+      o.frequency.value=880;o.type='sine';
+      g.gain.setValueAtTime(0,ctx.currentTime+t);
+      g.gain.linearRampToValueAtTime(0.3,ctx.currentTime+t+0.05);
+      g.gain.linearRampToValueAtTime(0,ctx.currentTime+t+0.3);
+      o.start(ctx.currentTime+t);o.stop(ctx.currentTime+t+0.35);
+    });
+  }catch(e){}
+}
+
+function fecharAlarme(){
+  document.getElementById('alarmeov').style.display='none';
+  if(alarmeAtivo)alarmesSoados[alarmeAtivo]=true;
+  alarmeAtivo=null;
+}
+
+function chkAlarmes(){
+  var agora=new Date();
+  var hojeStr=agora.toISOString().split('T')[0];
+  var hAtual=agora.getHours().toString().padStart(2,'0')+':'+agora.getMinutes().toString().padStart(2,'0');
+  // Calcular hora+10min
+  var d10=new Date(agora.getTime()+10*60000);
+  var h10=d10.getHours().toString().padStart(2,'0')+':'+d10.getMinutes().toString().padStart(2,'0');
+  var agAll=gAA();var leads=gL();
+  leads.forEach(function(l){
+    (agAll[l.id]||[]).filter(function(a){return !a.concluido&&a.data===hojeStr&&a.hora}).forEach(function(a){
+      var chave=l.id+'_'+a.id;
+      if(alarmesSoados[chave])return;
+      if(a.hora===h10){
+        // Avisar 10 minutos antes
+        alarmeAtivo=chave;
+        document.getElementById('alarmenome').textContent=l.nome;
+        document.getElementById('alarmetxt').textContent=a.texto;
+        document.getElementById('alarmehora').textContent='Horário: '+a.hora;
+        document.getElementById('alarmeov').style.display='flex';
+        tocarSom();
+      }
+    });
+  });
+}
+
+// Verificar a cada minuto
+setInterval(chkAlarmes,60000);
+
+// UTILS
+function fmtD(iso){if(!iso)return'';try{var d=iso.indexOf('T')>-1?new Date(iso):new Date(iso+'T12:00:00');if(isNaN(d.getTime()))return'';return d.toLocaleDateString('pt-BR');}catch(e){return'';}}
+function esc(s){return(s||'').toString().replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');}
+function cM(){document.getElementById('mov').classList.remove('on');}
+function toast(msg,tipo){var t=document.getElementById('toast');t.textContent=msg;t.className='toast on'+(tipo?' '+tipo:'');setTimeout(function(){t.className='toast';},2500);}
 </script>
 </body>
 </html>
