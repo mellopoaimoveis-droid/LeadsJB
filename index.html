@@ -30,7 +30,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);font-family:"Segoe UI
 .bnav::-webkit-scrollbar{display:none}
 .bnavt{display:flex;align-items:center;height:100%;padding:0 35vw}
 .nbi{flex-shrink:0;cursor:pointer;padding:4px 20px;position:relative;-webkit-tap-highlight-color:transparent}
-.nbi span{font-size:11px;font-weight:700;color:var(--text3);letter-spacing:.5px;text-transform:uppercase;white-space:nowrap}
+.nbi span{font-size:13px;font-weight:700;color:var(--text3);letter-spacing:.3px;text-transform:uppercase;white-space:nowrap}
 .nbi.on span{color:var(--text)}.nbi.on::after{content:"";position:absolute;bottom:-5px;left:50%;transform:translateX(-50%);width:22px;height:2px;background:var(--red);border-radius:2px}
 .sec{padding:13px}.lbl{font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;display:block;margin-bottom:5px}
 .inp{width:100%;background:var(--bg);border:1.5px solid var(--border);border-radius:10px;padding:12px 13px;color:var(--text);font-size:14px;outline:none;font-family:inherit}
@@ -647,24 +647,69 @@ function rIm(im){
   var h='<div class="imc">';
   if(im.foto)h+='<img class="imcimg" src="'+im.foto+'" onerror="this.style.display=\'none\'">';
   h+='<div class="imcbody">';
-  h+='<div class="imcnr">';
-  h+='<input class="imcni" id="imni" value="'+esc(im.nome||'')+'" onchange="iA.nome=this.value" placeholder="Nome do imóvel"/>';
-  h+='<button class="imcvb" onclick="window.open(\''+im.link+'\',\'_blank\')">Ver no site</button>';
-  h+='</div>';
-  h+='<div class="imcbairro">'+esc(im.bairro)+(im.cod?' — Cód. '+im.cod:'')+'</div>';
-  h+='<input class="imcvi" id="imvi" value="'+esc(im.preco||'')+'" onchange="iA.preco=this.value" placeholder="R$ 0,00"/>';
-  h+='<div class="imctags">';
+  // Código — só texto, não vai para nome
+  if(im.cod)h+='<div style="font-size:11px;color:var(--text3);font-weight:700;letter-spacing:.5px;margin-bottom:4px">CÓD. '+esc(im.cod)+'</div>';
+  // Valor em destaque
+  if(im.preco)h+='<div style="font-size:20px;font-weight:900;color:var(--red);margin-bottom:4px">'+esc(im.preco)+'</div>';
+  // Bairro
+  if(im.bairro)h+='<div style="font-size:13px;color:var(--text2);margin-bottom:6px">'+esc(im.bairro)+'</div>';
+  // Nome do Condomínio em destaque
+  if(im.nome&&im.nome.indexOf('Imóvel Cód.')===-1)h+='<div style="font-size:16px;font-weight:800;color:var(--red);margin-bottom:8px">'+esc(im.nome)+'</div>';
+  // Agenciador
+  if(im.agenciador)h+='<div style="font-size:12px;color:var(--text3);margin-bottom:8px">Agenciador: '+esc(im.agenciador)+'</div>';
+  // Tags m², Dorms, Suítes, Vagas
+  h+='<div class="imctags" style="margin-bottom:10px">';
   if(im.area)h+='<span class="imctag">'+im.area+'m²</span>';
-  if(im.quartos)h+='<span class="imctag">'+im.quartos+' quartos</span>';
+  if(im.quartos)h+='<span class="imctag">'+im.quartos+' dorms.</span>';
   if(im.suites&&im.suites!=='0')h+='<span class="imctag">'+im.suites+' suíte(s)</span>';
   if(im.vagas)h+='<span class="imctag">'+im.vagas+' vaga(s)</span>';
   h+='</div>';
+  // Proprietário e Telefone
+  if(im.proprietario)h+='<div style="font-size:12px;color:var(--text3);margin-bottom:2px">Proprietário: '+esc(im.proprietario)+'</div>';
+  if(im.fone)h+='<div style="font-size:12px;color:var(--text3);margin-bottom:8px">Tel: '+esc(im.fone)+'</div>';
+  // Link
+  h+='<a href="'+im.link+'" target="_blank" style="display:block;font-size:12px;color:var(--red);text-decoration:none;margin-bottom:12px">Ver no site →</a>';
+  // Botões
   h+='<div class="g2" style="margin-bottom:0">';
   h+='<button class="btn btnor btnf btnlg" onclick="novoLeadComIm()">Criar lead</button>';
+  h+='<button class="btn btnghost btnf btnlg" onclick="editarImInicio()">Editar</button>';
   h+='<button class="btn btnghost btnf btnlg" onclick="document.getElementById(\'imres\').innerHTML=\'\';document.getElementById(\'imst\').textContent=\'\'">Fechar</button>';
   h+='</div>';
   h+='</div></div>';
   document.getElementById('imres').innerHTML=h;
+}
+
+function editarImInicio(){
+  if(!iA)return;
+  document.getElementById('mt').textContent='Editar imóvel';
+  document.getElementById('mp').style.display='none';
+  document.getElementById('mb').innerHTML=
+    '<div style="margin-bottom:9px"><label class="lbl">Código</label><input class="inp" id="eicod0" value="'+esc(iA.cod||'')+'"/></div>'+
+    '<div style="margin-bottom:9px"><label class="lbl">Valor</label><input class="inp" id="eipreco0" value="'+esc(iA.preco||'')+'" placeholder="R$ 0,00"/></div>'+
+    '<div style="margin-bottom:9px"><label class="lbl">Bairro</label><input class="inp" id="eibairro0" value="'+esc(iA.bairro||'')+'"/></div>'+
+    '<div style="margin-bottom:9px"><label class="lbl">Nome do Condomínio</label><input class="inp" id="einome0" value="'+esc(iA.nome&&iA.nome.indexOf('Imóvel Cód.')===-1?iA.nome:'')+'" placeholder="Ex: Edifício Vila Bela"/></div>'+
+    '<div style="margin-bottom:9px"><label class="lbl">Agenciador</label><input class="inp" id="eiagenc0" value="'+esc(iA.agenciador||'')+'"/></div>'+
+    '<div class="g2" style="margin-bottom:9px">'+
+    '<div><label class="lbl">m²</label><input class="inp" id="eiarea0" value="'+esc(iA.area||'')+'" type="number"/></div>'+
+    '<div><label class="lbl">Dorms.</label><input class="inp" id="eiquartos0" value="'+esc(iA.quartos||'')+'" type="number"/></div>'+
+    '<div><label class="lbl">Suíte</label><input class="inp" id="eisuites0" value="'+esc(iA.suites||'')+'" type="number"/></div>'+
+    '<div><label class="lbl">Vagas</label><input class="inp" id="eivagas0" value="'+esc(iA.vagas||'')+'" type="number"/></div>'+
+    '</div>'+
+    '<div style="margin-bottom:9px"><label class="lbl">Proprietário</label><input class="inp" id="eiprop0" value="'+esc(iA.proprietario||'')+'"/></div>'+
+    '<div><label class="lbl">Telefone</label><input class="inp" id="eifone0" type="tel" value="'+esc(iA.fone||'')+'" placeholder="(48) 99999-9999" oninput="mT(this)"/></div>';
+  document.getElementById('mbtns').innerHTML=
+    '<button class="mbc" onclick="cM()">Cancelar</button>'+
+    '<button class="mbor" onclick="saveImInicio()">Salvar</button>';
+  document.getElementById('mov').classList.add('on');
+}
+
+function saveImInicio(){
+  var f=function(i){var e=document.getElementById(i);return e?e.value.trim():'';};
+  iA.cod=f('eicod0');iA.preco=f('eipreco0');iA.bairro=f('eibairro0');
+  iA.nome=f('einome0');iA.agenciador=f('eiagenc0');
+  iA.area=f('eiarea0');iA.quartos=f('eiquartos0');iA.suites=f('eisuites0');iA.vagas=f('eivagas0');
+  iA.proprietario=f('eiprop0');iA.fone=f('eifone0');
+  cM();rIm(iA);toast('Atualizado!','ok');
 }
 
 // LEADS
@@ -750,14 +795,26 @@ function rLeads(busca){
       h+='<div style="font-size:11px;font-weight:800;color:var(--text3);text-transform:uppercase;padding:10px 2px 5px;letter-spacing:.5px">'+grpNomes[grp]+'</div>';
     }
     var imObj=l.imoveis&&l.imoveis.length?l.imoveis[0]:null;
-    var im1=imObj?imObj.nome:'';
     var ultC='';
     if(l.atualizadoEm){var dC=new Date(l.atualizadoEm);ultC=dC.toLocaleDateString('pt-BR')+' '+dC.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});}
     h+='<div class="lmini" onclick="aLP(\''+l.id+'\')">';
     h+='<div class="lme">';
+    // 1. Nome do lead
     h+='<div class="lmn">'+(l.favorito?'★ ':'')+esc(l.nome)+'</div>';
-    h+='<div class="lmi">'+(l.tel||'')+(im1?' · '+esc(im1):'')+'</div>';
-    if(imObj&&imObj.link)h+='<a href="'+imObj.link+'" target="_blank" style="font-size:11px;color:var(--red);text-decoration:none;margin-top:2px;display:block" onclick="event.stopPropagation()">Ver imóvel no site</a>';
+    // 2. Telefone
+    if(l.tel)h+='<div class="lmi">'+esc(l.tel)+'</div>';
+    // 3. Nome do condomínio + Código lado a lado
+    if(imObj){
+      var condNome=imObj.nome&&imObj.nome.indexOf('Imóvel Cód.')===-1?imObj.nome:'';
+      var codStr=imObj.cod?'Cód. '+imObj.cod:'';
+      if(condNome||codStr){
+        h+='<div style="font-size:11px;color:var(--text2);margin-top:2px">';
+        if(condNome)h+='<span style="font-weight:700">'+esc(condNome)+'</span>';
+        if(condNome&&codStr)h+=' · ';
+        if(codStr)h+='<span style="color:var(--text3)">'+esc(codStr)+'</span>';
+        h+='</div>';
+      }
+    }
     if(ultC)h+='<div style="font-size:10px;color:var(--text3);margin-top:2px">Último contato: '+ultC+'</div>';
     if(ds>=5)h+='<span class="badr">'+ds+'d sem contato</span>';
     if(ags.length)h+='<span class="bador">'+ags.length+' lembrete(s)</span>';
@@ -890,26 +947,39 @@ function addImL(lid){
   document.getElementById('mp').style.display='none';
   document.getElementById('mb').innerHTML=
     '<div style="margin-bottom:9px"><label class="lbl">Link do imóvel</label><input class="inp" id="illink" placeholder="https://controleimoveis.com.br/..."/></div>'+
-    '<div style="margin-bottom:9px"><label class="lbl">Nome (opcional)</label><input class="inp" id="ilnome" placeholder="Ex: Apartamento Kobrasol"/></div>'+
-    '<div style="margin-bottom:9px"><label class="lbl">Valor (opcional)</label><input class="inp" id="ilpreco" placeholder="R$ 0,00"/></div>'+
-    '<div style="margin-bottom:9px"><label class="lbl">Condomínio (opcional)</label><input class="inp" id="ilcond" placeholder="Ex: Residencial das Flores"/></div>'+
-    '<div style="margin-bottom:9px"><label class="lbl">Agenciador (opcional)</label><input class="inp" id="ilagenc" placeholder="Ex: João Batista"/></div>'+
-    '<div style="margin-bottom:9px"><label class="lbl">Proprietário (opcional)</label><input class="inp" id="ilprop" placeholder="Ex: Maria Silva"/></div>'+
-    '<div><label class="lbl">Fone proprietário (opcional)</label><input class="inp" id="ilfone" type="tel" placeholder="(48) 99999-9999" oninput="mT(this)"/></div>';
+    '<div style="margin-bottom:9px"><label class="lbl">Código</label><input class="inp" id="ilcod" placeholder="Ex: 22490"/></div>'+
+    '<div style="margin-bottom:9px"><label class="lbl">Valor</label><input class="inp" id="ilpreco" placeholder="R$ 0,00"/></div>'+
+    '<div style="margin-bottom:9px"><label class="lbl">Bairro</label><input class="inp" id="ilbairro" placeholder="Ex: Kobrasol"/></div>'+
+    '<div style="margin-bottom:9px"><label class="lbl">Nome do Condomínio</label><input class="inp" id="ilnome" placeholder="Ex: Residencial das Flores" /></div>'+
+    '<div style="margin-bottom:9px"><label class="lbl">Agenciador</label><input class="inp" id="ilagenc" placeholder="Ex: João Batista"/></div>'+
+    '<div class="g2" style="margin-bottom:9px">'+
+    '<div><label class="lbl">m²</label><input class="inp" id="ilarea" type="number"/></div>'+
+    '<div><label class="lbl">Dorms.</label><input class="inp" id="ilquartos" type="number"/></div>'+
+    '<div><label class="lbl">Suíte</label><input class="inp" id="ilsuites" type="number"/></div>'+
+    '<div><label class="lbl">Vagas</label><input class="inp" id="ilvagas" type="number"/></div>'+
+    '</div>'+
+    '<div style="margin-bottom:9px"><label class="lbl">Proprietário</label><input class="inp" id="ilprop" placeholder="Ex: Maria Silva"/></div>'+
+    '<div style="margin-bottom:9px"><label class="lbl">Telefone</label><input class="inp" id="ilfone" type="tel" placeholder="(48) 99999-9999" oninput="mT(this)"/></div>';
   document.getElementById('mbtns').innerHTML='<button class="mbc" onclick="cM()">Cancelar</button><button class="mbor" onclick="saveImL(\''+lid+'\')">Adicionar</button>';
   document.getElementById('mov').classList.add('on');
 }
 function saveImL(lid){
-  var link=document.getElementById('illink').value.trim();
+  var f=function(i){var e=document.getElementById(i);return e?e.value.trim():'';};
+  var link=f('illink');
   var codM=link.match(/-(\d{4,6})(?:$|\/|\?)/);
-  var nome=document.getElementById('ilnome').value.trim()||('Imóvel '+(codM?codM[1]:''));
-  var preco=document.getElementById('ilpreco').value.trim();
-  var cond=document.getElementById('ilcond').value.trim();
-  var agenc=document.getElementById('ilagenc').value.trim();
-  var prop=document.getElementById('ilprop').value.trim();
-  var fone=document.getElementById('ilfone').value.trim();
   var ls=gL(),i=ls.findIndex(function(l){return l.id===lid});
-  if(i>-1){if(!ls[i].imoveis)ls[i].imoveis=[];ls[i].imoveis.push({nome:nome,preco:preco,link:link,condominio:cond,agenciador:agenc,proprietario:prop,fone:fone,id:'im'+Date.now()});sL(ls);}
+  if(i>-1){
+    if(!ls[i].imoveis)ls[i].imoveis=[];
+    ls[i].imoveis.push({
+      nome:f('ilnome'),preco:f('ilpreco'),link:link,
+      cod:f('ilcod')||(codM?codM[1]:''),
+      bairro:f('ilbairro'),
+      area:f('ilarea'),quartos:f('ilquartos'),suites:f('ilsuites'),vagas:f('ilvagas'),
+      agenciador:f('ilagenc'),proprietario:f('ilprop'),fone:f('ilfone'),
+      id:'im'+Date.now()
+    });
+    sL(ls);
+  }
   cM();rLP(lid);toast('Imóvel adicionado!','ok');
 }
 function remIm(lid,idx){
@@ -923,14 +993,22 @@ function verIm(lid,idx){
   var ls=gL(),i=ls.findIndex(function(l){return l.id===lid});
   if(i===-1)return;
   var im=ls[i].imoveis[idx];if(!im)return;
-  var h='<div style="background:var(--bg);border-radius:12px;padding:14px;line-height:2">';
-  h+='<div style="font-size:15px;font-weight:800;margin-bottom:6px">'+esc(im.nome||'Imóvel')+'</div>';
-  if(im.preco)h+='<div><span style="font-size:11px;color:var(--text3);font-weight:700">VALOR</span><br><span style="font-size:16px;font-weight:800;color:var(--red)">'+esc(im.preco)+'</span></div>';
-  if(im.condominio)h+='<div><span style="font-size:11px;color:var(--text3);font-weight:700">CONDOMÍNIO</span><br>🏢 '+esc(im.condominio)+'</div>';
-  if(im.agenciador)h+='<div><span style="font-size:11px;color:var(--text3);font-weight:700">AGENCIADOR</span><br>👤 '+esc(im.agenciador)+'</div>';
-  if(im.proprietario)h+='<div><span style="font-size:11px;color:var(--text3);font-weight:700">PROPRIETÁRIO</span><br>'+esc(im.proprietario)+'</div>';
-  if(im.fone)h+='<div><span style="font-size:11px;color:var(--text3);font-weight:700">FONE</span><br><a href="tel:'+im.fone.replace(/\D/g,'')+'" style="color:var(--red);text-decoration:none">📞 '+esc(im.fone)+'</a></div>';
-  if(im.link)h+='<div style="margin-top:8px"><a href="'+im.link+'" target="_blank" style="color:var(--red);font-size:13px;font-weight:700;text-decoration:none">🔗 Ver no site</a></div>';
+  var lbl=function(t){return '<span style="font-size:11px;color:var(--text3);font-weight:700;text-transform:uppercase">'+t+'</span><br>';};
+  var h='<div style="background:var(--bg);border-radius:12px;padding:14px;line-height:1.8">';
+  if(im.cod)h+='<div>'+lbl('Código')+'<span style="font-weight:700">'+esc(im.cod)+'</span></div>';
+  if(im.preco)h+='<div>'+lbl('Valor')+'<span style="font-size:16px;font-weight:800;color:var(--red)">'+esc(im.preco)+'</span></div>';
+  if(im.bairro)h+='<div>'+lbl('Bairro')+esc(im.bairro)+'</div>';
+  if(im.nome)h+='<div>'+lbl('Nome do Condomínio')+'<span style="font-size:15px;font-weight:800;color:var(--red)">'+esc(im.nome)+'</span></div>';
+  if(im.agenciador)h+='<div>'+lbl('Agenciador')+esc(im.agenciador)+'</div>';
+  var tags=[];
+  if(im.area)tags.push(im.area+'m²');
+  if(im.quartos)tags.push(im.quartos+' dorms.');
+  if(im.suites&&im.suites!=='0')tags.push(im.suites+' suíte(s)');
+  if(im.vagas)tags.push(im.vagas+' vaga(s)');
+  if(tags.length)h+='<div>'+lbl('Características')+tags.join(' · ')+'</div>';
+  if(im.proprietario)h+='<div>'+lbl('Proprietário')+esc(im.proprietario)+'</div>';
+  if(im.fone)h+='<div>'+lbl('Telefone')+'<a href="tel:'+im.fone.replace(/\D/g,'')+'" style="color:var(--red);text-decoration:none">'+esc(im.fone)+'</a></div>';
+  if(im.link)h+='<div style="margin-top:8px"><a href="'+im.link+'" target="_blank" style="color:var(--red);font-size:13px;font-weight:700;text-decoration:none">Ver no site →</a></div>';
   h+='</div>';
   document.getElementById('mt').textContent='Informações do imóvel';
   document.getElementById('mp').style.display='none';
@@ -946,12 +1024,19 @@ function editIm(lid,idx){
   document.getElementById('mt').textContent='Editar imóvel';
   document.getElementById('mp').style.display='none';
   document.getElementById('mb').innerHTML=
-    '<div style="margin-bottom:9px"><label class="lbl">Nome</label><input class="inp" id="einome" value="'+esc(im.nome||'')+'"/></div>'+
+    '<div style="margin-bottom:9px"><label class="lbl">Código</label><input class="inp" id="eicod" value="'+esc(im.cod||'')+'"/></div>'+
     '<div style="margin-bottom:9px"><label class="lbl">Valor</label><input class="inp" id="eipreco" value="'+esc(im.preco||'')+'" placeholder="R$ 0,00"/></div>'+
-    '<div style="margin-bottom:9px"><label class="lbl">Condomínio</label><input class="inp" id="eicond" value="'+esc(im.condominio||'')+'" placeholder="Ex: Residencial das Flores"/></div>'+
+    '<div style="margin-bottom:9px"><label class="lbl">Bairro</label><input class="inp" id="eibairro" value="'+esc(im.bairro||'')+'"/></div>'+
+    '<div style="margin-bottom:9px"><label class="lbl">Nome do Condomínio</label><input class="inp" id="einome" value="'+esc(im.nome||'')+'" /></div>'+
     '<div style="margin-bottom:9px"><label class="lbl">Agenciador</label><input class="inp" id="eiagenc" value="'+esc(im.agenciador||'')+'" placeholder="Ex: João Batista"/></div>'+
+    '<div class="g2" style="margin-bottom:9px">'+
+    '<div><label class="lbl">m²</label><input class="inp" id="eiarea" value="'+esc(im.area||'')+'" type="number"/></div>'+
+    '<div><label class="lbl">Dorms.</label><input class="inp" id="eiquartos" value="'+esc(im.quartos||'')+'" type="number"/></div>'+
+    '<div><label class="lbl">Suíte</label><input class="inp" id="eisuites" value="'+esc(im.suites||'')+'" type="number"/></div>'+
+    '<div><label class="lbl">Vagas</label><input class="inp" id="eivagas" value="'+esc(im.vagas||'')+'" type="number"/></div>'+
+    '</div>'+
     '<div style="margin-bottom:9px"><label class="lbl">Proprietário</label><input class="inp" id="eiprop" value="'+esc(im.proprietario||'')+'" placeholder="Ex: Maria Silva"/></div>'+
-    '<div style="margin-bottom:9px"><label class="lbl">Fone proprietário</label><input class="inp" id="eifone" type="tel" value="'+esc(im.fone||'')+'" placeholder="(48) 99999-9999" oninput="mT(this)"/></div>'+
+    '<div style="margin-bottom:9px"><label class="lbl">Telefone</label><input class="inp" id="eifone" type="tel" value="'+esc(im.fone||'')+'" placeholder="(48) 99999-9999" oninput="mT(this)"/></div>'+
     '<div><label class="lbl">Link</label><input class="inp" id="eilink" value="'+esc(im.link||'')+'" placeholder="https://..."/></div>';
   document.getElementById('mbtns').innerHTML=
     '<button class="mbc" onclick="cM()">Cancelar</button>'+
@@ -962,16 +1047,19 @@ function editIm(lid,idx){
 function saveIm(lid,idx){
   var ls=gL(),i=ls.findIndex(function(l){return l.id===lid});
   if(i===-1)return;
-  var n=document.getElementById('einome'),p=document.getElementById('eipreco'),l=document.getElementById('eilink');
-  var c=document.getElementById('eicond'),ag=document.getElementById('eiagenc');
-  var pr=document.getElementById('eiprop'),fn=document.getElementById('eifone');
-  if(n)ls[i].imoveis[idx].nome=n.value.trim();
-  if(p)ls[i].imoveis[idx].preco=p.value.trim();
-  if(l)ls[i].imoveis[idx].link=l.value.trim();
-  if(c)ls[i].imoveis[idx].condominio=c.value.trim();
-  if(ag)ls[i].imoveis[idx].agenciador=ag.value.trim();
-  if(pr)ls[i].imoveis[idx].proprietario=pr.value.trim();
-  if(fn)ls[i].imoveis[idx].fone=fn.value.trim();
+  var f=function(id){var e=document.getElementById(id);return e?e.value.trim():'';};
+  ls[i].imoveis[idx].cod=f('eicod');
+  ls[i].imoveis[idx].preco=f('eipreco');
+  ls[i].imoveis[idx].bairro=f('eibairro');
+  ls[i].imoveis[idx].nome=f('einome');
+  ls[i].imoveis[idx].agenciador=f('eiagenc');
+  ls[i].imoveis[idx].area=f('eiarea');
+  ls[i].imoveis[idx].quartos=f('eiquartos');
+  ls[i].imoveis[idx].suites=f('eisuites');
+  ls[i].imoveis[idx].vagas=f('eivagas');
+  ls[i].imoveis[idx].proprietario=f('eiprop');
+  ls[i].imoveis[idx].fone=f('eifone');
+  ls[i].imoveis[idx].link=f('eilink');
   sL(ls);cM();rLP(lid);toast('Imóvel atualizado!','ok');
 }
 
@@ -989,7 +1077,15 @@ function novoLeadComIm(){
   var im=iA;
   document.getElementById('mt').textContent='Criar lead';
   document.getElementById('mp').style.display='none';
-  var imBox=im?('<div style="background:var(--bg);border-radius:10px;padding:11px;margin-bottom:11px;border-left:3px solid var(--or)"><div style="font-size:13px;font-weight:700">'+esc(im.nome)+'</div><div style="font-size:12px;color:var(--text2)">'+(im.preco||'')+'</div></div>'):'';
+  var imBox='';
+  if(im){
+    imBox='<div style="background:var(--bg);border-radius:10px;padding:11px;margin-bottom:11px;border-left:3px solid var(--or)">';
+    if(im.cod)imBox+='<div style="font-size:11px;color:var(--text3);font-weight:700">Cód. '+esc(im.cod)+'</div>';
+    if(im.preco)imBox+='<div style="font-size:15px;font-weight:800;color:var(--red)">'+esc(im.preco)+'</div>';
+    if(im.bairro)imBox+='<div style="font-size:12px;color:var(--text2)">'+esc(im.bairro)+'</div>';
+    if(im.nome&&im.nome.indexOf('Imóvel Cód.')===-1)imBox+='<div style="font-size:13px;font-weight:700;color:var(--red)">'+esc(im.nome)+'</div>';
+    imBox+='</div>';
+  }
   document.getElementById('mb').innerHTML=imBox+'<div style="margin-bottom:9px"><label class="lbl">Nome *</label><input class="inp" id="nlnome" placeholder="Ex: Carlos Silva"/></div><div style="margin-bottom:9px"><label class="lbl">Telefone</label><input class="inp" id="nltel" type="tel" placeholder="(48) 99999-9999" oninput="mT(this)"/></div><div><label class="lbl">Observação</label><textarea class="msga" id="nlobs" rows="3" placeholder="Perfil, interesses..."></textarea></div>';
   document.getElementById('mbtns').innerHTML='<button class="mbc" onclick="cM()">Cancelar</button><button class="mbor" onclick="criarL(true)">Criar lead</button>';
   document.getElementById('mov').classList.add('on');
@@ -1001,8 +1097,14 @@ function criarL(comIm){
   if(!nome){toast('Digite o nome','err');return;}
   var im=null;
   if(comIm&&iA){
-    var ni=document.getElementById('imni');var vi=document.getElementById('imvi');
-    im={nome:ni?ni.value:(iA.nome||''),preco:vi?vi.value:(iA.preco||''),link:iA.link,id:'im'+Date.now()};
+    // Salva todos os campos do iA no imóvel do lead
+    im={
+      nome:iA.nome||'',preco:iA.preco||'',link:iA.link||'',
+      cod:iA.cod||'',bairro:iA.bairro||'',
+      area:iA.area||'',quartos:iA.quartos||'',suites:iA.suites||'',vagas:iA.vagas||'',
+      agenciador:iA.agenciador||'',proprietario:iA.proprietario||'',fone:iA.fone||'',
+      foto:iA.foto||'',id:'im'+Date.now(),entradaLead:true
+    };
   }
   var nltel=document.getElementById('nltel');var nlobs=document.getElementById('nlobs');
   var telVal=nltel?nltel.value.trim():'';
@@ -1161,7 +1263,38 @@ function notaVoz(id){
   document.getElementById('mbtns').innerHTML='<button class="mbc" onclick="stopVoz();cM()">Cancelar</button><button class="mbor" onclick="saveNV(\''+id+'\')">Salvar</button>';
   document.getElementById('mov').classList.add('on');
 }
-function togVoz(){if(recog){stopVoz();return;}var SR=window.SpeechRecognition||window.webkitSpeechRecognition;if(!SR){toast('Voz disponível apenas online','err');return;}recog=new SR();recog.lang='pt-BR';recog.continuous=true;recog.interimResults=true;var btn=document.getElementById('btnmic'),st=document.getElementById('vozst');if(btn){btn.style.background='rgba(192,57,43,.1)';btn.style.borderColor='var(--red)';btn.textContent='⏹';}if(st)st.textContent='Ouvindo...';recog.onresult=function(e){var t='';for(var i=0;i<e.results.length;i++)t+=e.results[i][0].transcript;var f=document.getElementById('voztxt');if(f)f.value=t;};recog.onend=function(){var b=document.getElementById('btnmic'),s=document.getElementById('vozst');if(b){b.style.background='';b.style.borderColor='';b.textContent='🎤';}if(s)s.textContent='Pronto! Revise e salve.';recog=null;};recog.onerror=function(e){stopVoz();if(e.error==='not-allowed')toast('Permita o microfone','err');};recog.start();}
+function togVoz(){
+  if(recog){stopVoz();return;}
+  var SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  if(!SR){toast('Voz disponível apenas online','err');return;}
+  recog=new SR();
+  recog.lang='pt-BR';
+  recog.continuous=true;
+  recog.interimResults=true;
+  var btn=document.getElementById('btnmic'),st=document.getElementById('vozst');
+  if(btn){btn.style.background='rgba(192,57,43,.1)';btn.style.borderColor='var(--red)';btn.textContent='⏹';}
+  if(st)st.textContent='Ouvindo... toque ⏹ para parar';
+  var final='';
+  recog.onresult=function(e){
+    var interim='';
+    for(var i=e.resultIndex;i<e.results.length;i++){
+      if(e.results[i].isFinal)final+=e.results[i][0].transcript+' ';
+      else interim+=e.results[i][0].transcript;
+    }
+    var f=document.getElementById('voztxt');
+    if(f)f.value=(final+interim).trim();
+  };
+  recog.onend=function(){
+    var b=document.getElementById('btnmic'),s=document.getElementById('vozst');
+    if(b){b.style.background='';b.style.borderColor='';b.textContent='🎤';}
+    if(s)s.textContent='Pronto! Revise e salve.';
+    var f=document.getElementById('voztxt');
+    if(f&&final)f.value=final.trim();
+    recog=null;
+  };
+  recog.onerror=function(e){stopVoz();if(e.error==='not-allowed')toast('Permita o microfone','err');};
+  recog.start();
+}
 function stopVoz(){if(recog){try{recog.stop();}catch(e){}recog=null;}}
 function saveNV(id){var txt=document.getElementById('voztxt')?document.getElementById('voztxt').value.trim():'';if(!txt){toast('Fale ou digite','err');return;}stopVoz();var ls=gL(),i=ls.findIndex(function(l){return l.id===id});if(i>-1){if(!ls[i].notas)ls[i].notas=[];ls[i].notas.push({texto:txt,data:new Date().toISOString()});ls[i].atualizadoEm=new Date().toISOString();sL(ls);}cM();rLP(id);toast('Nota salva!','ok');}
 
@@ -1477,21 +1610,31 @@ function rPri(busca){
   imoveis.forEach(function(p){
     var patrocinado=p.patrocinado?true:false;
     h2+='<div class="card" style="margin-bottom:11px;border-left:4px solid '+(patrocinado?'var(--or)':'var(--border)')+'">'; 
-    if(patrocinado)h2+='<div style="font-size:11px;font-weight:800;color:var(--or);margin-bottom:6px;text-transform:uppercase">⭐ Patrocinado</div>';
+    if(patrocinado)h2+='<div style="font-size:10px;font-weight:800;color:var(--or);margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px">⭐ Patrocinado</div>';
     if(p.foto)h2+='<img src="'+p.foto+'" style="width:100%;height:160px;object-fit:cover;border-radius:10px;margin-bottom:10px" onerror="this.style.display=\'none\'"/>';
-    h2+='<div style="font-size:15px;font-weight:800;margin-bottom:3px">'+esc(p.nome||'Imóvel')+'</div>';
-    h2+='<div style="font-size:12px;color:var(--text3);margin-bottom:4px">'+esc(p.bairro||'')+(p.cod?' · Cód. '+p.cod:'')+'</div>';
-    if(p.preco)h2+='<div style="font-size:18px;font-weight:800;color:var(--red);margin-bottom:8px">'+esc(p.preco)+'</div>';
+    // 1. Bairro + Código — fonte maior
+    if(p.bairro||p.cod)h2+='<div style="font-size:14px;font-weight:700;color:var(--text2);margin-bottom:5px">'+esc(p.bairro||'')+(p.bairro&&p.cod?' · ':'')+esc(p.cod?'Cód. '+p.cod:'')+'</div>';
+    // 2. Nome do condomínio em destaque
+    if(p.nome&&p.nome.indexOf('Imóvel Cód.')===-1)h2+='<div style="font-size:18px;font-weight:900;color:var(--red);margin-bottom:5px">'+esc(p.nome)+'</div>';
+    // 3. Endereço, Número, Complemento
+    var end='';
+    if(p.endereco)end+=esc(p.endereco);
+    if(p.numero)end+=(end?', ':'')+esc(p.numero);
+    if(p.complemento)end+=(end?' — ':'')+esc(p.complemento);
+    if(end)h2+='<div style="font-size:13px;color:var(--text2);margin-bottom:8px">'+end+'</div>';
+    // 4. Valor
+    if(p.preco)h2+='<div style="font-size:15px;font-weight:800;color:var(--text);margin-bottom:8px">'+esc(p.preco)+'</div>';
+    // 5. Tags
     var tags='';
     if(p.area)tags+='<span class="imtag">'+p.area+'m²</span>';
-    if(p.quartos)tags+='<span class="imtag">'+p.quartos+' quartos</span>';
+    if(p.quartos)tags+='<span class="imtag">'+p.quartos+' dorms.</span>';
     if(p.suites&&p.suites!=='0')tags+='<span class="imtag">'+p.suites+' suíte(s)</span>';
     if(p.vagas)tags+='<span class="imtag">'+p.vagas+' vaga(s)</span>';
-    if(tags)h2+='<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px">'+tags+'</div>';
-    if(p.condominio)h2+='<div style="font-size:12px;color:var(--text2);margin-bottom:3px">🏢 '+esc(p.condominio)+'</div>';
-    if(p.agenciador)h2+='<div style="font-size:12px;color:var(--text2);margin-bottom:3px">👤 '+esc(p.agenciador)+'</div>';
-    if(p.proprietario)h2+='<div style="font-size:12px;color:var(--text2);margin-bottom:3px">🏠 '+esc(p.proprietario)+'</div>';
-    if(p.fone)h2+='<div style="font-size:12px;color:var(--text2);margin-bottom:10px"><a href="tel:'+p.fone.replace(/\D/g,'')+'" style="color:var(--red);text-decoration:none">📞 '+esc(p.fone)+'</a></div>';
+    if(tags)h2+='<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px">'+tags+'</div>';
+    // 6. Agenciador, Proprietário, Fone
+    if(p.agenciador)h2+='<div style="font-size:13px;color:var(--text2);margin-bottom:3px">Agenciador: <b>'+esc(p.agenciador)+'</b></div>';
+    if(p.proprietario)h2+='<div style="font-size:13px;color:var(--text2);margin-bottom:3px">Proprietário: <b>'+esc(p.proprietario)+'</b></div>';
+    if(p.fone)h2+='<div style="font-size:13px;color:var(--text2);margin-bottom:10px">Tel: <a href="tel:'+p.fone.replace(/\D/g,'')+'" style="color:var(--red);text-decoration:none;font-weight:700">'+esc(p.fone)+'</a></div>';
     h2+='<div class="g2">';
     h2+='<button class="btn btnwpp" onclick="wppPri(\''+p.id+'\')">WhatsApp</button>';
     h2+='<button class="btn btnor" onclick="addPriToComp(\''+p.id+'\')">Comparar</button>';
@@ -1499,7 +1642,7 @@ function rPri(busca){
     if(p.link)h2+='<button class="btn btnghost" onclick="window.open(\''+p.link+'\',\'_blank\')">Ver no site</button>';
     h2+='</div>';
     h2+='<button onclick="editPri(\''+p.id+'\')" style="width:100%;margin-top:9px;background:rgba(232,147,90,.08);border:1px solid rgba(232,147,90,.3);color:var(--or);border-radius:9px;padding:10px;font-size:12px;font-weight:700;cursor:pointer">✎ Editar informações</button>';
-    h2+='<button onclick="remPri(\''+p.id+'\')" style="width:100%;margin-top:6px;background:rgba(192,57,43,.07);border:1px solid rgba(192,57,43,.15);color:var(--red);border-radius:9px;padding:10px;font-size:12px;font-weight:700;cursor:pointer">Remover</button>';
+    h2+='<button onclick="confRemPri(\''+p.id+'\')" style="width:100%;margin-top:6px;background:rgba(192,57,43,.07);border:1px solid rgba(192,57,43,.15);color:var(--red);border-radius:9px;padding:10px;font-size:12px;font-weight:700;cursor:pointer">Excluir</button>';
     h2+='<button onclick="togglePatrocinado(\''+p.id+'\')" style="width:100%;margin-top:6px;background:'+(patrocinado?'rgba(232,147,90,.15)':'var(--bg2)')+';border:1px solid '+(patrocinado?'var(--orb)':'var(--border)')+';color:'+(patrocinado?'var(--or)':'var(--text3)')+';border-radius:9px;padding:9px;font-size:12px;font-weight:700;cursor:pointer">'+(patrocinado?'⭐ Patrocinado':'Marcar como patrocinado')+'</button>';
     h2+='</div>';
   });
@@ -1510,14 +1653,30 @@ function editPri(id){
   var lista=gPri();
   var p=lista.find(function(x){return x.id===id;});
   if(!p)return;
+  // Migrar campo condominio para nome se necessário
+  if(!p.nome&&p.condominio)p.nome=p.condominio;
   document.getElementById('mt').textContent='Editar imóvel';
   document.getElementById('mp').style.display='none';
   document.getElementById('mb').innerHTML=
+    '<div style="margin-bottom:9px"><label class="lbl">Código</label><input class="inp" id="epcod" value="'+esc(p.cod||'')+'"/></div>'+
     '<div style="margin-bottom:9px"><label class="lbl">Valor</label><input class="inp" id="epreco" value="'+esc(p.preco||'')+'" placeholder="R$ 0,00"/></div>'+
-    '<div style="margin-bottom:9px"><label class="lbl">Condomínio</label><input class="inp" id="epcond" value="'+esc(p.condominio||'')+'" placeholder="Ex: Residencial das Flores"/></div>'+
-    '<div style="margin-bottom:9px"><label class="lbl">Agenciador</label><input class="inp" id="epagenc" value="'+esc(p.agenciador||'')+'" placeholder="Ex: João Batista"/></div>'+
+    '<div style="margin-bottom:9px"><label class="lbl">Bairro</label><input class="inp" id="epbairro" value="'+esc(p.bairro||'')+'"/></div>'+
+    '<div style="margin-bottom:9px"><label class="lbl">Nome do Condomínio</label><input class="inp" id="epnome" value="'+esc(p.nome&&p.nome.indexOf('Imóvel Cód.')===-1?p.nome:'')+'" placeholder="Ex: Edifício Vila Bela"/></div>'+
+    '<div style="margin-bottom:9px"><label class="lbl">Endereço</label><input class="inp" id="ependereco" value="'+esc(p.endereco||'')+'" placeholder="Ex: Rua das Flores"/></div>'+
+    '<div class="g2" style="margin-bottom:9px">'+
+    '<div><label class="lbl">Número</label><input class="inp" id="epnumero" value="'+esc(p.numero||'')+'" placeholder="Ex: 123"/></div>'+
+    '<div><label class="lbl">Complemento</label><input class="inp" id="epcompl" value="'+esc(p.complemento||'')+'" placeholder="Ex: Apto 202"/></div>'+
+    '</div>'+
+    '<div style="margin-bottom:9px"><label class="lbl">Agenciador</label><input class="inp" id="epagenc" value="'+esc(p.agenciador||'')+'"/></div>'+
+    '<div class="g2" style="margin-bottom:9px">'+
+    '<div><label class="lbl">m²</label><input class="inp" id="eparea" value="'+esc(p.area||'')+'" type="number"/></div>'+
+    '<div><label class="lbl">Dorms.</label><input class="inp" id="epquartos" value="'+esc(p.quartos||'')+'" type="number"/></div>'+
+    '<div><label class="lbl">Suíte</label><input class="inp" id="epsuites" value="'+esc(p.suites||'')+'" type="number"/></div>'+
+    '<div><label class="lbl">Vagas</label><input class="inp" id="epvagas" value="'+esc(p.vagas||'')+'" type="number"/></div>'+
+    '</div>'+
     '<div style="margin-bottom:9px"><label class="lbl">Proprietário</label><input class="inp" id="epprop" value="'+esc(p.proprietario||'')+'" placeholder="Ex: Maria Silva"/></div>'+
-    '<div><label class="lbl">Fone proprietário</label><input class="inp" id="epfone" type="tel" value="'+esc(p.fone||'')+'" placeholder="(48) 99999-9999" oninput="mT(this)"/></div>';
+    '<div style="margin-bottom:9px"><label class="lbl">Telefone</label><input class="inp" id="epfone" type="tel" value="'+esc(p.fone||'')+'" placeholder="(48) 99999-9999" oninput="mT(this)"/></div>'+
+    '<div><label class="lbl">Link</label><input class="inp" id="eplink" value="'+esc(p.link||'')+'" placeholder="https://..."/></div>';
   document.getElementById('mbtns').innerHTML=
     '<button class="mbc" onclick="cM()">Cancelar</button>'+
     '<button class="mbor" onclick="savePri(\''+id+'\')">Salvar</button>';
@@ -1528,13 +1687,22 @@ function savePri(id){
   var lista=gPri();
   var p=lista.find(function(x){return x.id===id;});
   if(!p)return;
-  var pr=document.getElementById('epreco'),c=document.getElementById('epcond'),ag=document.getElementById('epagenc');
-  var pp=document.getElementById('epprop'),fn=document.getElementById('epfone');
-  if(pr)p.preco=pr.value.trim();
-  if(c)p.condominio=c.value.trim();
-  if(ag)p.agenciador=ag.value.trim();
-  if(pp)p.proprietario=pp.value.trim();
-  if(fn)p.fone=fn.value.trim();
+  var f=function(i){var e=document.getElementById(i);return e?e.value.trim():'';};
+  p.cod=f('epcod');
+  p.preco=f('epreco');
+  p.bairro=f('epbairro');
+  p.nome=f('epnome');
+  p.endereco=f('ependereco');
+  p.numero=f('epnumero');
+  p.complemento=f('epcompl');
+  p.agenciador=f('epagenc');
+  p.area=f('eparea');
+  p.quartos=f('epquartos');
+  p.suites=f('epsuites');
+  p.vagas=f('epvagas');
+  p.proprietario=f('epprop');
+  p.fone=f('epfone');
+  p.link=f('eplink')||p.link;
   sPri(lista);cM();
   rPri(document.getElementById('pribusca')?document.getElementById('pribusca').value:'');
   toast('Atualizado!','ok');
@@ -1550,13 +1718,22 @@ function togglePatrocinado(id){
   toast(p.patrocinado?'Marcado como patrocinado':'Removido patrocinado','ok');
 }
 
-function remPri(id){
+function confRemPri(id){
   var p=gPri().find(function(x){return x.id===id;});
-  var nome=p?p.nome||'este imóvel':'este imóvel';
-  if(!confirm('Remover "'+nome+'" da lista?'))return;
-  sPri(gPri().filter(function(p){return p.id!==id;}));
+  var nome=p?(p.nome&&p.nome.indexOf('Imóvel Cód.')===-1?p.nome:(p.cod?'Cód. '+p.cod:'este imóvel')):'este imóvel';
+  window._priDelId=id;
+  document.getElementById('mt').textContent='Excluir imóvel?';
+  document.getElementById('mp').style.display='block';
+  document.getElementById('mp').textContent='"'+nome+'" será excluído da lista.';
+  document.getElementById('mb').innerHTML='';
+  document.getElementById('mbtns').innerHTML='<button class="mbc" onclick="cM()">Cancelar</button><button class="mbr" onclick="confirmarRemPri()">Excluir</button>';
+  document.getElementById('mov').classList.add('on');
+}
+function confirmarRemPri(){
+  sPri(gPri().filter(function(p){return p.id!==window._priDelId;}));
+  cM();
   rPri(document.getElementById('pribusca')?document.getElementById('pribusca').value:'');
-  toast('Removido','ok');
+  toast('Excluído','ok');
 }
 
 function wppPri(id){
