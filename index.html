@@ -307,9 +307,9 @@ html,body{height:100%;overflow:hidden;background:var(--bg);font-family:"Segoe UI
         <div id="top3lista"></div>
         <div class="div" style="margin:0"></div>
       </div>
-      <span class="lbl">Imóvel</span>
+      <span class="lbl">Imóvel <span style="font-weight:400;color:var(--text3);font-size:11px">— código ou link</span></span>
       <div style="display:flex;gap:8px;margin-bottom:6px">
-        <input class="binp" id="linki" ontouchstart="event.stopPropagation()" placeholder="Cole o link da Controle..." onkeydown="if(event.key==='Enter')buscarIm()" style="flex:1"/>
+        <input class="binp" id="linki" ontouchstart="event.stopPropagation()" placeholder="Código (ex: 20013) ou link completo..." onkeydown="if(event.key==='Enter')buscarIm()" style="flex:1"/>
         <button onclick="buscarIm()" style="background:var(--red);border:none;color:#fff;border-radius:10px;padding:0 17px;font-size:19px;cursor:pointer;font-weight:700">→</button>
       </div>
       <div id="imst" style="font-size:12px;color:var(--text3);min-height:16px;margin-bottom:7px"></div>
@@ -515,6 +515,7 @@ window.addEventListener('load',function(){
   gT(0);rLeads();rAgendaHoje();rPainelResumo();
   setTimeout(chkAgenda,800);
   setTimeout(chkVista,1500);
+  pedirNotificacao();
 });
 
 // PAINEL RESUMO + TOP 3
@@ -633,10 +634,18 @@ function rFavs(){
 // BUSCA IMÓVEL
 function buscarIm(){
   var inp=document.getElementById('linki');
-  var link=inp.value.trim();
-  if(!link){toast('Cole o link do imóvel','err');return;}
+  var val=inp.value.trim();
+  if(!val){toast('Digite o código ou cole o link','err');return;}
   var st=document.getElementById('imst');
-  st.textContent='Buscando...';inp.value='';
+  // Se for só número = código → monta o link da Controle
+  var link=val;
+  if(/^\d{4,6}$/.test(val)){
+    link='https://controleimoveis.com.br/imovel/'+val;
+    st.textContent='Buscando código '+val+'...';
+  } else {
+    st.textContent='Buscando...';
+  }
+  inp.value='';
   fetch(link).then(function(r){return r.text()}).then(function(h){
     var doc=new DOMParser().parseFromString(h,'text/html');
     var im=extrDados(doc,link)||extrURL(link);
@@ -858,11 +867,13 @@ function rLeads(busca){
         if(codStr)h+='<span style="color:var(--text3)">'+esc(codStr)+'</span>';
         h+='</div>';
       }
-      if(imObj.link)h+='<a href="'+imObj.link+'" target="_blank" style="font-size:11px;color:var(--red);text-decoration:none;margin-top:2px;display:block" onclick="event.stopPropagation()">Ver imóvel no site</a>';
+      if(imObj.link)h+='<a href="'+imObj.link+'" target="_blank" style="font-size:11px;color:var(--red);text-decoration:none;margin-top:2px;display:inline-flex;align-items:center;gap:3px" onclick="event.stopPropagation()">🏠 Abrir no Vista →</a>';
     }
     if(ultC)h+='<div style="font-size:10px;color:var(--text3);margin-top:2px">Último contato: '+ultC+'</div>';
     if(ds>=5)h+='<span class="badr">'+ds+'d sem contato</span>';
+    else if(ds>=2)h+='<span style="font-size:10px;font-weight:700;background:rgba(232,147,90,.15);color:var(--or);border-radius:6px;padding:2px 7px;margin-top:3px;display:inline-block">'+ds+'d sem contato</span>';
     if(ags.length)h+='<span class="bador">'+ags.length+' lembrete(s)</span>';
+    if((l.tentativas||0)>=3)h+='<span style="font-size:10px;font-weight:700;background:rgba(192,57,43,.10);color:var(--red);border-radius:6px;padding:2px 7px;margin-top:3px;display:inline-block">'+(l.tentativas||0)+'x sem resp.</span>';
     h+='</div>';
     h+='<div class="lmd">';
     h+='<span class="lmst">'+(STL[l.status]||l.status)+'</span>';
@@ -898,6 +909,13 @@ function rLP(id){
   h+='<div class="g2">';
   h+='<button class="btn btnor btnf" onclick="abrirIA(\''+id+'\')">✦ IA</button>';
   h+='<button class="btn btnor btnf" onclick="abrirWpp(\''+id+'\')">WhatsApp</button>';
+  var tent=l.tentativas||0;
+  var corT=tent>=5?'var(--red)':tent>=3?'var(--or)':'var(--text3)';
+  h+='<div style="display:flex;align-items:center;gap:8px;padding:9px 0 3px;border-top:1px solid var(--border);margin-top:6px">';
+  h+='<span style="font-size:12px;color:var(--text2);flex:1">Tentativas sem resposta: <b style="color:'+corT+'">'+tent+'x</b></span>';
+  h+='<button onclick="addTentativa(\''+id+'\')" style="background:rgba(232,147,90,.12);border:1px solid var(--or);color:var(--or);border-radius:8px;padding:5px 11px;font-size:12px;font-weight:700;cursor:pointer">+ Tentei</button>';
+  h+='<button onclick="zeroTentativa(\''+id+'\')" style="background:var(--bg);border:1px solid var(--border);color:var(--text3);border-radius:8px;padding:5px 9px;font-size:12px;cursor:pointer">✓ Respondeu</button>';
+  h+="</div>";
   if(l.tel)h+='<a class="btn btnor btnf" href="tel:'+l.tel+'">Ligar</a>';
   else h+='<button class="btn btnghost btnf" onclick="editL(\''+id+'\')">Editar</button>';
   h+='</div>';
@@ -983,6 +1001,16 @@ function fLP(){document.getElementById('lpov').classList.remove('on');lAid=null;
 function setST(id,status){
   var ls=gL(),i=ls.findIndex(function(l){return l.id===id});
   if(i>-1){ls[i].status=status;ls[i].stAtuEm=new Date().toISOString();ls[i].atualizadoEm=new Date().toISOString();sL(ls);rLP(id);}
+}
+
+function addTentativa(id){
+  var ls=gL(),i=ls.findIndex(function(l){return l.id===id});
+  if(i>-1){ls[i].tentativas=(ls[i].tentativas||0)+1;ls[i].atualizadoEm=new Date().toISOString();sL(ls);rLP(id);toast('Tentativa '+(ls[i].tentativas)+'x registrada','ok');}
+}
+
+function zeroTentativa(id){
+  var ls=gL(),i=ls.findIndex(function(l){return l.id===id});
+  if(i>-1){ls[i].tentativas=0;ls[i].atualizadoEm=new Date().toISOString();sL(ls);rLP(id);toast('Ótimo! Tentativas zeradas ✓','ok');}
 }
 
 function togFav(id){
@@ -1962,18 +1990,34 @@ var alarmeAtivo=null;
 var alarmesSoados={};
 
 function tocarSom(){
+  // Toca som + vibra (Android) + notificação nativa se disponível
   try{
     var ctx=new(window.AudioContext||window.webkitAudioContext)();
-    // Campainha suave — 3 bips curtos
     [0,0.35,0.7].forEach(function(t){
       var o=ctx.createOscillator();var g=ctx.createGain();
       o.connect(g);g.connect(ctx.destination);
       o.frequency.value=880;o.type='sine';
       g.gain.setValueAtTime(0,ctx.currentTime+t);
-      g.gain.linearRampToValueAtTime(0.3,ctx.currentTime+t+0.05);
+      g.gain.linearRampToValueAtTime(0.35,ctx.currentTime+t+0.05);
       g.gain.linearRampToValueAtTime(0,ctx.currentTime+t+0.3);
       o.start(ctx.currentTime+t);o.stop(ctx.currentTime+t+0.35);
     });
+  }catch(e){}
+  // Vibração no Android
+  try{if(navigator.vibrate)navigator.vibrate([200,100,200,100,400]);}catch(e){}
+}
+
+function pedirNotificacao(){
+  if('Notification' in window && Notification.permission === 'default'){
+    Notification.requestPermission();
+  }
+}
+
+function notifNativa(titulo, corpo){
+  try{
+    if('Notification' in window && Notification.permission === 'granted'){
+      new Notification(titulo, {body: corpo, icon: '/LeadsJB/icon-192.png', tag: 'cockpit-alarme', renotify: true});
+    }
   }catch(e){}
 }
 
@@ -2002,6 +2046,7 @@ function chkAlarmes(){
         document.getElementById('alarmetxt').textContent=a.texto;
         document.getElementById('alarmehora').textContent='Horário: '+a.hora;
         document.getElementById('alarmeov').style.display='flex';
+        notifNativa('⏰ Lembrete Cockpit', l.nome+' — '+a.texto);
         tocarSom();
       }
     });
@@ -2212,7 +2257,11 @@ async function enviarIA() {
 
     var resp = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
-      headers: {'Content-Type': 'application/json'},
+      headers: {
+        'Content-Type': 'application/json',
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-allow-browser': 'true'
+      },
       body: JSON.stringify({
         model: 'claude-sonnet-4-20250514',
         max_tokens: 1000,
@@ -2222,6 +2271,15 @@ async function enviarIA() {
     });
 
     var data = await resp.json();
+
+    if (!resp.ok) {
+      typing.remove();
+      var errMsg = (data.error && data.error.message) ? data.error.message : 'Erro ' + resp.status;
+      appendMsgIA('ai', '⚠️ ' + errMsg);
+      iaCarregando = false;
+      return;
+    }
+
     var resposta = data.content && data.content[0] ? data.content[0].text : 'Erro ao obter resposta.';
 
     typing.remove();
@@ -2231,7 +2289,7 @@ async function enviarIA() {
 
   } catch(e) {
     typing.remove();
-    appendMsgIA('ai', 'Erro de conexão. Verifique sua internet e tente novamente.');
+    appendMsgIA('ai', '📶 Erro de conexão. Verifique sua internet e tente novamente. (' + (e.message||'') + ')');
   }
   iaCarregando = false;
 }
@@ -2278,8 +2336,24 @@ function destruirMic() {
 
 function iniciarMicIA() {
   var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-  if (!SR) { toast('Reconhecimento de voz não suportado neste navegador', 'err'); return; }
+  if (!SR) {
+    toast('Microfone não suportado. Use Chrome no Android.', 'err');
+    return;
+  }
+  if (navigator.permissions) {
+    navigator.permissions.query({name:'microphone'}).then(function(status){
+      if (status.state === 'denied') {
+        toast('Microfone bloqueado. Libere nas configurações do Chrome.', 'err');
+        return;
+      }
+      _iniciarRecSR(SR);
+    }).catch(function(){ _iniciarRecSR(SR); });
+  } else {
+    _iniciarRecSR(SR);
+  }
+}
 
+function _iniciarRecSR(SR) {
   destruirMic();
 
   var rec = new SR();
@@ -2298,35 +2372,36 @@ function iniciarMicIA() {
   };
 
   rec.onresult = function(e) {
-    // Primeiro: destruir o mic para não haver loop
     destruirMic();
     resetMicUI();
-
     var texto = e.results[0][0].transcript;
     var inp = document.getElementById('iainp');
     if (inp && texto) {
       inp.value = texto;
       inp.style.height = 'auto';
       inp.style.height = Math.min(inp.scrollHeight, 100) + 'px';
-      // Envia automaticamente após pequeno delay
       setTimeout(function(){ enviarIA(); }, 300);
     }
   };
 
   rec.onend = function() {
-    // Só limpa UI se ainda não foi limpo pelo onresult
-    if (iaMicAtivo) {
-      resetMicUI();
-    }
+    if (iaMicAtivo) resetMicUI();
     iaMicRec = null;
   };
 
   rec.onerror = function(e) {
     destruirMic();
     resetMicUI();
-    if (e.error !== 'aborted' && e.error !== 'no-speech') {
-      toast('Microfone: ' + e.error, 'err');
-    }
+    var msgs = {
+      'not-allowed': 'Permissão negada. Libere o microfone no Chrome.',
+      'no-speech': '',
+      'aborted': '',
+      'network': 'Sem conexão para reconhecimento de voz.',
+      'service-not-allowed': 'Microfone não permitido neste contexto.'
+    };
+    var m = msgs[e.error];
+    if (m === undefined) m = 'Erro no microfone: ' + e.error;
+    if (m) toast(m, 'err');
   };
 
   try {
@@ -2334,7 +2409,7 @@ function iniciarMicIA() {
   } catch(e) {
     destruirMic();
     resetMicUI();
-    toast('Erro ao iniciar microfone', 'err');
+    toast('Erro ao iniciar microfone: ' + e.message, 'err');
   }
 }
 
