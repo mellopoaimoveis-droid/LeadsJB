@@ -688,6 +688,11 @@ function editarImInicio(){
     '<div style="margin-bottom:9px"><label class="lbl">Valor</label><input class="inp" id="eipreco0" value="'+esc(iA.preco||'')+'" placeholder="R$ 0,00"/></div>'+
     '<div style="margin-bottom:9px"><label class="lbl">Bairro</label><input class="inp" id="eibairro0" value="'+esc(iA.bairro||'')+'"/></div>'+
     '<div style="margin-bottom:9px"><label class="lbl">Nome do Condomínio</label><input class="inp" id="einome0" value="'+esc(iA.nome&&iA.nome.indexOf('Imóvel Cód.')===-1?iA.nome:'')+'" placeholder="Ex: Edifício Vila Bela"/></div>'+
+    '<div style="margin-bottom:9px"><label class="lbl">Endereço</label><input class="inp" id="eiendereco0" value="'+esc(iA.endereco||'')+'" placeholder="Ex: Rua das Flores"/></div>'+
+    '<div class="g2" style="margin-bottom:9px">'+
+    '<div><label class="lbl">Número</label><input class="inp" id="einumero0" value="'+esc(iA.numero||'')+'" placeholder="Ex: 123"/></div>'+
+    '<div><label class="lbl">Complemento</label><input class="inp" id="eicompl0" value="'+esc(iA.complemento||'')+'" placeholder="Ex: Apto 202"/></div>'+
+    '</div>'+
     '<div style="margin-bottom:9px"><label class="lbl">Agenciador</label><input class="inp" id="eiagenc0" value="'+esc(iA.agenciador||'')+'"/></div>'+
     '<div class="g2" style="margin-bottom:9px">'+
     '<div><label class="lbl">m²</label><input class="inp" id="eiarea0" value="'+esc(iA.area||'')+'" type="number"/></div>'+
@@ -706,7 +711,8 @@ function editarImInicio(){
 function saveImInicio(){
   var f=function(i){var e=document.getElementById(i);return e?e.value.trim():'';};
   iA.cod=f('eicod0');iA.preco=f('eipreco0');iA.bairro=f('eibairro0');
-  iA.nome=f('einome0');iA.agenciador=f('eiagenc0');
+  iA.nome=f('einome0');iA.endereco=f('eiendereco0');iA.numero=f('einumero0');iA.complemento=f('eicompl0');
+  iA.agenciador=f('eiagenc0');
   iA.area=f('eiarea0');iA.quartos=f('eiquartos0');iA.suites=f('eisuites0');iA.vagas=f('eivagas0');
   iA.proprietario=f('eiprop0');iA.fone=f('eifone0');
   cM();rIm(iA);toast('Atualizado!','ok');
@@ -814,6 +820,7 @@ function rLeads(busca){
         if(codStr)h+='<span style="color:var(--text3)">'+esc(codStr)+'</span>';
         h+='</div>';
       }
+      if(imObj.link)h+='<a href="'+imObj.link+'" target="_blank" style="font-size:11px;color:var(--red);text-decoration:none;margin-top:2px;display:block" onclick="event.stopPropagation()">Ver imóvel no site</a>';
     }
     if(ultC)h+='<div style="font-size:10px;color:var(--text3);margin-top:2px">Último contato: '+ultC+'</div>';
     if(ds>=5)h+='<span class="badr">'+ds+'d sem contato</span>';
