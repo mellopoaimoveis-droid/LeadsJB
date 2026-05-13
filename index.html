@@ -134,6 +134,28 @@ html,body{height:100%;overflow:hidden;background:var(--bg);font-family:"Segoe UI
 .toast.on{opacity:1}.toast.err{background:var(--red)}.toast.ok{background:var(--or)}
 .div{height:1px;background:var(--border);margin:13px 0}
 .empty{text-align:center;color:var(--text3);padding:36px 20px;font-size:14px;line-height:2}
+/* CHAT IA */
+.iaov{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:6000;display:none;align-items:flex-end}
+.iaov.on{display:flex}
+.iabox{background:var(--bg);border-radius:22px 22px 0 0;width:100%;height:88vh;display:flex;flex-direction:column;padding-bottom:max(12px,env(safe-area-inset-bottom))}
+.iahdr{display:flex;align-items:center;justify-content:space-between;padding:14px 15px 0;margin-bottom:8px;flex-shrink:0}
+.iamsg-wrap{flex:1;overflow-y:auto;padding:4px 13px 8px;display:flex;flex-direction:column;gap:9px}
+.iamsg{max-width:85%;padding:11px 13px;border-radius:14px;font-size:14px;line-height:1.55}
+.iamsg.user{background:var(--red);color:#fff;align-self:flex-end;border-bottom-right-radius:4px}
+.iamsg.ai{background:var(--card);color:var(--text);align-self:flex-start;border-bottom-left-radius:4px;box-shadow:var(--sh)}
+.iamsg.ai b{color:var(--red)}
+.iamsg.typing{opacity:.6}
+.iainp-row{display:flex;gap:8px;padding:8px 13px 0;flex-shrink:0;border-top:1px solid var(--border)}
+.iainp{flex:1;background:var(--bg);border:1.5px solid var(--border);border-radius:12px;padding:11px 13px;font-size:14px;color:var(--text);outline:none;font-family:inherit;resize:none;max-height:100px}
+.iainp:focus{border-color:rgba(192,57,43,.35)}
+.iasbtn{background:var(--red);border:none;color:#fff;border-radius:12px;padding:11px 16px;font-size:18px;cursor:pointer;flex-shrink:0}
+.iachip-row{display:flex;gap:6px;padding:6px 13px 0;overflow-x:auto;scrollbar-width:none;flex-shrink:0}
+.iachip-row::-webkit-scrollbar{display:none}
+.iachip{flex-shrink:0;background:var(--card);border:1.5px solid var(--border);color:var(--text2);border-radius:20px;padding:6px 13px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap}
+.iachip:active{background:var(--orl);border-color:var(--orb);color:var(--or)}
+.iamicbtn{background:var(--bg);border:1.5px solid var(--border);color:var(--text2);border-radius:12px;padding:11px 13px;font-size:18px;cursor:pointer;flex-shrink:0;transition:all .2s}
+.iamicbtn.gravando{background:rgba(192,57,43,.12);border-color:var(--red);animation:pulse-mic .8s infinite}
+@keyframes pulse-mic{0%,100%{transform:scale(1)}50%{transform:scale(1.12)}}
 </style>
 </head>
 <body>
@@ -193,6 +215,34 @@ html,body{height:100%;overflow:hidden;background:var(--bg);font-family:"Segoe UI
 </div>
 <div class="toast" id="toast"></div>
 
+<!-- CHAT IA -->
+<div class="iaov" id="iaov">
+  <div class="iabox">
+    <div class="iahdr">
+      <div>
+        <div style="font-size:17px;font-weight:800">✦ Assistente IA</div>
+        <div style="font-size:11px;color:var(--text3);margin-top:1px">João Batista · Controle Imóveis</div>
+      </div>
+      <button onclick="fecharIA()" style="background:var(--bg2);border:none;color:var(--text2);width:34px;height:34px;border-radius:50%;font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center">×</button>
+    </div>
+    <div class="iachip-row" id="iachips">
+      <button class="iachip" onclick="chipIA('Analise meus leads de hoje')">📊 Analisar leads</button>
+      <button class="iachip" onclick="chipIA('Quais leads precisam de atenção urgente?')">⚠️ Urgentes</button>
+      <button class="iachip" onclick="chipIA('Crie uma mensagem de 1ª abordagem para o lead atual')">✉️ 1ª Abordagem</button>
+      <button class="iachip" onclick="chipIA('Crie um follow-up para o lead atual')">🔄 Follow-up</button>
+      <button class="iachip" onclick="chipIA('Simule um financiamento para o imóvel do lead atual')">💰 Financiamento</button>
+      <button class="iachip" onclick="chipIA('Dê dicas para fechar essa venda')">🎯 Dicas de venda</button>
+    </div>
+    <div class="iamsg-wrap" id="iamsgwrap"></div>
+    <div class="iainp-row">
+      <button class="iamicbtn" id="iamicbtn" onclick="toggleMicIA()" title="Falar">🎙️</button>
+      <textarea class="iainp" id="iainp" rows="1" placeholder="Pergunte sobre leads, imóveis, mensagens..." onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();enviarIA()}"></textarea>
+      <button class="iasbtn" onclick="enviarIA()">↑</button>
+    </div>
+    <div id="iamiclabel" style="text-align:center;font-size:12px;color:var(--text3);padding:4px 13px 2px;flex-shrink:0;display:none">🔴 Ouvindo... Toque no 🎙️ para parar</div>
+  </div>
+</div>
+
 <!-- APP -->
 <div class="app">
 <div class="slides-wrap">
@@ -203,7 +253,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);font-family:"Segoe UI
   <div class="hdr">
     <div><div class="ht">Cockpit</div><div class="hs">Joao Batista · Controle</div></div>
     <div class="hbts">
-      <button class="hbtn" onclick="window.open('https://claude.ai','_blank')">IA</button>
+      <button class="hbtn" onclick="abrirIA()">IA</button>
       <button class="hbtn" onclick="window.open('https://controleimoveis.com.br','_blank')">CI</button>
       <button class="hbtn" onclick="expBkp()">Exportar</button>
       <button class="hbtn" onclick="document.getElementById('bkpf').click()">Importar</button>
@@ -260,7 +310,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);font-family:"Segoe UI
   <div class="hdr">
     <div><div class="ht">Leads</div><div class="hs">Atendimento rápido</div></div>
     <div class="hbts">
-      <button class="hbtn" onclick="window.open('https://claude.ai','_blank')">IA</button>
+      <button class="hbtn" onclick="abrirIA()">IA</button>
       <button class="hbtn" onclick="window.open('https://controleimoveis.com.br','_blank')">CI</button>
       <button class="hbtn" onclick="abrirRelatorio()">Rel.</button>
       <button class="hbtn" onclick="novoLead()">+ Novo</button>
@@ -270,7 +320,6 @@ html,body{height:100%;overflow:hidden;background:var(--bg);font-family:"Segoe UI
     <input class="binp" id="lbusca" ontouchstart="event.stopPropagation()" placeholder="Buscar por nome ou telefone..." oninput="setFiltro('busca');rLeads(this.value)" style="flex:1"/>
     <button class="bclr" onclick="document.getElementById('lbusca').value='';setFiltro('todos');rLeads('')">×</button>
   </div>
-  <!-- FILTROS RÁPIDOS -->
   <div style="display:flex;gap:6px;padding:6px 13px;overflow-x:auto;flex-shrink:0;scrollbar-width:none">
     <button id="fb0" class="fbtn fativo" onclick="setFiltro('todos')">Todos</button>
     <button id="fb1" class="fbtn" onclick="setFiltro('atrasados')">⚠️ Atrasados</button>
@@ -281,35 +330,37 @@ html,body{height:100%;overflow:hidden;background:var(--bg);font-family:"Segoe UI
   <div class="scroll"><div class="sec" style="padding-top:8px"><div id="llista"></div></div></div>
 </div>
 
-<!-- S2: FINANCIAMENTO -->
+<!-- S2: IMÓVEIS EM DESTAQUE / MEUS AGÊS -->
 <div class="slide">
   <div class="hdr">
-    <div><div class="ht">Financiamento</div><div class="hs">Simulação imobiliária</div></div>
+    <div><div class="ht" id="priTitulo">Imóveis em Destaque</div><div class="hs" id="priSub">Patrocinados e prioritários</div></div>
     <div class="hbts">
-      <button class="hbtn" onclick="window.open('https://claude.ai','_blank')">IA</button>
+      <button class="hbtn" onclick="abrirIA()">IA</button>
       <button class="hbtn" onclick="window.open('https://controleimoveis.com.br','_blank')">CI</button>
     </div>
   </div>
-  <div class="bbar">
-    <input class="binp" id="gi2" ontouchstart="event.stopPropagation()" placeholder="Buscar lead..." oninput="bG(this.value)" onblur="setTimeout(fBG,200)" style="flex:1"/>
-    <button class="bclr" onclick="document.getElementById('gi2').value='';fBG()">×</button>
+  <div style="display:flex;gap:0;padding:0 13px;flex-shrink:0;border-bottom:2px solid var(--border);background:var(--bg)">
+    <button id="abaDestaque" onclick="setAba('destaque')" style="flex:1;padding:10px 0;border:none;border-bottom:3px solid var(--red);background:none;font-size:13px;font-weight:800;color:var(--red);cursor:pointer;margin-bottom:-2px">Imóveis em Destaque</button>
+    <button id="abaMeusAges" onclick="setAba('meusages')" style="flex:1;padding:10px 0;border:none;border-bottom:3px solid transparent;background:none;font-size:13px;font-weight:700;color:var(--text3);cursor:pointer;margin-bottom:-2px">Meus Agês</button>
   </div>
-  <div class="scroll"><div class="sec">
-    <div class="fttab">
-      <button class="ftt on" id="ftprice" onclick="setFT('price',this)">Tabela Price</button>
-      <button class="ftt" id="ftsac" onclick="setFT('sac',this)">SAC</button>
+  <div class="bbar">
+    <input class="binp" id="pribusca" ontouchstart="event.stopPropagation()" placeholder="Buscar por nome ou bairro..." oninput="rPri(this.value)" style="flex:1"/>
+    <button class="bclr" onclick="document.getElementById('pribusca').value='';rPri('')">×</button>
+  </div>
+  <div style="padding:6px 13px;flex-shrink:0">
+    <button id="btnPatroc" onclick="toggleFiltroPatroc()" style="padding:6px 14px;border-radius:20px;border:1.5px solid var(--border);background:var(--card);color:var(--text2);font-size:12px;font-weight:700;cursor:pointer">⭐ Só patrocinados</button>
+  </div>
+  <div style="display:flex;gap:8px;padding:6px 13px 8px;flex-shrink:0;border-bottom:1px solid var(--border);background:var(--bg)">
+    <input class="binp" id="prilink" placeholder="Cole o link do imóvel..." onkeydown="event.stopPropagation();if(event.key==='Enter')addPri()" ontouchstart="event.stopPropagation()" style="flex:1"/>
+    <button onclick="addPri()" style="background:var(--red);border:none;color:#fff;border-radius:10px;padding:0 17px;font-size:19px;cursor:pointer;font-weight:700;flex-shrink:0">+</button>
+  </div>
+  <div id="prist" style="font-size:12px;color:var(--text3);min-height:16px;padding:3px 13px;flex-shrink:0"></div>
+  <div class="scroll">
+    <div class="sec">
+      <div id="agendahoje" style="margin-bottom:10px"></div>
+      <div id="prilist"></div>
     </div>
-    <div class="g2" style="margin-bottom:11px">
-      <div><label class="lbl">Valor do imóvel</label><input class="inp" id="fv" placeholder="R$ 0" oninput="mM(this);cFin()"/></div>
-      <div><label class="lbl">Entrada</label><input class="inp" id="fe" placeholder="R$ 0" oninput="mM(this);cFin()"/></div>
-      <div><label class="lbl">Taxa anual (%)</label><input class="inp" id="ftx" placeholder="10.5" oninput="cFin()"/></div>
-      <div><label class="lbl">Prazo (meses)</label><input class="inp" id="fp" placeholder="360" oninput="cFin()"/></div>
-      <div><label class="lbl">Renda familiar</label><input class="inp" id="fr" placeholder="R$ 0" oninput="mM(this);cFin()"/></div>
-      <div><label class="lbl">FGTS</label><input class="inp" id="ff" placeholder="R$ 0" oninput="mM(this);cFin()"/></div>
-    </div>
-    <div id="finres"></div>
-    <button class="btn btnor btnf btnlg" onclick="window.open('https://www8.caixa.gov.br/siopiinternet-web/','_blank')">Simular na Caixa (oficial)</button>
-  </div></div>
+  </div>
 </div>
 
 <!-- S3: COMPARAR -->
@@ -317,7 +368,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);font-family:"Segoe UI
   <div class="hdr">
     <div><div class="ht">Comparar</div><div class="hs">Até 3 imóveis</div></div>
     <div class="hbts">
-      <button class="hbtn" onclick="window.open('https://claude.ai','_blank')">IA</button>
+      <button class="hbtn" onclick="abrirIA()">IA</button>
       <button class="hbtn" onclick="window.open('https://controleimoveis.com.br','_blank')">CI</button>
       <button class="hbtn" onclick="limparComp()">Limpar</button>
     </div>
@@ -341,7 +392,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);font-family:"Segoe UI
   <div class="hdr">
     <div><div class="ht">Mensagens</div><div class="hs">Templates editáveis</div></div>
     <div class="hbts">
-      <button class="hbtn" onclick="window.open('https://claude.ai','_blank')">IA</button>
+      <button class="hbtn" onclick="abrirIA()">IA</button>
       <button class="hbtn" onclick="window.open('https://controleimoveis.com.br','_blank')">CI</button>
     </div>
   </div>
@@ -368,50 +419,18 @@ html,body{height:100%;overflow:hidden;background:var(--bg);font-family:"Segoe UI
   </div></div>
 </div>
 
-<!-- S5: IMÓVEIS EM DESTAQUE / MEUS AGÊS -->
-<div class="slide">
-  <div class="hdr">
-    <div><div class="ht" id="priTitulo">Imóveis em Destaque</div><div class="hs" id="priSub">Patrocinados e prioritários</div></div>
-    <div class="hbts">
-      <button class="hbtn" onclick="window.open('https://claude.ai','_blank')">IA</button>
-      <button class="hbtn" onclick="window.open('https://controleimoveis.com.br','_blank')">CI</button>
-    </div>
-  </div>
-  <!-- ABAS -->
-  <div style="display:flex;gap:0;padding:0 13px;flex-shrink:0;border-bottom:2px solid var(--border);background:var(--bg)">
-    <button id="abaDestaque" onclick="setAba('destaque')" style="flex:1;padding:10px 0;border:none;border-bottom:3px solid var(--red);background:none;font-size:13px;font-weight:800;color:var(--red);cursor:pointer;margin-bottom:-2px">Imóveis em Destaque</button>
-    <button id="abaMeusAges" onclick="setAba('meusages')" style="flex:1;padding:10px 0;border:none;border-bottom:3px solid transparent;background:none;font-size:13px;font-weight:700;color:var(--text3);cursor:pointer;margin-bottom:-2px">Meus Agês</button>
-  </div>
-  <div class="bbar">
-    <input class="binp" id="pribusca" ontouchstart="event.stopPropagation()" placeholder="Buscar por nome ou bairro..." oninput="rPri(this.value)" style="flex:1"/>
-    <button class="bclr" onclick="document.getElementById('pribusca').value='';rPri('')">×</button>
-  </div>
-  <div style="padding:6px 13px;flex-shrink:0">
-    <button id="btnPatroc" onclick="toggleFiltroPatroc()" style="padding:6px 14px;border-radius:20px;border:1.5px solid var(--border);background:var(--card);color:var(--text2);font-size:12px;font-weight:700;cursor:pointer">⭐ Só patrocinados</button>
-  </div>
-  <!-- INPUT FIXO -->
-  <div style="display:flex;gap:8px;padding:6px 13px 8px;flex-shrink:0;border-bottom:1px solid var(--border);background:var(--bg)">
-    <input class="binp" id="prilink" placeholder="Cole o link do imóvel..." onkeydown="event.stopPropagation();if(event.key==='Enter')addPri()" ontouchstart="event.stopPropagation()" style="flex:1"/>
-    <button onclick="addPri()" style="background:var(--red);border:none;color:#fff;border-radius:10px;padding:0 17px;font-size:19px;cursor:pointer;font-weight:700;flex-shrink:0">+</button>
-  </div>
-  <div id="prist" style="font-size:12px;color:var(--text3);min-height:16px;padding:3px 13px;flex-shrink:0"></div>
-  <div class="scroll">
-    <div class="sec">
-      <div id="agendahoje" style="margin-bottom:10px"></div>
-      <div id="prilist"></div>
-    </div>
-  </div>
-</div>
-
 </div></div>
+<!-- BOTÕES SIMULADORES FIXOS acima do menu -->
+<div style="display:flex;gap:8px;padding:8px 13px;background:var(--card);border-top:1px solid var(--border);flex-shrink:0">
+  <button class="btn btnghost btnf" style="flex:1;font-size:11px" onclick="window.open('https://www8.caixa.gov.br/siopiinternet-web/','_blank')">Simulador CEF</button>
+</div>
 <div class="bnav" id="bnav">
   <div class="bnavt">
     <div class="nbi on" id="nb0" onclick="gT(0)"><span>Início</span></div>
     <div class="nbi" id="nb1" onclick="gT(1)"><span>Leads</span></div>
-    <div class="nbi" id="nb2" onclick="gT(2)"><span>Financ.</span></div>
+    <div class="nbi" id="nb2" onclick="gT(2)"><span>Destaque</span></div>
     <div class="nbi" id="nb3" onclick="gT(3)"><span>Comparar</span></div>
     <div class="nbi" id="nb4" onclick="gT(4)"><span>Msgs</span></div>
-    <div class="nbi" id="nb5" onclick="gT(5)"><span>Destaque</span></div>
   </div>
 </div>
 </div>
@@ -434,7 +453,7 @@ function cMD(){return{msg1:'Olá, {nome}! Aqui é o *João Batista da Controle I
 
 // NAVEGAÇÃO
 var tA=0,iA=null,cS=[null,null,null];
-var NTELAS=6;
+var NTELAS=5;
 var sl=null;
 
 function gT(i){
@@ -452,9 +471,9 @@ function gT(i){
   tA=i;
   if(i===0){rFavs();rAgendaHoje();rPainelResumo();}
   if(i===1)rLeads(document.getElementById('lbusca')?document.getElementById('lbusca').value:'');
+  if(i===2)rPri('');
   if(i===3){cS=gC();rComp();}
   if(i===4)loadMsgs();
-  if(i===5)rPri('');
 }
 
 window.addEventListener('load',function(){
@@ -515,7 +534,7 @@ function rPainelResumo(){
     if(!imEntrada&&ims.length)imEntrada=ims[0]; // fallback leads antigos
     if(!imEntrada)return;
     var chave=imEntrada.nome||'Sem nome';
-    if(!mapa[chave])mapa[chave]={nome:chave,link:imEntrada.link||'',count:0};
+    if(!mapa[chave])mapa[chave]={nome:chave,cod:imEntrada.cod||'',link:imEntrada.link||'',count:0};
     mapa[chave].count++;
   });
   var top3=Object.values(mapa).filter(function(x){return x.nome!=='Sem nome';}).sort(function(a,b){return b.count-a.count;}).slice(0,3);
@@ -529,7 +548,9 @@ function rPainelResumo(){
   top3.forEach(function(item,i){
     h2+='<div style="display:flex;align-items:center;background:var(--card);border-radius:10px;padding:9px 12px;margin-bottom:5px;box-shadow:var(--sh)">';
     h2+='<span style="font-size:11px;font-weight:800;color:var(--text3);width:22px;flex-shrink:0">'+ranks[i]+'</span>';
-    h2+='<div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+esc(item.nome)+'</div>';
+    h2+='<div style="flex:1;min-width:0">';
+    h2+='<div style="font-size:13px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+esc(item.nome)+'</div>';
+    if(item.cod)h2+='<div style="font-size:11px;color:var(--text3)">Cód. '+esc(item.cod)+'</div>';
     if(item.link)h2+='<a href="'+item.link+'" target="_blank" style="font-size:11px;color:var(--red);text-decoration:none">Ver no site</a>';
     h2+='</div>';
     h2+='<span style="background:var(--orl);border:1px solid var(--orb);color:var(--or);font-size:12px;font-weight:800;padding:2px 8px;border-radius:6px;flex-shrink:0;margin-left:8px">'+item.count+'x</span>';
@@ -858,6 +879,7 @@ function rLP(id){
   // AÇÕES
   h+='<div class="psec"><div class="pst">Ações</div>';
   h+='<div class="g2">';
+  h+='<button class="btn btnor btnf" onclick="abrirIA(\''+id+'\')">✦ IA</button>';
   h+='<button class="btn btnor btnf" onclick="abrirWpp(\''+id+'\')">WhatsApp</button>';
   if(l.tel)h+='<a class="btn btnor btnf" href="tel:'+l.tel+'">Ligar</a>';
   else h+='<button class="btn btnghost btnf" onclick="editL(\''+id+'\')">Editar</button>';
@@ -901,6 +923,9 @@ function rLP(id){
     h+='<div class="agi '+cls+'">';
     h+='<div style="flex:1"><div style="font-size:13px;font-weight:600">'+esc(a.texto)+'</div>';
     h+='<div style="font-size:11px;color:var(--text3)">'+fmtD(a.data)+(a.hora?' às '+a.hora:'')+'</div></div>';
+    // Botão Google Calendar
+    var gcUrl='https://calendar.google.com/calendar/render?action=TEMPLATE&text='+encodeURIComponent(a.texto+(l?' - '+l.nome:''))+'&dates='+a.data.replace(/-/g,'')+(a.hora?'T'+a.hora.replace(':','')+'00':'T080000')+'/'+a.data.replace(/-/g,'')+(a.hora?'T'+a.hora.replace(':','')+'00':'T090000');
+    h+='<a href="'+gcUrl+'" target="_blank" class="agok" style="text-decoration:none;padding:5px 7px">📅</a>';
     h+='<button class="agok" onclick="okAg(\''+id+'\',\''+a.id+'\')">OK</button>';
     h+='<button class="aged" onclick="editAg(\''+id+'\',\''+a.id+'\')">Editar</button>';
     h+='<button class="agx" onclick="delAg(\''+id+'\',\''+a.id+'\')">×</button>';
@@ -1034,15 +1059,20 @@ function editIm(lid,idx){
     '<div style="margin-bottom:9px"><label class="lbl">Código</label><input class="inp" id="eicod" value="'+esc(im.cod||'')+'"/></div>'+
     '<div style="margin-bottom:9px"><label class="lbl">Valor</label><input class="inp" id="eipreco" value="'+esc(im.preco||'')+'" placeholder="R$ 0,00"/></div>'+
     '<div style="margin-bottom:9px"><label class="lbl">Bairro</label><input class="inp" id="eibairro" value="'+esc(im.bairro||'')+'"/></div>'+
-    '<div style="margin-bottom:9px"><label class="lbl">Nome do Condomínio</label><input class="inp" id="einome" value="'+esc(im.nome||'')+'" /></div>'+
-    '<div style="margin-bottom:9px"><label class="lbl">Agenciador</label><input class="inp" id="eiagenc" value="'+esc(im.agenciador||'')+'" placeholder="Ex: João Batista"/></div>'+
+    '<div style="margin-bottom:9px"><label class="lbl">Nome do Condomínio</label><input class="inp" id="einome" value="'+esc(im.nome&&im.nome.indexOf('Imóvel Cód.')===-1?im.nome:'')+'" placeholder="Ex: Edifício Vila Bela"/></div>'+
+    '<div style="margin-bottom:9px"><label class="lbl">Endereço</label><input class="inp" id="eiendereco" value="'+esc(im.endereco||'')+'" placeholder="Ex: Rua das Flores"/></div>'+
+    '<div class="g2" style="margin-bottom:9px">'+
+    '<div><label class="lbl">Número</label><input class="inp" id="einumero" value="'+esc(im.numero||'')+'" placeholder="Ex: 123"/></div>'+
+    '<div><label class="lbl">Complemento</label><input class="inp" id="eicompl" value="'+esc(im.complemento||'')+'" placeholder="Ex: Apto 202"/></div>'+
+    '</div>'+
+    '<div style="margin-bottom:9px"><label class="lbl">Agenciador</label><input class="inp" id="eiagenc" value="'+esc(im.agenciador||'')+'"/></div>'+
     '<div class="g2" style="margin-bottom:9px">'+
     '<div><label class="lbl">m²</label><input class="inp" id="eiarea" value="'+esc(im.area||'')+'" type="number"/></div>'+
     '<div><label class="lbl">Dorms.</label><input class="inp" id="eiquartos" value="'+esc(im.quartos||'')+'" type="number"/></div>'+
     '<div><label class="lbl">Suíte</label><input class="inp" id="eisuites" value="'+esc(im.suites||'')+'" type="number"/></div>'+
     '<div><label class="lbl">Vagas</label><input class="inp" id="eivagas" value="'+esc(im.vagas||'')+'" type="number"/></div>'+
     '</div>'+
-    '<div style="margin-bottom:9px"><label class="lbl">Proprietário</label><input class="inp" id="eiprop" value="'+esc(im.proprietario||'')+'" placeholder="Ex: Maria Silva"/></div>'+
+    '<div style="margin-bottom:9px"><label class="lbl">Proprietário</label><input class="inp" id="eiprop" value="'+esc(im.proprietario||'')+'"/></div>'+
     '<div style="margin-bottom:9px"><label class="lbl">Telefone</label><input class="inp" id="eifone" type="tel" value="'+esc(im.fone||'')+'" placeholder="(48) 99999-9999" oninput="mT(this)"/></div>'+
     '<div><label class="lbl">Link</label><input class="inp" id="eilink" value="'+esc(im.link||'')+'" placeholder="https://..."/></div>';
   document.getElementById('mbtns').innerHTML=
@@ -1059,6 +1089,9 @@ function saveIm(lid,idx){
   ls[i].imoveis[idx].preco=f('eipreco');
   ls[i].imoveis[idx].bairro=f('eibairro');
   ls[i].imoveis[idx].nome=f('einome');
+  ls[i].imoveis[idx].endereco=f('eiendereco');
+  ls[i].imoveis[idx].numero=f('einumero');
+  ls[i].imoveis[idx].complemento=f('eicompl');
   ls[i].imoveis[idx].agenciador=f('eiagenc');
   ls[i].imoveis[idx].area=f('eiarea');
   ls[i].imoveis[idx].quartos=f('eiquartos');
@@ -1276,30 +1309,33 @@ function togVoz(){
   if(!SR){toast('Voz disponível apenas online','err');return;}
   recog=new SR();
   recog.lang='pt-BR';
-  recog.continuous=true;
-  recog.interimResults=true;
+  recog.continuous=false;
+  recog.interimResults=false;
+  recog.maxAlternatives=1;
   var btn=document.getElementById('btnmic'),st=document.getElementById('vozst');
   if(btn){btn.style.background='rgba(192,57,43,.1)';btn.style.borderColor='var(--red)';btn.textContent='⏹';}
-  if(st)st.textContent='Ouvindo... toque ⏹ para parar';
-  var final='';
+  if(st)st.textContent='Ouvindo... fale agora';
+  var jaFinalizou=false;
   recog.onresult=function(e){
-    var interim='';
-    for(var i=e.resultIndex;i<e.results.length;i++){
-      if(e.results[i].isFinal)final+=e.results[i][0].transcript+' ';
-      else interim+=e.results[i][0].transcript;
-    }
+    if(jaFinalizou)return;
+    var t='';
+    for(var i=0;i<e.results.length;i++)t+=e.results[i][0].transcript;
     var f=document.getElementById('voztxt');
-    if(f)f.value=(final+interim).trim();
+    if(f)f.value=(f.value?(f.value+' '):'')+t.trim();
   };
   recog.onend=function(){
+    if(jaFinalizou)return;
+    jaFinalizou=true;
+    recog=null;
     var b=document.getElementById('btnmic'),s=document.getElementById('vozst');
     if(b){b.style.background='';b.style.borderColor='';b.textContent='🎤';}
     if(s)s.textContent='Pronto! Revise e salve.';
-    var f=document.getElementById('voztxt');
-    if(f&&final)f.value=final.trim();
-    recog=null;
   };
-  recog.onerror=function(e){stopVoz();if(e.error==='not-allowed')toast('Permita o microfone','err');};
+  recog.onerror=function(e){
+    jaFinalizou=true;
+    stopVoz();
+    if(e.error==='not-allowed')toast('Permita o microfone','err');
+  };
   recog.start();
 }
 function stopVoz(){if(recog){try{recog.stop();}catch(e){}recog=null;}}
@@ -1524,7 +1560,7 @@ function setAba(aba){
   filtroPatroc=false;
   var btn=document.getElementById('btnPatroc');
   if(btn){btn.style.background='var(--card)';btn.style.borderColor='var(--border)';btn.style.color='var(--text2)';}
-  gT(5,false);
+  gT(2,false);
   rPri('');
 }
 
@@ -1780,7 +1816,7 @@ function abrirRelatorio(){
     if(!imEntrada&&ims.length)imEntrada=ims[0]; // fallback leads antigos
     if(imEntrada){
       var chave=imEntrada.nome||'Sem nome';
-      if(!mapa[chave])mapa[chave]={nome:chave,link:imEntrada.link||'',count:0,status:{novo:0,contato:0,visita:0,proposta:0}};
+      if(!mapa[chave])mapa[chave]={nome:chave,cod:imEntrada.cod||'',link:imEntrada.link||'',count:0,status:{novo:0,contato:0,visita:0,proposta:0}};
       mapa[chave].count++;
       if(mapa[chave].status[l.status]!==undefined)mapa[chave].status[l.status]++;
     }
@@ -1796,8 +1832,11 @@ function abrirRelatorio(){
   else{
     lista.forEach(function(item){
       h+='<div style="background:var(--card);border-radius:12px;padding:13px;margin-bottom:9px;box-shadow:var(--sh)">';
-      h+='<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">';
-      h+='<div style="font-size:14px;font-weight:700;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+esc(item.nome)+'</div>';
+      h+='<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">';
+      h+='<div style="flex:1;min-width:0">';
+      if(item.cod)h+='<div style="font-size:11px;color:var(--text3);font-weight:700;margin-bottom:2px">Cód. '+esc(item.cod)+'</div>';
+      h+='<div style="font-size:14px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+esc(item.nome)+'</div>';
+      h+='</div>';
       h+='<span style="background:var(--orl);border:1px solid var(--orb);color:var(--or);font-size:13px;font-weight:800;padding:4px 10px;border-radius:8px;flex-shrink:0;margin-left:8px">'+item.count+' lead'+(item.count>1?'s':'')+'</span>';
       h+='</div>';
       if(item.link)h+='<a href="'+item.link+'" target="_blank" style="font-size:11px;color:var(--red);text-decoration:none;display:block;margin-bottom:6px">Ver no site</a>';
@@ -1834,7 +1873,15 @@ function fBG(){var d=document.getElementById('bdrop');if(d)d.classList.remove('o
 
 // BACKUP
 function expBkp(){
-  var d={leads:gL(),msgs:gMs(),comp:gC(),agenda:gAA(),data:new Date().toISOString()};
+  var d={
+    leads:gL(),
+    msgs:gMs(),
+    comp:gC(),
+    agenda:gAA(),
+    destaque:JSON.parse(localStorage.getItem(PK)||'[]'),
+    meusages:JSON.parse(localStorage.getItem(AGK)||'[]'),
+    data:new Date().toISOString()
+  };
   var blob=new Blob([JSON.stringify(d,null,2)],{type:'application/json'});
   var url=URL.createObjectURL(blob);var a=document.createElement('a');a.href=url;a.download='backup-cockpit-'+new Date().toISOString().split('T')[0]+'.json';a.click();URL.revokeObjectURL(url);
   toast('Backup exportado!','ok');
@@ -1846,17 +1893,11 @@ function impBkp(e){
     try{
       var d=JSON.parse(ev.target.result);
       if(d.leads){
-        // Migrar leads do formato antigo (imovelNome/imovelLink) para novo (imoveis:[])
         d.leads.forEach(function(l){
           if(!l.imoveis){
             l.imoveis=[];
             if(l.imovelNome||l.imovelLink){
-              l.imoveis.push({
-                nome:l.imovelNome||'Imóvel vinculado',
-                preco:l.imovelPreco||'',
-                link:l.imovelLink||'',
-                id:'im'+Date.now()
-              });
+              l.imoveis.push({nome:l.imovelNome||'Imóvel vinculado',preco:l.imovelPreco||'',link:l.imovelLink||'',id:'im'+Date.now()});
             }
           }
         });
@@ -1864,8 +1905,10 @@ function impBkp(e){
       }
       if(d.msgs)localStorage.setItem(MK,JSON.stringify(d.msgs));
       if(d.agenda)localStorage.setItem(AK,JSON.stringify(d.agenda));
-      toast('Importado! '+(d.leads?d.leads.length:0)+' leads.','ok');
-      rLeads();rFavs();
+      if(d.destaque)localStorage.setItem(PK,JSON.stringify(d.destaque));
+      if(d.meusages)localStorage.setItem(AGK,JSON.stringify(d.meusages));
+      toast('Importado! '+(d.leads?d.leads.length:0)+' leads, '+(d.destaque?d.destaque.length:0)+' destaques.','ok');
+      rLeads();rFavs();rPainelResumo();
     }catch(err){toast('Arquivo inválido','err');}
   };
   r.readAsText(f);e.target.value='';
@@ -1946,6 +1989,232 @@ function chkAlarmes(){
       }
     });
   });
+}
+
+// ============================================================
+// CHAT IA EMBUTIDO
+// ============================================================
+var iaChatHistorico = [];
+var iaLeadAtual = null;
+var iaCarregando = false;
+
+function abrirIA(leadId) {
+  iaLeadAtual = leadId || lAid || null;
+  document.getElementById('iaov').classList.add('on');
+  var wrap = document.getElementById('iamsgwrap');
+  if (!wrap.innerHTML) {
+    var saudacao = 'Olá, João Batista! 👋\n\nSou seu assistente IA integrado ao Cockpit. Tenho acesso aos seus leads e posso ajudar com:\n\n• Analisar leads e prioridades\n• Criar mensagens personalizadas\n• Dicas de abordagem e fechamento\n• Simular financiamentos\n\nO que precisa?';
+    appendMsgIA('ai', saudacao);
+  }
+  setTimeout(function(){document.getElementById('iainp').focus();},300);
+}
+
+function fecharIA() {
+  document.getElementById('iaov').classList.remove('on');
+}
+
+function chipIA(txt) {
+  document.getElementById('iainp').value = txt;
+  enviarIA();
+}
+
+function appendMsgIA(tipo, texto) {
+  var wrap = document.getElementById('iamsgwrap');
+  var div = document.createElement('div');
+  div.className = 'iamsg ' + tipo;
+  // Formatar texto: **negrito**, quebras de linha
+  var html = texto
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/\*\*(.+?)\*\*/g,'<b>$1</b>')
+    .replace(/\*(.+?)\*/g,'<b>$1</b>')
+    .replace(/\n/g,'<br>');
+  div.innerHTML = html;
+  wrap.appendChild(div);
+  wrap.scrollTop = wrap.scrollHeight;
+  return div;
+}
+
+function construirContexto() {
+  var leads = gL();
+  var agAll = gAA();
+  var hoje = new Date().toISOString().split('T')[0];
+  var msgs = gMs();
+
+  // Resumo dos leads
+  var resumo = leads.map(function(l) {
+    var ds = dSC(l);
+    var ag = (agAll[l.id] || []).filter(function(a){return !a.concluido;});
+    var imNome = l.imoveis && l.imoveis.length ? l.imoveis[0].nome : 'sem imóvel';
+    var imPreco = l.imoveis && l.imoveis.length ? l.imoveis[0].preco : '';
+    var imBairro = l.imoveis && l.imoveis.length ? l.imoveis[0].bairro : '';
+    var lembretes = ag.map(function(a){return a.texto + ' (' + a.data + ')';}).join(', ');
+    return '- ' + l.nome + ' | Tel: ' + (l.tel||'?') + ' | Status: ' + (l.status||'novo') +
+      ' | ' + ds + 'd sem contato | Imóvel: ' + imNome + (imPreco?' | Valor: '+imPreco:'') +
+      (imBairro?' | Bairro: '+imBairro:'') +
+      (l.obs?' | Obs: '+l.obs:'') +
+      (lembretes?' | Lembretes: '+lembretes:'') +
+      ' | Histórico: ' + (l.historico||[]).map(function(h){return h.tipo;}).join(', ');
+  }).join('\n');
+
+  // Lead atual se houver
+  var leadCtx = '';
+  if (iaLeadAtual) {
+    var lAtual = leads.find(function(x){return x.id === iaLeadAtual;});
+    if (lAtual) {
+      var im = lAtual.imoveis && lAtual.imoveis.length ? lAtual.imoveis[0] : null;
+      leadCtx = '\n\nLEAD ATUAL ABERTO:\nNome: ' + lAtual.nome +
+        '\nTelefone: ' + (lAtual.tel||'?') +
+        '\nStatus: ' + (lAtual.status||'novo') +
+        (im ? '\nImóvel: ' + im.nome + '\nValor: ' + im.preco + '\nBairro: ' + im.bairro +
+          '\nÁrea: ' + (im.area||'?') + 'm² | Quartos: ' + (im.quartos||'?') +
+          (im.suites?' | Suítes: '+im.suites:'') + (im.vagas?' | Vagas: '+im.vagas:'') +
+          '\nAgenciador: ' + (im.agenciador||'?') +
+          '\nLink: ' + (im.link||'') : '') +
+        '\nObs: ' + (lAtual.obs||'nenhuma') +
+        '\nHistórico: ' + (lAtual.historico||[]).map(function(h){return h.tipo;}).join(', ') +
+        '\nNotas: ' + (lAtual.notas||[]).map(function(n){return n.texto;}).join(' | ');
+    }
+  }
+
+  return 'Você é um assistente de vendas imobiliárias do corretor João Batista da Controle Imóveis (Florianópolis/SC). ' +
+    'Responda sempre em português, de forma objetiva e prática. Use *negrito* para destacar pontos importantes. ' +
+    'Quando criar mensagens para WhatsApp, use formatação do WhatsApp (*negrito*, emojis moderados). ' +
+    'Data de hoje: ' + hoje + '.\n\n' +
+    'LEADS CADASTRADOS (' + leads.length + ' total):\n' + resumo +
+    leadCtx +
+    '\n\nTEMPLATES DE MENSAGEM:\n1ª Abordagem: ' + (msgs.msg1||'') + '\nFollow-up: ' + (msgs.msg2||'');
+}
+
+async function enviarIA() {
+  if (iaCarregando) return;
+  var inp = document.getElementById('iainp');
+  var texto = inp.value.trim();
+  if (!texto) return;
+  inp.value = '';
+  inp.style.height = 'auto';
+
+  appendMsgIA('user', texto);
+  iaChatHistorico.push({role: 'user', content: texto});
+
+  iaCarregando = true;
+  var typing = appendMsgIA('ai', '...');
+  typing.classList.add('typing');
+
+  try {
+    var sistema = construirContexto();
+    var msgs = iaChatHistorico.slice(-10); // últimas 10 mensagens
+
+    var resp = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        system: sistema,
+        messages: msgs
+      })
+    });
+
+    var data = await resp.json();
+    var resposta = data.content && data.content[0] ? data.content[0].text : 'Erro ao obter resposta.';
+
+    typing.remove();
+    appendMsgIA('ai', resposta);
+    iaChatHistorico.push({role: 'assistant', content: resposta});
+
+  } catch(e) {
+    typing.remove();
+    appendMsgIA('ai', 'Erro de conexão. Verifique sua internet e tente novamente.');
+  }
+  iaCarregando = false;
+}
+
+// Ajuste automático de altura do textarea
+document.addEventListener('DOMContentLoaded', function(){
+  var inp = document.getElementById('iainp');
+  if(inp) inp.addEventListener('input', function(){
+    this.style.height = 'auto';
+    this.style.height = Math.min(this.scrollHeight, 100) + 'px';
+  });
+});
+
+// MICROFONE DO CHAT IA — sessão única, sem loop
+var iaMicRec = null;
+var iaMicAtivo = false;
+
+function toggleMicIA() {
+  if (iaMicAtivo) {
+    pararMicIA();
+  } else {
+    iniciarMicIA();
+  }
+}
+
+function iniciarMicIA() {
+  var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SR) { toast('Reconhecimento de voz não suportado neste navegador', 'err'); return; }
+
+  // Garante que qualquer instância anterior seja destruída
+  if (iaMicRec) {
+    try { iaMicRec.abort(); } catch(e) {}
+    iaMicRec = null;
+  }
+
+  iaMicRec = new SR();
+  iaMicRec.lang = 'pt-BR';
+  iaMicRec.continuous = false;       // sessão única — sem loop
+  iaMicRec.interimResults = false;   // só resultado final
+  iaMicRec.maxAlternatives = 1;
+
+  iaMicRec.onstart = function() {
+    iaMicAtivo = true;
+    var btn = document.getElementById('iamicbtn');
+    var label = document.getElementById('iamiclabel');
+    if (btn) { btn.classList.add('gravando'); btn.textContent = '⏹️'; }
+    if (label) label.style.display = 'block';
+  };
+
+  iaMicRec.onresult = function(e) {
+    var texto = e.results[0][0].transcript;
+    var inp = document.getElementById('iainp');
+    if (inp) {
+      inp.value = (inp.value ? inp.value + ' ' : '') + texto;
+      inp.style.height = 'auto';
+      inp.style.height = Math.min(inp.scrollHeight, 100) + 'px';
+    }
+  };
+
+  iaMicRec.onend = function() {
+    // Chamado automaticamente ao terminar — limpa tudo
+    iaMicAtivo = false;
+    iaMicRec = null;
+    var btn = document.getElementById('iamicbtn');
+    var label = document.getElementById('iamiclabel');
+    if (btn) { btn.classList.remove('gravando'); btn.textContent = '🎙️'; }
+    if (label) label.style.display = 'none';
+  };
+
+  iaMicRec.onerror = function(e) {
+    iaMicAtivo = false;
+    iaMicRec = null;
+    var btn = document.getElementById('iamicbtn');
+    var label = document.getElementById('iamiclabel');
+    if (btn) { btn.classList.remove('gravando'); btn.textContent = '🎙️'; }
+    if (label) label.style.display = 'none';
+    if (e.error !== 'aborted') toast('Microfone: ' + e.error, 'err');
+  };
+
+  try {
+    iaMicRec.start();
+  } catch(e) {
+    toast('Erro ao iniciar microfone', 'err');
+  }
+}
+
+function pararMicIA() {
+  if (iaMicRec) {
+    try { iaMicRec.stop(); } catch(e) {}
+  }
 }
 
 // Verificar a cada minuto
