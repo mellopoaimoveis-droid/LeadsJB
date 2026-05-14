@@ -4,222 +4,115 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#f0f4f8">
 <title>Tudo Sob Controle</title>
-<link rel="manifest" href="data:application/json;base64,eyJuYW1lIjogIlR1ZG8gU29iIENvbnRyb2xlIiwgInNob3J0X25hbWUiOiAiVFNDIiwgInN0YXJ0X3VybCI6ICIuIiwgImRpc3BsYXkiOiAiZnVsbHNjcmVlbiIsICJiYWNrZ3JvdW5kX2NvbG9yIjogIiNmMGY0ZjgiLCAidGhlbWVfY29sb3IiOiAiIzFlM2E1ZiIsICJvcmllbnRhdGlvbiI6ICJwb3J0cmFpdCIsICJpY29ucyI6IFt7InNyYyI6ICJkYXRhOmltYWdlL3N2Zyt4bWw7YmFzZTY0LFBITjJaeUI0Yld4dWN6MGlhSFIwY0RvdkwzZDNkeTUzTXk1dmNtY3ZNakF3TUM5emRtY2lJSFpwWlhkQ2IzZzlJakFnTUNBeE9USWdNVGt5SWo0S0lDQThjbVZqZENCM2FXUjBhRDBpTVRreUlpQm9aV2xuYUhROUlqRTVNaUlnY25nOUlqUXdJaUJtYVd4c1BTSWpNV1V6WVRWbUlpOCtDaUFnUEhSbGVIUWdlRDBpT1RZaUlIazlJamN5SWlCbWIyNTBMV1poYldsc2VUMGlRWEpwWVd3Z1FteGhZMnNzSUhOaGJuTXRjMlZ5YVdZaUlHWnZiblF0YzJsNlpUMGlORElpSUdadmJuUXRkMlZwWjJoMFBTSTVNREFpSUdacGJHdzlJaU5sT0dJNE5HSWlJSFJsZUhRdFlXNWphRzl5UFNKdGFXUmtiR1VpUGxROEwzUmxlSFErQ2lBZ1BIUmxlSFFnZUQwaU9UWWlJSGs5SWpFeE9DSWdabTl1ZEMxbVlXMXBiSGs5SWtGeWFXRnNJRUpzWVdOckxDQnpZVzV6TFhObGNtbG1JaUJtYjI1MExYTnBlbVU5SWpReUlpQm1iMjUwTFhkbGFXZG9kRDBpT1RBd0lpQm1hV3hzUFNJalptWm1abVptSWlCMFpYaDBMV0Z1WTJodmNqMGliV2xrWkd4bElqNVRQQzkwWlhoMFBnb2dJRHgwWlhoMElIZzlJamsySWlCNVBTSXhOalFpSUdadmJuUXRabUZ0YVd4NVBTSkJjbWxoYkNCQ2JHRmpheXdnYzJGdWN5MXpaWEpwWmlJZ1ptOXVkQzF6YVhwbFBTSTBNaUlnWm05dWRDMTNaV2xuYUhROUlqa3dNQ0lnWm1sc2JEMGlJMlU0WWpnMFlpSWdkR1Y0ZEMxaGJtTm9iM0k5SW0xcFpHUnNaU0krUXp3dmRHVjRkRDRLUEM5emRtYysiLCAic2l6ZXMiOiAiMTkyeDE5MiIsICJ0eXBlIjogImltYWdlL3N2Zyt4bWwifSwgeyJzcmMiOiAiZGF0YTppbWFnZS9zdmcreG1sO2Jhc2U2NCxQSE4yWnlCNGJXeHVjejBpYUhSMGNEb3ZMM2QzZHk1M015NXZjbWN2TWpBd01DOXpkbWNpSUhacFpYZENiM2c5SWpBZ01DQXhPVElnTVRreUlqNEtJQ0E4Y21WamRDQjNhV1IwYUQwaU1Ua3lJaUJvWldsbmFIUTlJakU1TWlJZ2NuZzlJalF3SWlCbWFXeHNQU0lqTVdVellUVm1JaTgrQ2lBZ1BIUmxlSFFnZUQwaU9UWWlJSGs5SWpjeUlpQm1iMjUwTFdaaGJXbHNlVDBpUVhKcFlXd2dRbXhoWTJzc0lITmhibk10YzJWeWFXWWlJR1p2Ym5RdGMybDZaVDBpTkRJaUlHWnZiblF0ZDJWcFoyaDBQU0k1TURBaUlHWnBiR3c5SWlObE9HSTROR0lpSUhSbGVIUXRZVzVqYUc5eVBTSnRhV1JrYkdVaVBsUThMM1JsZUhRK0NpQWdQSFJsZUhRZ2VEMGlPVFlpSUhrOUlqRXhPQ0lnWm05dWRDMW1ZVzFwYkhrOUlrRnlhV0ZzSUVKc1lXTnJMQ0J6WVc1ekxYTmxjbWxtSWlCbWIyNTBMWE5wZW1VOUlqUXlJaUJtYjI1MExYZGxhV2RvZEQwaU9UQXdJaUJtYVd4c1BTSWpabVptWm1abUlpQjBaWGgwTFdGdVkyaHZjajBpYldsa1pHeGxJajVUUEM5MFpYaDBQZ29nSUR4MFpYaDBJSGc5SWprMklpQjVQU0l4TmpRaUlHWnZiblF0Wm1GdGFXeDVQU0pCY21saGJDQkNiR0ZqYXl3Z2MyRnVjeTF6WlhKcFppSWdabTl1ZEMxemFYcGxQU0kwTWlJZ1ptOXVkQzEzWldsbmFIUTlJamt3TUNJZ1ptbHNiRDBpSTJVNFlqZzBZaUlnZEdWNGRDMWhibU5vYjNJOUltMXBaR1JzWlNJK1F6d3ZkR1Y0ZEQ0S1BDOXpkbWMrIiwgInNpemVzIjogIjUxMng1MTIiLCAidHlwZSI6ICJpbWFnZS9zdmcreG1sIn1dfQ==">
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
-<link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxOTIgMTkyIj4KICA8cmVjdCB3aWR0aD0iMTkyIiBoZWlnaHQ9IjE5MiIgcng9IjQwIiBmaWxsPSIjMWUzYTVmIi8+CiAgPHRleHQgeD0iOTYiIHk9IjcyIiBmb250LWZhbWlseT0iQXJpYWwgQmxhY2ssIHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iNDIiIGZvbnQtd2VpZ2h0PSI5MDAiIGZpbGw9IiNlOGI4NGIiIHRleHQtYW5jaG9yPSJtaWRkbGUiPlQ8L3RleHQ+CiAgPHRleHQgeD0iOTYiIHk9IjExOCIgZm9udC1mYW1pbHk9IkFyaWFsIEJsYWNrLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjQyIiBmb250LXdlaWdodD0iOTAwIiBmaWxsPSIjZmZmZmZmIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj5TPC90ZXh0PgogIDx0ZXh0IHg9Ijk2IiB5PSIxNjQiIGZvbnQtZmFtaWx5PSJBcmlhbCBCbGFjaywgc2Fucy1zZXJpZiIgZm9udC1zaXplPSI0MiIgZm9udC13ZWlnaHQ9IjkwMCIgZmlsbD0iI2U4Yjg0YiIgdGV4dC1hbmNob3I9Im1pZGRsZSI+QzwvdGV4dD4KPC9zdmc+">
-<link rel="apple-touch-icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxOTIgMTkyIj4KICA8cmVjdCB3aWR0aD0iMTkyIiBoZWlnaHQ9IjE5MiIgcng9IjQwIiBmaWxsPSIjMWUzYTVmIi8+CiAgPHRleHQgeD0iOTYiIHk9IjcyIiBmb250LWZhbWlseT0iQXJpYWwgQmxhY2ssIHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iNDIiIGZvbnQtd2VpZ2h0PSI5MDAiIGZpbGw9IiNlOGI4NGIiIHRleHQtYW5jaG9yPSJtaWRkbGUiPlQ8L3RleHQ+CiAgPHRleHQgeD0iOTYiIHk9IjExOCIgZm9udC1mYW1pbHk9IkFyaWFsIEJsYWNrLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjQyIiBmb250LXdlaWdodD0iOTAwIiBmaWxsPSIjZmZmZmZmIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj5TPC90ZXh0PgogIDx0ZXh0IHg9Ijk2IiB5PSIxNjQiIGZvbnQtZmFtaWx5PSJBcmlhbCBCbGFjaywgc2Fucy1zZXJpZiIgZm9udC1zaXplPSI0MiIgZm9udC13ZWlnaHQ9IjkwMCIgZmlsbD0iI2U4Yjg0YiIgdGV4dC1hbmNob3I9Im1pZGRsZSI+QzwvdGV4dD4KPC9zdmc+">
 <style>
-:root {
-  --bg: #f0f4f8;
-  --bg2: #e4eaf2;
-  --card: #ffffff;
-  --navy: #1e3a5f;
-  --navy2: #2d5282;
-  --blue: #3b82f6;
-  --blue2: #60a5fa;
-  --blue-p: #dbeafe;
-  --gold: #b45309;
-  --gold-p: #fef3c7;
-  --green: #059669;
-  --green-p: #d1fae5;
-  --red: #dc2626;
-  --red-p: #fee2e2;
-  --text: #1e293b;
-  --text2: #64748b;
-  --border: #e2e8f0;
-  --shadow: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.04);
-  --shadow2: 0 4px 12px rgba(0,0,0,0.1);
+:root{
+  --bg:#f0f4f8;--bg2:#e4eaf2;--card:#ffffff;
+  --navy:#1e3a5f;--navy2:#2d5282;
+  --blue:#3b82f6;--blue-p:#dbeafe;
+  --gold:#b45309;--gold-p:#fef3c7;
+  --green:#059669;--green-p:#d1fae5;
+  --red:#dc2626;--red-p:#fee2e2;
+  --text:#1e293b;--text2:#64748b;--border:#e2e8f0;
 }
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
-html,body{height:100%;overflow:hidden;}
-body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);display:flex;flex-direction:column;}
-
-/* HEADER */
-.hdr{background:var(--card);padding:14px 16px 12px;border-bottom:1px solid var(--border);flex-shrink:0;box-shadow:var(--shadow);}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
+.hdr{background:var(--card);padding:14px 16px 12px;position:sticky;top:0;z-index:10;border-bottom:1px solid var(--border);}
 .hdr-row{display:flex;align-items:center;justify-content:space-between;}
-.hdr-left{display:flex;align-items:center;gap:10px;}
-.logo-circle{width:36px;height:36px;background:var(--navy);border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;overflow:hidden;}
-.logo-circle img{width:28px;height:28px;object-fit:contain;filter:brightness(0) invert(1);}
-.logo-fallback{width:28px;height:28px;display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-size:11px;font-weight:800;color:white;letter-spacing:-0.5px;}
-.app-name{font-family:'Syne',sans-serif;font-size:17px;font-weight:800;letter-spacing:-0.3px;color:var(--navy);}
+.app-name{font-family:'Syne',sans-serif;font-size:18px;font-weight:800;color:var(--navy);}
 .app-name span{color:var(--blue);}
-.app-sub{font-size:10px;color:var(--text2);letter-spacing:0.3px;}
-.hdr-btns{display:flex;gap:5px;}
-.btn-sm{background:var(--bg);border:1px solid var(--border);color:var(--text2);padding:6px 11px;border-radius:18px;font-size:11px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all 0.2s;}
-.btn-sm:hover{background:var(--blue-p);color:var(--navy);border-color:var(--blue2);}
-
-/* SCROLL AREA */
-.scroll{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;}
-.scroll::-webkit-scrollbar{width:3px;}
-.scroll::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}
+.app-sub{font-size:10px;color:var(--text2);}
+.hdr-btns{display:flex;gap:6px;}
+.btn-sm{background:var(--bg);border:1px solid var(--border);color:var(--text2);padding:6px 12px;border-radius:18px;font-size:11px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;}
 .main{padding:14px 14px 120px;}
-
-.sec-label{font-size:10px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:1.2px;margin-bottom:8px;}
-
-/* FORM CARD */
-.form-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:14px;margin-bottom:12px;box-shadow:var(--shadow);}
+.sec-lbl{font-size:10px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:1.2px;margin-bottom:8px;}
+.card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:14px;margin-bottom:12px;box-shadow:0 1px 3px rgba(0,0,0,0.08);}
 .inp-row{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:9px;}
 .inp-row.full{grid-template-columns:1fr;}
 .inp-grp{display:flex;flex-direction:column;gap:3px;}
 .inp-lbl{font-size:10px;color:var(--text2);font-weight:600;text-transform:uppercase;letter-spacing:0.4px;}
-.inp-wrap{position:relative;display:flex;align-items:center;}
-.inp{width:100%;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:9px 36px 9px 11px;color:var(--text);font-size:13px;font-family:'DM Sans',sans-serif;outline:none;transition:all 0.2s;}
-.inp:focus{border-color:var(--blue);background:var(--card);box-shadow:0 0 0 3px var(--blue-p);}
+.inp-wrap{position:relative;}
+.inp{width:100%;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:9px 36px 9px 11px;color:var(--text);font-size:13px;font-family:'DM Sans',sans-serif;outline:none;}
+.inp:focus{border-color:var(--blue);box-shadow:0 0 0 2px var(--blue-p);}
 .inp::placeholder{color:var(--text2);opacity:0.5;}
-.mic{position:absolute;right:7px;background:none;border:none;cursor:pointer;color:var(--text2);font-size:10px;font-weight:700;padding:3px;transition:all 0.2s;font-family:'DM Sans',sans-serif;opacity:0.6;}
-.mic:hover{color:var(--blue);opacity:1;}
-.mic.on{color:var(--red);opacity:1;animation:pulse 1s infinite;}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
-
+.mic{position:absolute;right:7px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--text2);font-size:10px;font-weight:700;padding:3px;font-family:'DM Sans',sans-serif;}
+.mic.on{color:var(--red);}
 .btn-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
-.btn-p{background:var(--navy);border:none;border-radius:9px;padding:11px;color:white;font-size:13px;font-weight:600;font-family:'Syne',sans-serif;cursor:pointer;transition:all 0.2s;}
-.btn-p:hover{background:var(--navy2);transform:translateY(-1px);box-shadow:var(--shadow2);}
-.btn-s{background:var(--red-p);border:1px solid #fca5a5;border-radius:9px;padding:11px;color:var(--red);font-size:13px;font-weight:600;font-family:'Syne',sans-serif;cursor:pointer;transition:all 0.2s;}
-.btn-s:hover{background:#fecaca;}
-
-/* IMOVEL CARD */
-.im-card{background:var(--card);border:1px solid var(--border);border-radius:13px;padding:13px;margin-bottom:12px;box-shadow:var(--shadow);display:none;}
-.im-card.show{display:block;animation:fadeUp 0.3s ease;}
-@keyframes fadeUp{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+.btn-p{background:var(--navy);border:none;border-radius:9px;padding:11px;color:white;font-size:13px;font-weight:600;font-family:'Syne',sans-serif;cursor:pointer;}
+.btn-s{background:var(--red-p);border:1px solid #fca5a5;border-radius:9px;padding:11px;color:var(--red);font-size:13px;font-weight:600;font-family:'Syne',sans-serif;cursor:pointer;}
+.im-card{background:var(--card);border:1px solid var(--border);border-radius:13px;padding:13px;margin-bottom:12px;display:none;}
+.im-card.show{display:block;}
 .im-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
 .im-cod{font-family:'Syne',sans-serif;font-size:15px;font-weight:700;color:var(--navy);}
 .im-badge{background:var(--green-p);color:var(--green);border:1px solid #6ee7b7;border-radius:18px;padding:3px 9px;font-size:10px;font-weight:700;}
 .im-dados{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:10px;}
 .im-dado{background:var(--bg);border:1px solid var(--border);border-radius:7px;padding:7px 9px;}
-.im-dado-lbl{font-size:9px;color:var(--text2);text-transform:uppercase;letter-spacing:0.4px;margin-bottom:1px;}
+.im-dado-lbl{font-size:9px;color:var(--text2);text-transform:uppercase;}
 .im-dado-val{font-size:13px;font-weight:600;color:var(--text);}
 .im-dado-val.gold{color:var(--gold);}
-.btn-ver{width:100%;background:var(--blue-p);border:1px solid #93c5fd;border-radius:8px;padding:9px;color:var(--navy);font-size:12px;font-weight:600;font-family:'Syne',sans-serif;cursor:pointer;transition:all 0.2s;}
-.btn-ver:hover{background:#bfdbfe;}
-.btn-edit{background:var(--gold-p);border:1px solid #fcd34d;color:var(--gold);font-size:12px;font-weight:600;font-family:'Syne',sans-serif;}
-.btn-edit:hover{background:#fde68a;}
+.btn-ver{flex:1;background:var(--blue-p);border:1px solid #93c5fd;border-radius:8px;padding:9px;color:var(--navy);font-size:12px;font-weight:600;font-family:'Syne',sans-serif;cursor:pointer;}
+.btn-edit{background:var(--gold-p);border:1px solid #fcd34d;color:var(--gold);}
 
-/* FERRAMENTAS */
-.tools{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:12px;}
-.tool{background:var(--card);border:1px solid var(--border);border-radius:11px;padding:11px 9px;cursor:pointer;text-align:center;transition:all 0.2s;text-decoration:none;display:flex;flex-direction:column;align-items:center;gap:3px;color:var(--text);box-shadow:var(--shadow);}
-.tool:hover{background:var(--blue-p);border-color:#93c5fd;transform:translateY(-1px);}
-.tool-lbl{font-size:12px;font-weight:700;font-family:'Syne',sans-serif;color:var(--navy);}
-.tool-sub{font-size:10px;color:var(--text2);}
-
-/* MENSAGEM */
-.msg-sec{background:var(--card);border:1px solid var(--border);border-radius:13px;padding:13px;margin-bottom:12px;box-shadow:var(--shadow);display:none;}
-.msg-sec.show{display:block;animation:fadeUp 0.3s ease;}
+.msg-sec{background:var(--card);border:1px solid var(--border);border-radius:13px;padding:13px;margin-bottom:12px;display:none;}
+.msg-sec.show{display:block;}
 .tabs{display:flex;gap:5px;margin-bottom:11px;overflow-x:auto;padding-bottom:2px;}
 .tabs::-webkit-scrollbar{display:none;}
-.tab{background:var(--bg);border:1px solid var(--border);border-radius:16px;padding:5px 12px;font-size:11px;color:var(--text2);cursor:pointer;white-space:nowrap;transition:all 0.2s;font-family:'DM Sans',sans-serif;font-weight:500;}
+.tab{background:var(--bg);border:1px solid var(--border);border-radius:16px;padding:5px 12px;font-size:11px;color:var(--text2);cursor:pointer;white-space:nowrap;font-family:'DM Sans',sans-serif;font-weight:500;}
 .tab.active{background:var(--navy);border-color:var(--navy);color:white;}
 .msg-box{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:11px;font-size:13px;color:var(--text);line-height:1.6;min-height:95px;white-space:pre-wrap;outline:none;}
-.msg-box:focus{border-color:var(--blue);box-shadow:0 0 0 3px var(--blue-p);}
+.fabs{position:fixed;bottom:20px;right:14px;display:flex;flex-direction:column;align-items:center;gap:9px;z-index:50;}
+.fab{width:50px;height:50px;border-radius:50%;border:none;cursor:pointer;font-size:11px;font-weight:800;font-family:'Syne',sans-serif;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 12px rgba(0,0,0,0.2);}
 
-/* FABS */
-.fabs{position:fixed;bottom:20px;right:14px;display:flex;flex-direction:column;align-items:center;gap:9px;z-index:200;}
-.fab{width:50px;height:50px;border-radius:50%;border:none;cursor:pointer;font-size:11px;font-weight:800;font-family:'Syne',sans-serif;display:flex;align-items:center;justify-content:center;transition:all 0.3s;box-shadow:var(--shadow2);letter-spacing:0.3px;}
-.fab-ia{background:var(--navy);color:white;animation:float 3s ease-in-out infinite;}
-.fab-wa{background:#25D366;color:white;}
-.fab:hover{transform:scale(1.08);}
-@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
-
-/* AI PANEL */
-.ai-ov{position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:300;display:none;align-items:flex-end;backdrop-filter:blur(2px);}
-.ai-ov.open{display:flex;animation:fadeIn 0.2s ease;}
-@keyframes fadeIn{from{opacity:0}to{opacity:1}}
-.ai-panel{width:100%;background:var(--card);border-top-left-radius:22px;border-top-right-radius:22px;height:75vh;display:flex;flex-direction:column;overflow:hidden;animation:panelUp 0.3s cubic-bezier(0.34,1.56,0.64,1);border-top:1px solid var(--border);box-shadow:0 -4px 20px rgba(0,0,0,0.1);}
-@keyframes panelUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
-.ai-hdr{padding:13px 16px 11px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);flex-shrink:0;background:var(--bg);}
-.ai-hdr-l{display:flex;align-items:center;gap:9px;}
-.ai-av{width:32px;height:32px;background:var(--navy);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;font-family:'Syne',sans-serif;color:white;}
-.ai-nm{font-family:'Syne',sans-serif;font-weight:700;font-size:14px;color:var(--navy);}
-.ai-ctx{font-size:10px;color:var(--blue);margin-top:1px;}
-.ai-x{background:var(--bg);border:1px solid var(--border);color:var(--text2);width:28px;height:28px;border-radius:50%;cursor:pointer;font-size:12px;display:flex;align-items:center;justify-content:center;font-family:'DM Sans',sans-serif;}
-.ai-msgs{flex:1;overflow-y:auto;padding:13px;display:flex;flex-direction:column;gap:9px;background:var(--bg);}
-.bbl{max-width:86%;padding:9px 12px;border-radius:13px;font-size:13px;line-height:1.5;animation:fadeUp 0.2s ease;}
-.bbl.ai{background:var(--card);border:1px solid var(--border);border-bottom-left-radius:3px;align-self:flex-start;box-shadow:var(--shadow);}
-.bbl.me{background:var(--navy);color:white;border-bottom-right-radius:3px;align-self:flex-end;}
-.typing{display:flex;gap:4px;padding:10px 12px;background:var(--card);border:1px solid var(--border);border-radius:13px;border-bottom-left-radius:3px;align-self:flex-start;box-shadow:var(--shadow);}
-.typing span{width:5px;height:5px;background:var(--text2);border-radius:50%;animation:tp 1.2s ease-in-out infinite;}
-.typing span:nth-child(2){animation-delay:0.2s;}
-.typing span:nth-child(3){animation-delay:0.4s;}
-@keyframes tp{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-5px)}}
-.chips{display:flex;gap:5px;padding:7px 12px;overflow-x:auto;flex-shrink:0;border-top:1px solid var(--border);background:var(--card);}
-.chips::-webkit-scrollbar{display:none;}
-.chip{background:var(--blue-p);border:1px solid #93c5fd;border-radius:13px;padding:5px 10px;font-size:11px;color:var(--navy);white-space:nowrap;cursor:pointer;transition:all 0.2s;font-family:'DM Sans',sans-serif;font-weight:500;}
-.chip:hover{background:#bfdbfe;}
-.ai-inp-area{padding:9px 12px 16px;border-top:1px solid var(--border);display:flex;gap:7px;align-items:flex-end;flex-shrink:0;background:var(--card);}
-.ai-inp{flex:1;background:var(--bg);border:1px solid var(--border);border-radius:16px;padding:8px 13px;color:var(--text);font-size:13px;font-family:'DM Sans',sans-serif;outline:none;resize:none;max-height:70px;overflow-y:auto;line-height:1.4;}
-.ai-inp:focus{border-color:var(--blue);box-shadow:0 0 0 3px var(--blue-p);}
-.ai-inp::placeholder{color:var(--text2);opacity:0.5;}
-.ai-btn{width:34px;height:34px;border-radius:50%;border:none;cursor:pointer;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all 0.2s;font-family:'DM Sans',sans-serif;}
-.ai-mic{background:var(--bg);border:1px solid var(--border);color:var(--text2);}
-.ai-mic:hover{color:var(--blue);}
-.ai-mic.on{color:var(--red);border-color:#fca5a5;background:var(--red-p);animation:pulse 1s infinite;}
-.ai-snd{background:var(--navy);color:white;}
-.ai-snd:hover{background:var(--navy2);}
-
-/* MODAL DADOS */
-.ov{position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:300;display:none;align-items:flex-end;backdrop-filter:blur(2px);}
-.ov.open{display:flex;animation:fadeIn 0.2s ease;}
-.modal{width:100%;background:var(--card);border-top-left-radius:22px;border-top-right-radius:22px;padding:18px 16px 28px;animation:panelUp 0.3s cubic-bezier(0.34,1.56,0.64,1);border-top:1px solid var(--border);max-height:88vh;overflow-y:auto;}
-.modal-title{font-family:'Syne',sans-serif;font-size:15px;font-weight:700;color:var(--navy);margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;}
-.modal-x{background:var(--bg);border:1px solid var(--border);color:var(--text2);width:28px;height:28px;border-radius:50%;cursor:pointer;font-size:12px;display:flex;align-items:center;justify-content:center;font-family:'DM Sans',sans-serif;}
+.fab-ia{background:var(--navy);color:white;animation:float 3s ease-in-out infinite;text-decoration:none;}.fab-wa{background:#25D366;color:white;}@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
+/* MODAL */
+#modalWrap{display:none;position:fixed;top:0;left:0;width:100%;height:100%;z-index:9999;}
+#modalWrap.show{display:block;}
+#modalFundo{position:absolute;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);}
+#modalCaixa{position:absolute;bottom:0;left:0;right:0;background:white;border-radius:22px 22px 0 0;padding:20px 16px 32px;max-height:85vh;overflow-y:auto;}
+.modal-tit{font-family:'Syne',sans-serif;font-size:15px;font-weight:700;color:var(--navy);margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;}
+.modal-x{background:var(--bg);border:1px solid var(--border);color:var(--text2);width:28px;height:28px;border-radius:50%;cursor:pointer;font-size:13px;font-family:'DM Sans',sans-serif;}
 .dgrid{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:9px;}
-.dgrid.full{grid-template-columns:1fr;}
-
 /* HISTORICO */
-.hist-ov{position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:300;display:none;backdrop-filter:blur(2px);}
-.hist-ov.open{display:block;animation:fadeIn 0.2s ease;}
-.hist-panel{position:absolute;top:0;right:0;width:88%;max-width:340px;height:100%;background:var(--card);border-left:1px solid var(--border);display:flex;flex-direction:column;animation:slideIn 0.3s ease;box-shadow:-4px 0 20px rgba(0,0,0,0.1);}
-@keyframes slideIn{from{transform:translateX(100%)}to{transform:translateX(0)}}
+#histWrap{display:none;position:fixed;top:0;left:0;width:100%;height:100%;z-index:9999;}
+#histWrap.show{display:block;}
+#histFundo{position:absolute;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.4);}
+#histCaixa{position:absolute;top:0;right:0;width:88%;max-width:340px;height:100%;background:var(--card);display:flex;flex-direction:column;}
 .hist-hdr{padding:16px 14px 12px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;background:var(--bg);}
 .hist-title{font-family:'Syne',sans-serif;font-size:15px;font-weight:700;color:var(--navy);}
-.hist-x{background:var(--bg2);border:1px solid var(--border);color:var(--text2);width:28px;height:28px;border-radius:50%;cursor:pointer;font-size:12px;display:flex;align-items:center;justify-content:center;font-family:'DM Sans',sans-serif;}
+.hist-x{background:var(--bg2);border:1px solid var(--border);color:var(--text2);width:28px;height:28px;border-radius:50%;cursor:pointer;font-size:12px;font-family:'DM Sans',sans-serif;}
 .hist-srch{padding:9px 13px;border-bottom:1px solid var(--border);background:var(--bg);}
 .hist-srch input{width:100%;background:var(--card);border:1px solid var(--border);border-radius:8px;padding:8px 11px;color:var(--text);font-size:12px;font-family:'DM Sans',sans-serif;outline:none;}
-.hist-srch input:focus{border-color:var(--blue);}
-.hist-srch input::placeholder{color:var(--text2);opacity:0.5;}
 .hist-list{flex:1;overflow-y:auto;padding:11px;display:flex;flex-direction:column;gap:7px;background:var(--bg);}
 .hist-empty{text-align:center;color:var(--text2);font-size:12px;padding:35px 18px;}
-.hist-item{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:10px 11px;cursor:pointer;transition:all 0.2s;box-shadow:var(--shadow);}
-.hist-item:hover{border-color:#93c5fd;background:var(--blue-p);}
+.hist-item{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:10px 11px;cursor:pointer;position:relative;}
 .hist-nome{font-weight:600;font-size:13px;margin-bottom:2px;color:var(--navy);}
 .hist-info{font-size:11px;color:var(--text2);display:flex;gap:7px;}
 .hist-data{font-size:10px;color:var(--text2);opacity:0.5;margin-top:2px;}
 .hist-footer{padding:11px 13px;border-top:1px solid var(--border);display:flex;flex-direction:column;gap:7px;background:var(--bg);}
-
-/* TOAST */
-.toast{position:fixed;bottom:85px;left:50%;transform:translateX(-50%) translateY(12px);background:var(--navy);color:white;padding:8px 16px;border-radius:16px;font-size:12px;font-weight:600;z-index:500;opacity:0;transition:all 0.3s;white-space:nowrap;box-shadow:var(--shadow2);}
-.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
-.toast.err{background:var(--red);}
+.toast{position:fixed;bottom:85px;left:50%;transform:translateX(-50%);background:var(--navy);color:white;padding:8px 16px;border-radius:16px;font-size:12px;font-weight:600;z-index:99999;opacity:0;transition:opacity 0.3s;white-space:nowrap;pointer-events:none;}
+.toast.show{opacity:1;}
 .toast.ok{background:var(--green);}
+.toast.err{background:var(--red);}
 </style>
 </head>
 <body>
-
-<!-- HEADER -->
 <div class="hdr">
   <div class="hdr-row">
-    <div class="hdr-left">
-      <div>
-        <div class="app-name">Tudo Sob <span>Controle</span></div>
-        <div class="app-sub">Atendimento Imobiliario</div>
-      </div>
+    <div>
+      <div class="app-name">Tudo Sob <span>Controle</span></div>
+      <div class="app-sub">Atendimento Imobiliario</div>
     </div>
     <div class="hdr-btns">
-      <button class="btn-sm" onclick="openHistory()">Historico</button>
+      <button class="btn-sm" onclick="openHist()">Historico</button>
       <button class="btn-sm" onclick="backupDown()">Backup</button>
     </div>
   </div>
 </div>
-
-<!-- SCROLL -->
-<div class="scroll">
 <div class="main">
-
-  <div class="sec-label">Atendimento</div>
-  <div class="form-card">
+  <div class="sec-lbl">Atendimento</div>
+  <div class="card">
     <div class="inp-row">
       <div class="inp-grp">
         <span class="inp-lbl">Nome</span>
@@ -240,7 +133,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);dis
       <div class="inp-grp">
         <span class="inp-lbl">Link do Imovel</span>
         <div class="inp-wrap">
-          <input type="text" class="inp" id="fLink" placeholder="Cole o link do imovel" onkeydown="if(event.key==='Enter')buscar()">
+          <input type="text" class="inp" id="fLink" placeholder="Cole o link do imovel">
           <button class="mic" onclick="startMic('fLink',this)">MIC</button>
         </div>
       </div>
@@ -250,44 +143,23 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);dis
       <button class="btn-s" onclick="novoAtend()">Novo Atendimento</button>
     </div>
   </div>
-
-  <!-- IMOVEL CARD -->
   <div class="im-card" id="imCard">
     <div class="im-hdr">
       <span class="im-cod" id="imCod">—</span>
       <span class="im-badge">Disponivel</span>
     </div>
     <div class="im-dados" id="imDados" style="display:none;"></div>
-    <div style="display:flex;gap:7px;">
-      <button class="btn-ver" style="flex:1;" onclick="verImovel()">Ver no site</button>
-      <button class="btn-ver btn-edit" style="flex:1;" onclick="openDados()">Editar dados</button>
+    <div style="display:flex;gap:7px;margin-bottom:8px;">
+      <button class="btn-ver" onclick="verImovel()">Ver no site</button>
+      <button class="btn-ver btn-edit" onclick="abrirModal()">Editar dados</button>
+    </div>
+    <div id="imLinkDiv" style="display:none;">
+      <a id="imLinkA" href="#" target="_blank" style="font-size:11px;color:var(--blue);word-break:break-all;"></a>
     </div>
   </div>
 
-  <!-- FERRAMENTAS -->
-  <div class="sec-label">Ferramentas</div>
-  <div class="tools">
-    <a class="tool" href="https://controleimoveis.com.br" target="_blank">
-      <span class="tool-lbl">Controle</span>
-      <span class="tool-sub">Site imobiliaria</span>
-    </a>
-    <button class="tool" onclick="abrirVista()">
-      <span class="tool-lbl">Vista</span>
-      <span class="tool-sub">Abrir app</span>
-    </button>
-    <a class="tool" href="https://www8.caixa.gov.br/siopiinternet-web/simulaOperacaoInternet.do?method=enquadrarProdutos" target="_blank">
-      <span class="tool-lbl">Caixa</span>
-      <span class="tool-sub">Simulador oficial</span>
-    </a>
-    <a class="tool" href="https://simuladorloft.lovable.app/" target="_blank">
-      <span class="tool-lbl">Loft</span>
-      <span class="tool-sub">Simulador Loft</span>
-    </a>
-  </div>
-
-  <!-- MENSAGEM -->
   <div class="msg-sec" id="msgSec">
-    <div class="sec-label">Mensagem WhatsApp</div>
+    <div class="sec-lbl">Mensagem WhatsApp</div>
     <div class="tabs">
       <button class="tab active" data-key="abord" onclick="selTab(this)">1a Abordagem</button>
       <button class="tab" data-key="follow" onclick="selTab(this)">Follow-up</button>
@@ -300,477 +172,302 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);dis
       <button class="btn-p" style="width:100%;" onclick="enviarWA()">Enviar pelo WhatsApp</button>
     </div>
   </div>
-
 </div>
-</div>
-
-<!-- FABS -->
 <div class="fabs">
-  <button class="fab fab-ia" onclick="openAI()">IA</button>
-  <button class="fab fab-wa" onclick="enviarWAFab()">WA</button>
+  <a class="fab fab-ia" href="https://claude.ai" target="_blank">IA</a>
+  <button class="fab fab-wa" onclick="abrirMsgSec()">WA</button>
+  <div id="toolsMenu" style="display:none;flex-direction:column;align-items:center;gap:9px;">
+    <a class="fab fab-tool" href="https://controleimoveis.com.br" target="_blank" title="Controle">CI</a>
+    <button class="fab fab-tool" onclick="abrirVista()" title="Vista">VS</button>
+    <a class="fab fab-tool fab-caixa" href="https://www8.caixa.gov.br/siopiinternet-web/simulaOperacaoInternet.do?method=enquadrarProdutos" target="_blank" title="Caixa">CX</a>
+    <a class="fab fab-tool fab-loft" href="https://simuladorloft.lovable.app/" target="_blank" title="Loft">LF</a>
+  </div>
+  <button class="fab fab-menu" onclick="toggleTools()" id="btnMenu">&#9776;</button>
 </div>
-
-<!-- MODAL DADOS IMOVEL -->
-<div class="ov" id="dadosOv" onclick="if(event.target===this)closeDados()">
-  <div class="modal">
-    <div class="modal-title">
+<!-- MODAL DADOS -->
+<div id="modalWrap">
+  <div id="modalFundo" onclick="fecharModal()"></div>
+  <div id="modalCaixa">
+    <div class="modal-tit">
       Dados do Imovel
-      <button class="modal-x" onclick="closeDados()">X</button>
+      <button class="modal-x" onclick="fecharModal()">X</button>
     </div>
     <div class="dgrid">
-      <div class="inp-grp">
-        <span class="inp-lbl">Tipo</span>
-        <div class="inp-wrap"><input type="text" class="inp" id="dTipo" placeholder="Ex: Apartamento"></div>
-      </div>
-      <div class="inp-grp">
-        <span class="inp-lbl">Valor</span>
-        <div class="inp-wrap"><input type="text" class="inp" id="dValor" placeholder="R$ 000.000" oninput="fmtValor(this)"></div>
-      </div>
-      <div class="inp-grp">
-        <span class="inp-lbl">Area m2</span>
-        <div class="inp-wrap"><input type="number" class="inp" id="dArea" placeholder="75"></div>
-      </div>
-      <div class="inp-grp">
-        <span class="inp-lbl">Dormitorios</span>
-        <div class="inp-wrap"><input type="number" class="inp" id="dDorm" placeholder="2"></div>
-      </div>
-      <div class="inp-grp">
-        <span class="inp-lbl">Suites</span>
-        <div class="inp-wrap"><input type="number" class="inp" id="dSuite" placeholder="1"></div>
-      </div>
-      <div class="inp-grp">
-        <span class="inp-lbl">Vagas garagem</span>
-        <div class="inp-wrap"><input type="number" class="inp" id="dGar" placeholder="1"></div>
-      </div>
+      <div class="inp-grp"><span class="inp-lbl">Tipo</span><div class="inp-wrap"><input type="text" class="inp" id="dTipo" placeholder="Apartamento"></div></div>
+      <div class="inp-grp"><span class="inp-lbl">Valor</span><div class="inp-wrap"><input type="text" class="inp" id="dValor" placeholder="R$ 000.000" oninput="fmtValor(this)"></div></div>
+      <div class="inp-grp"><span class="inp-lbl">Area m2</span><div class="inp-wrap"><input type="number" class="inp" id="dArea" placeholder="75"></div></div>
+      <div class="inp-grp"><span class="inp-lbl">Dormitorios</span><div class="inp-wrap"><input type="number" class="inp" id="dDorm" placeholder="2"></div></div>
+      <div class="inp-grp"><span class="inp-lbl">Suites</span><div class="inp-wrap"><input type="number" class="inp" id="dSuite" placeholder="1"></div></div>
+      <div class="inp-grp"><span class="inp-lbl">Vagas</span><div class="inp-wrap"><input type="number" class="inp" id="dGar" placeholder="1"></div></div>
     </div>
-    <div class="dgrid full">
-      <div class="inp-grp">
-        <span class="inp-lbl">Bairro / Cidade</span>
-        <div class="inp-wrap"><input type="text" class="inp" id="dBairro" placeholder="Ex: Campinas, Sao Jose"></div>
-      </div>
+    <div style="margin-bottom:9px;">
+      <div class="inp-grp"><span class="inp-lbl">Bairro / Cidade</span><div class="inp-wrap"><input type="text" class="inp" id="dBairro" placeholder="Campinas, Sao Jose"></div></div>
     </div>
-    <div class="dgrid full" style="margin-bottom:14px;">
-      <div class="inp-grp">
-        <span class="inp-lbl">Condominio</span>
-        <div class="inp-wrap"><input type="text" class="inp" id="dCond" placeholder="Ex: Residencial das Flores"></div>
-      </div>
+    <div style="margin-bottom:14px;">
+      <div class="inp-grp"><span class="inp-lbl">Condominio</span><div class="inp-wrap"><input type="text" class="inp" id="dCond" placeholder="Residencial das Flores"></div></div>
     </div>
     <button class="btn-p" style="width:100%;" onclick="salvarDados()">Salvar Dados</button>
   </div>
 </div>
-
-<!-- AI OVERLAY -->
-<div class="ai-ov" id="aiOv" onclick="if(event.target===this)closeAI()">
-  <div class="ai-panel">
-    <div class="ai-hdr">
-      <div class="ai-hdr-l">
-        <div class="ai-av">IA</div>
-        <div>
-          <div class="ai-nm">Assistente IA</div>
-          <div class="ai-ctx" id="aiCtx">Sem cliente ativo</div>
-        </div>
-      </div>
-      <button class="ai-x" onclick="closeAI()">X</button>
-    </div>
-    <div class="ai-msgs" id="aiMsgs">
-      <div class="bbl ai" id="aiGreeting">Ola! Estou pronto para te ajudar.</div>
-    </div>
-    <div class="chips">
-      <span class="chip" onclick="qSend(this.innerText)">Sugerir resposta</span>
-      <span class="chip" onclick="qSend(this.innerText)">Como abordar objecao?</span>
-      <span class="chip" onclick="qSend(this.innerText)">Explicar financiamento</span>
-      <span class="chip" onclick="qSend(this.innerText)">Imoveis alternativos</span>
-      <span class="chip" onclick="qSend(this.innerText)">Argumentos de venda</span>
-    </div>
-    <div class="ai-inp-area">
-      <textarea class="ai-inp" id="aiInp" placeholder="Digite ou use o microfone..." rows="1" onkeydown="aiEnter(event)" oninput="autoResize(this)"></textarea>
-      <button class="ai-btn ai-mic" id="aiMic" onclick="startAIMic()">MIC</button>
-      <button class="ai-btn ai-snd" onclick="sendAI()">&#9658;</button>
-    </div>
-  </div>
-</div>
-
 <!-- HISTORICO -->
-<div class="hist-ov" id="histOv" onclick="if(event.target===this)closeHist()">
-  <div class="hist-panel">
+<div id="histWrap">
+  <div id="histFundo" onclick="fecharHist()"></div>
+  <div id="histCaixa">
     <div class="hist-hdr">
       <span class="hist-title">Historico</span>
-      <button class="hist-x" onclick="closeHist()">X</button>
+      <button class="hist-x" onclick="fecharHist()">X</button>
     </div>
-    <div class="hist-srch">
-      <input type="text" id="histQ" placeholder="Nome, telefone ou codigo..." oninput="filterHist()">
-    </div>
-    <div class="hist-list" id="histList">
-      <div class="hist-empty">Nenhum atendimento registrado.</div>
-    </div>
+    <div class="hist-srch"><input type="text" id="histQ" placeholder="Nome, telefone ou codigo..." oninput="filtrarH()"></div>
+    <div class="hist-list" id="histList"><div class="hist-empty">Nenhum atendimento.</div></div>
     <div class="hist-footer">
       <button class="btn-p" style="font-size:12px;padding:9px;" onclick="backupDown()">Baixar Backup</button>
-      <label class="btn-p" style="font-size:12px;padding:9px;text-align:center;cursor:pointer;display:block;">
-        Restaurar Backup
-        <input type="file" accept=".json" style="display:none;" onchange="backupUp(this)">
-      </label>
+      <label class="btn-p" style="font-size:12px;padding:9px;text-align:center;cursor:pointer;display:block;">Restaurar Backup<input type="file" accept=".json" style="display:none;" onchange="backupUp(this)"></label>
+      <button style="width:100%;background:var(--red-p);border:1px solid #fca5a5;border-radius:9px;padding:9px;color:var(--red);font-size:12px;font-weight:600;font-family:'Syne',sans-serif;cursor:pointer;" onclick="limparH()">Limpar Historico</button>
     </div>
   </div>
 </div>
-
 <div class="toast" id="toast"></div>
-
 <script>
-// Proxy para contornar bloqueio CORS do GitHub Pages
-const API_DIRECT = 'https://api.anthropic.com/v1/messages';
-const API_PROXY = 'https://corsproxy.io/?url=https://api.anthropic.com/v1/messages';
-const API = API_PROXY;
-let A = {nome:'',tel:'',link:'',cod:'',tipo:'',valor:'',area:'',dorm:'',suite:'',gar:'',bairro:'',cond:''};
-let aiHist = [];
-let recog=null,aiRecog=null,micOn=false,aiMicOn=false;
-const T = {};
+let A={nome:'',tel:'',link:'',cod:'',tipo:'',valor:'',area:'',dorm:'',suite:'',gar:'',bairro:'',cond:''};
+const T={};
+let recog=null,micOn=false;
 
-// ===== BUSCAR =====
-function buscar() {
+function buscar(){
   const nome=v('fNome'),tel=v('fTel'),link=v('fLink');
-  if (!link) { toast('Informe o link do imovel',1); return; }
+  if(!link){toast('Informe o link do imovel','err');return;}
   let cod='';
-  try {
-    const u=new URL(link);
-    const m=u.pathname.match(/(\d{4,})/g);
-    cod=m?m[m.length-1]:u.pathname.split('/').filter(Boolean).pop();
-  } catch { cod=link; }
+  try{const u=new URL(link);const m=u.pathname.match(/(\d{4,})/g);cod=m?m[m.length-1]:u.pathname.split('/').filter(Boolean).pop();}
+  catch{cod=link;}
   A={...A,nome,tel,link,cod};
-  updCtx(); updT();
+  updT();
   document.getElementById('imCard').classList.add('show');
   document.getElementById('imCod').textContent=cod?'Cod. '+cod:'Imovel';
   document.getElementById('imDados').style.display='none';
-  toast('Imovel carregado!','ok');
-  setTimeout(()=>openDados(),400);
-  // Auto-save to history
-  setTimeout(()=>salvarHistorico(), 1000);
+  // link guardado mas nao exibido
+  document.getElementById('imLinkDiv').style.display='none';
+  salvarH();
+  toast('Preencha os dados do imovel','ok');
+  setTimeout(()=>abrirModal(),400);
 }
 
-function verImovel() {
-  if (A.link) window.open(A.link,'_blank');
-  else toast('Nenhum link informado',1);
+function abrirModal(){
+  document.getElementById('dTipo').value=A.tipo||'';
+  document.getElementById('dValor').value=A.valor||'';
+  document.getElementById('dArea').value=A.area||'';
+  document.getElementById('dDorm').value=A.dorm||'';
+  document.getElementById('dSuite').value=A.suite||'';
+  document.getElementById('dGar').value=A.gar||'';
+  document.getElementById('dBairro').value=A.bairro||'';
+  document.getElementById('dCond').value=A.cond||'';
+  document.getElementById('modalWrap').classList.add('show');
 }
+function fecharModal(){document.getElementById('modalWrap').classList.remove('show');}
 
-// ===== MODAL DADOS =====
-function openDados() {
-  const map={dTipo:'tipo',dValor:'valor',dArea:'area',dDorm:'dorm',dSuite:'suite',dGar:'gar',dBairro:'bairro',dCond:'cond'};
-  Object.keys(map).forEach(id=>{ document.getElementById(id).value=A[map[id]]||''; });
-  document.getElementById('dadosOv').classList.add('open');
-}
-function closeDados() { document.getElementById('dadosOv').classList.remove('open'); }
-
-function salvarDados() {
-  A.tipo=v('dTipo'); A.valor=v('dValor'); A.area=v('dArea');
-  A.dorm=v('dDorm'); A.suite=v('dSuite'); A.gar=v('dGar');
-  A.bairro=v('dBairro'); A.cond=v('dCond');
-  closeDados(); renderImDados(); updT();
+function salvarDados(){
+  A.tipo=v('dTipo');A.valor=v('dValor');A.area=v('dArea');
+  A.dorm=v('dDorm');A.suite=v('dSuite');A.gar=v('dGar');
+  A.bairro=v('dBairro');A.cond=v('dCond');
+  fecharModal();renderDados();updT();
   const at=document.querySelector('.tab.active');
-  if(at) document.getElementById('msgBox').innerText=T[at.getAttribute('data-key')]||'';
-  salvarHistorico();
+  if(at)document.getElementById('msgBox').innerText=T[at.getAttribute('data-key')]||'';
+  document.getElementById('msgSec').classList.add('show');
+  salvarH();
   toast('Dados salvos!','ok');
 }
 
-function renderImDados() {
+function renderDados(){
   const el=document.getElementById('imDados');
-  const campos=[
-    {l:'Tipo',v:A.tipo},{l:'Valor',v:A.valor},
-    {l:'Area',v:A.area?A.area+'m2':''},{l:'Dorms.',v:A.dorm},
-    {l:'Suites',v:A.suite},{l:'Garagem',v:A.gar?A.gar+' vaga(s)':''},
-    {l:'Bairro',v:A.bairro},{l:'Cond.',v:A.cond},
-  ].filter(c=>c.v);
-  if (!campos.length){el.style.display='none';return;}
+  const campos=[{l:'Tipo',v:A.tipo},{l:'Valor',v:A.valor},{l:'Area',v:A.area?A.area+'m2':''},{l:'Dorms.',v:A.dorm},{l:'Suites',v:A.suite},{l:'Garagem',v:A.gar?A.gar+' vaga(s)':''},{l:'Bairro',v:A.bairro},{l:'Cond.',v:A.cond}].filter(c=>c.v);
+  if(!campos.length){el.style.display='none';return;}
   el.style.display='grid';
   el.innerHTML=campos.map(c=>`<div class="im-dado"><div class="im-dado-lbl">${c.l}</div><div class="im-dado-val${c.l==='Valor'?' gold':''}">${c.v}</div></div>`).join('');
 }
 
-function fmtValor(el) {
-  let n=el.value.replace(/\D/g,'');
-  if(n) el.value='R$ '+parseInt(n).toLocaleString('pt-BR');
+function fmtValor(el){let n=el.value.replace(/\D/g,'');if(n)el.value='R$ '+parseInt(n).toLocaleString('pt-BR');}
+
+function verImovel(){
+  const link=v('fLink')||A.link;
+  if(link&&link.startsWith('http'))window.open(link,'_blank');
+  else if(A.cod)window.open('https://controleimoveis.com.br/imovel/'+A.cod,'_blank');
+  else toast('Nenhum link informado','err');
 }
 
-// ===== NOVO ATENDIMENTO =====
-function novoAtend() {
-  salvarHistorico();
+function novoAtend(){
+  salvarH();
   ['fNome','fTel','fLink'].forEach(id=>document.getElementById(id).value='');
   document.getElementById('imCard').classList.remove('show');
   document.getElementById('msgSec').classList.remove('show');
   document.getElementById('imDados').style.display='none';
+  document.getElementById('imLinkDiv').style.display='none';
   A={nome:'',tel:'',link:'',cod:'',tipo:'',valor:'',area:'',dorm:'',suite:'',gar:'',bairro:'',cond:''};
-  aiHist=[];
-  document.getElementById('aiMsgs').innerHTML='<div class="bbl ai" id="aiGreeting">Pronto para o proximo atendimento.</div>';
-  updCtx(); updT();
-  toast('Novo atendimento!','ok');
+  updT();toast('Novo atendimento!','ok');
 }
 
-// ===== VISTA =====
-function abrirVista() {
-  window.location.href='vistacrm://';
-  setTimeout(()=>toast('Abrindo Vista...'),200);
-}
+function abrirVista(){window.location.href='vistacrm://';setTimeout(()=>toast('Abrindo Vista...'),200);}
 
-// ===== WHATSAPP =====
-function openMsg() {
+function abrirMsgSec(){
   document.getElementById('msgSec').classList.add('show');
   updT();
-  setTimeout(()=>document.getElementById('msgSec').scrollIntoView({behavior:'smooth',block:'nearest'}),50);
+  setTimeout(()=>document.getElementById('msgSec').scrollIntoView({behavior:'smooth',block:'start'}),100);
 }
 
-function updT() {
+function toggleTools(){
+  const menu = document.getElementById('toolsMenu');
+  const btn = document.getElementById('btnMenu');
+  if(menu.style.display==='none'||menu.style.display===''){
+    menu.style.display='flex';
+    btn.innerHTML='&#10005;';
+  } else {
+    menu.style.display='none';
+    btn.innerHTML='&#9776;';
+  }
+}
+
+function updT(){
   const nm=A.nome||'cliente';
-  // Build imovel block
-  let bloco='';
-  const linhas=[];
-  let l1='';
-  if(A.tipo) l1+=A.tipo;
-  if(A.bairro) l1+=(l1?' | ':'')+A.bairro;
-  if(l1) linhas.push('\u2705 '+l1);
-  if(A.area) linhas.push(A.area+'m2');
-  if(A.dorm) linhas.push(A.dorm+' dorm.');
-  if(A.suite) linhas.push(A.suite+' suite(s)');
-  if(A.gar) linhas.push(A.gar+' vaga(s)');
-  if(linhas.length) bloco='\n\n'+linhas.join('\n');
-  const valorBloco=A.valor?'\n\nValor: '+A.valor:'';
-
-  T['abord']='Ola!\n*Joao Batista da Controle Imoveis.*\n\nTudo bem, '+nm+'?\n\nVi que voce demonstrou interesse em um de nossos imoveis:'+bloco+valorBloco+'\n\nQuero tirar suas duvidas, apresentar mais detalhes e agendar uma visita.\n\nVamos conversar?';
-  T['follow']='Ola, '+nm+'! Tudo bem?\n\nEstou retomando nosso contato. Voce ainda tem interesse no imovel? Posso apresentar mais detalhes ou outras opcoes dentro do seu perfil.';
-  T['financ']='Ola!\n*Joao Batista da Controle Imoveis.*\n\nTudo bem, '+nm+'?'+(A.valor?'\n\nValor do imovel: '+A.valor+'.':'')+'\n\nPosso fazer uma simulacao para voce?';
-  T['visita']='Ola, '+nm+'!\n\nGostaria de agendar uma visita ao imovel'+(A.bairro?' no '+A.bairro:'')+'. Qual seria o melhor dia e horario para voce?';
+  let bloco='';const linhas=[];let l1='';
+  if(A.tipo)l1+=A.tipo;
+  if(A.bairro)l1+=(l1?' | ':'')+A.bairro;
+  if(l1)linhas.push('\u2705 '+l1);
+  if(A.area)linhas.push('\u2705 '+A.area+'m2');
+  if(A.dorm)linhas.push('\u2705 '+A.dorm+' dorm.');
+  if(A.suite)linhas.push('\u2705 '+A.suite+' suite(s)');
+  if(A.gar)linhas.push('\u2705 '+A.gar+' vaga(s)');
+  if(linhas.length)bloco='\n\n'+linhas.join('\n');
+  const val=A.valor?'\n\nValor: '+A.valor:'';
+  T['abord']='Ola!\n*Joao Batista da Controle.*\n\nTudo bem, '+nm+'?\n\nVi que voce demonstrou interesse em um de nossos imoveis:'+bloco+val+'\n\nPosso enviar mais fotos e marcar uma visita!\n\nTem interesse?\n\nVamos conversar?';
+  T['follow']='Ola, '+nm+'! Tudo bem?\n\nEstou retomando nosso contato. Voce ainda tem interesse no imovel? Posso apresentar mais detalhes ou outras opcoes.';
+  T['financ']='Ola!\n*Joao Batista da Controle.*\n\nTudo bem, '+nm+'?'+(A.valor?'\n\nValor do imovel: '+A.valor+'.':'')+'\n\nPosso fazer uma simulacao para voce?';
+  T['visita']='Ola, '+nm+'!\n\nGostaria de agendar uma visita ao imovel'+(A.bairro?' no '+A.bairro:'')+'. Qual seria o melhor dia e horario?';
   T['livre']='';
-
   const at=document.querySelector('.tab.active');
-  if(at){const k=at.getAttribute('data-key');if(k&&T[k]!==undefined)document.getElementById('msgBox').innerText=T[k];}
+  if(at){const k=at.getAttribute('data-key');if(T[k]!==undefined)document.getElementById('msgBox').innerText=T[k];}
 }
 
-function selTab(btn) {
+function selTab(btn){
   document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
   btn.classList.add('active');
   document.getElementById('msgBox').innerText=T[btn.getAttribute('data-key')]||'';
 }
 
-function enviarWA() {
+function enviarWA(){
   const tel=A.tel.replace(/\D/g,'');
   const msg=document.getElementById('msgBox').innerText;
-  if(!tel){toast('Informe o telefone',1);return;}
+  if(!tel){toast('Informe o telefone','err');return;}
   const tf=tel.startsWith('55')?tel:'55'+tel;
   window.open('https://wa.me/'+tf+'?text='+encodeURIComponent(msg),'_blank');
 }
 
-function enviarWAFab() {
-  const tel=A.tel.replace(/\D/g,'');
-  if(!tel){openMsg();toast('Informe o telefone do cliente',1);return;}
-  updT();
-  const tf=tel.startsWith('55')?tel:'55'+tel;
-  window.open('https://wa.me/'+tf+'?text='+encodeURIComponent(T['abord']||''),'_blank');
+function abrirClaude(){
+  let ctx = 'Voce e um assistente imobiliario ajudando Joao Batista, corretor da Controle Imoveis em Sao Jose/SC.\n\n';
+  ctx += 'DADOS DO ATENDIMENTO ATUAL:\n';
+  ctx += 'Corretor: Joao Batista | Controle Imoveis\n';
+  if(A.nome)  ctx += 'Cliente: '+A.nome+'\n';
+  if(A.tel)   ctx += 'Telefone: '+A.tel+'\n';
+  if(A.cod)   ctx += 'Codigo imovel: '+A.cod+'\n';
+  if(A.tipo)  ctx += 'Tipo: '+A.tipo+'\n';
+  if(A.valor) ctx += 'Valor: '+A.valor+'\n';
+  if(A.area)  ctx += 'Area: '+A.area+'m2\n';
+  if(A.dorm)  ctx += 'Dormitorios: '+A.dorm+'\n';
+  if(A.suite) ctx += 'Suites: '+A.suite+'\n';
+  if(A.gar)   ctx += 'Vagas: '+A.gar+'\n';
+  if(A.bairro)ctx += 'Bairro: '+A.bairro+'\n';
+  if(A.cond)  ctx += 'Condominio: '+A.cond+'\n';
+  ctx += '\nCom base nesses dados, me ajude com esse atendimento. O que voce pode fazer por mim?';
+  
+  // Tenta abrir claude.ai com o texto pre-preenchido
+  const url = 'https://claude.ai/new?q=' + encodeURIComponent(ctx);
+  window.open(url, '_blank');
+  toast('Abrindo Claude com contexto...', 'ok');
 }
 
-// ===== IA =====
-function openAI() {
-  document.getElementById('aiOv').classList.add('open');
-  updCtx();
-  // Update greeting only if first message
-  const msgs=document.getElementById('aiMsgs');
-  const gr=document.getElementById('aiGreeting');
-  if(gr && msgs.children.length===1) {
-    gr.textContent = A.nome
-      ? 'Ola! Tenho os dados do atendimento de '+A.nome+(A.cod?' (Cod. '+A.cod+')':'')+' carregados. Como posso te ajudar?'
-      : 'Ola! Estou pronto para te ajudar. Preencha os dados do cliente para respostas mais precisas.';
-  }
-  // NO autofocus - user taps input when ready
-}
-function closeAI(){document.getElementById('aiOv').classList.remove('open');}
+function getH(){try{return JSON.parse(localStorage.getItem('tsc_h')||'[]');}catch{return[];}}
+function setH(h){try{localStorage.setItem('tsc_h',JSON.stringify(h));}catch{}}
 
-function updCtx() {
-  document.getElementById('aiCtx').textContent=A.nome?A.nome+(A.cod?' — Cod.'+A.cod:''):'Sem cliente ativo';
-}
-
-function buildSys() {
-  let s='Voce e um assistente especializado em atendimento imobiliario para Joao Batista, corretor da Controle Imoveis em Sao Jose/SC. Seja direto e pratico. Responda em portugues brasileiro.\n\nIMPORTANTE: Voce ja possui todos os dados abaixo. NUNCA peca ao usuario para informar dados do cliente ou do imovel — voce ja os tem.\n\nDADOS DO ATENDIMENTO:\nCorretor: Joao Batista | Controle Imoveis | Sao Jose/SC';
-  if(A.nome)  s+='\nCliente: '+A.nome;
-  else        s+='\nCliente: nao informado';
-  if(A.tel)   s+=' | Tel: '+A.tel;
-  if(A.cod)   s+='\nCodigo imovel: '+A.cod;
-  if(A.tipo)  s+='\nTipo: '+A.tipo;
-  if(A.valor) s+=' | Valor: '+A.valor;
-  if(A.area)  s+=' | '+A.area+'m2';
-  if(A.dorm)  s+=' | '+A.dorm+' dorms';
-  if(A.suite) s+=' | '+A.suite+' suites';
-  if(A.gar)   s+=' | '+A.gar+' vaga(s)';
-  if(A.bairro)s+=' | '+A.bairro;
-  if(A.cond)  s+=' | Cond: '+A.cond;
-  if(A.link)  s+='\nLink: '+A.link;
-  return s;
-}
-
-async function sendAI() {
-  const inp=document.getElementById('aiInp');
-  const txt=inp.value.trim();
-  if(!txt)return;
-  inp.value='';inp.style.height='auto';
-  addBbl(txt,'me');
-  aiHist.push({role:'user',content:txt});
-  const ty=addTyping();
-  try {
-    const r=await fetch(API,{method:'POST',headers:{'Content-Type':'application/json','x-anthropic-version':'2023-06-01'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,system:buildSys(),messages:aiHist.slice(-12)})});
-    const d=await r.json();
-    const rep=d.content.map(i=>i.text||'').join('');
-    ty.remove();addBbl(rep,'ai');
-    aiHist.push({role:'assistant',content:rep});
-  } catch(e){ty.remove();addBbl('Erro de conexao. Verifique sua internet.','ai');}
-}
-
-function addBbl(txt,role) {
-  const el=document.getElementById('aiMsgs');
-  const d=document.createElement('div');
-  d.className='bbl '+role;d.textContent=txt;
-  el.appendChild(d);el.scrollTop=el.scrollHeight;
-}
-function addTyping() {
-  const el=document.getElementById('aiMsgs');
-  const d=document.createElement('div');
-  d.className='typing';d.innerHTML='<span></span><span></span><span></span>';
-  el.appendChild(d);el.scrollTop=el.scrollHeight;return d;
-}
-function qSend(txt){document.getElementById('aiInp').value=txt;sendAI();}
-function aiEnter(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendAI();}}
-function autoResize(el){el.style.height='auto';el.style.height=Math.min(el.scrollHeight,70)+'px';}
-
-// ===== HISTORICO =====
-function getH(){
-  try {
-    const d = localStorage.getItem('tsc_historico');
-    return d ? JSON.parse(d) : [];
-  } catch(e) { return []; }
-}
-function setH(h){
-  try {
-    localStorage.setItem('tsc_historico', JSON.stringify(h));
-  } catch(e) { console.error('Erro ao salvar historico:', e); }
-}
-
-function salvarHistorico() {
-  if(!A.nome && !A.tel && !A.cod) return;
-  const h = getH();
-  const entry = {
-    id: Date.now(),
-    nome: A.nome || 'Sem nome',
-    tel: A.tel || '',
-    link: A.link || '',
-    cod: A.cod || '',
-    tipo: A.tipo || '',
-    valor: A.valor || '',
-    area: A.area || '',
-    dorm: A.dorm || '',
-    suite: A.suite || '',
-    gar: A.gar || '',
-    bairro: A.bairro || '',
-    cond: A.cond || '',
-    data: new Date().toLocaleString('pt-BR')
-  };
-  h.unshift(entry);
-  setH(h.slice(0, 80));
-}
-
-function openHistory(){renderH();document.getElementById('histOv').classList.add('open');}
-function closeHist(){document.getElementById('histOv').classList.remove('open');}
-
-function renderH(q) {
+function salvarH(){
+  if(!A.nome&&!A.tel&&!A.cod)return;
   const h=getH();
-  const f=(q||'').toLowerCase();
+  const entry={id:Date.now(),nome:A.nome||'Sem nome',tel:A.tel||'',link:A.link||'',cod:A.cod||'',tipo:A.tipo||'',valor:A.valor||'',area:A.area||'',dorm:A.dorm||'',suite:A.suite||'',gar:A.gar||'',bairro:A.bairro||'',cond:A.cond||'',data:new Date().toLocaleString('pt-BR')};
+  const idx=h.findIndex(i=>i.nome===entry.nome&&i.cod===entry.cod);
+  if(idx>=0)h[idx]=entry;else h.unshift(entry);
+  setH(h.slice(0,80));
+}
+
+function openHist(){renderH();document.getElementById('histWrap').classList.add('show');}
+function fecharHist(){document.getElementById('histWrap').classList.remove('show');}
+
+function renderH(q){
+  const h=getH();const f=(q||'').toLowerCase();
   const res=f?h.filter(i=>i.nome.toLowerCase().includes(f)||i.tel.includes(f)||i.cod.toLowerCase().includes(f)):h;
   const el=document.getElementById('histList');
   if(!res.length){el.innerHTML='<div class="hist-empty">Nenhum resultado.</div>';return;}
-  el.innerHTML=res.map(i=>`<div class="hist-item" onclick="loadH(${i.id})"><div class="hist-nome">${i.nome}</div><div class="hist-info"><span>${i.tel||'—'}</span><span>Cod. ${i.cod||'—'}</span>${i.valor?`<span>${i.valor}</span>`:''}</div><div class="hist-data">${i.data}</div></div>`).join('');
+  el.innerHTML=res.map(i=>`<div class="hist-item" onclick="loadH(${i.id})"><div class="hist-nome">${i.nome}</div><div class="hist-info"><span>${i.tel||'—'}</span><span>Cod. ${i.cod||'—'}</span>${i.valor?`<span>${i.valor}</span>`:''}</div><div class="hist-data">${i.data}</div><button onclick="deletarH(${i.id},event)" style="position:absolute;top:8px;right:8px;background:var(--red-p);border:1px solid #fca5a5;border-radius:6px;padding:3px 8px;color:var(--red);font-size:10px;font-weight:700;cursor:pointer;">X</button></div>`).join('');
 }
-function filterHist(){renderH(document.getElementById('histQ').value);}
+function filtrarH(){renderH(document.getElementById('histQ').value);}
 
-function loadH(id) {
+function loadH(id){
   const item=getH().find(i=>i.id===id);
   if(!item)return;
-  document.getElementById('fNome').value=item.nome;
-  document.getElementById('fTel').value=item.tel;
-  document.getElementById('fLink').value=item.link;
-  A={...item};
-  if(item.cod){
-    document.getElementById('imCard').classList.add('show');
-    document.getElementById('imCod').textContent='Cod. '+item.cod;
-    renderImDados();
-  }
-  updCtx();updT();closeHist();
-  toast('Atendimento carregado!','ok');
+  fecharHist();
+  setTimeout(()=>{
+    document.getElementById('fNome').value=item.nome||'';
+    document.getElementById('fTel').value=item.tel||'';
+    document.getElementById('fLink').value=item.link||'';
+    A={...item};
+    if(item.cod||item.link){
+      document.getElementById('imCard').classList.add('show');
+      document.getElementById('imCod').textContent=item.cod?'Cod. '+item.cod:'Imovel';
+      renderDados();
+      // link guardado mas nao exibido
+      document.getElementById('imLinkDiv').style.display='none';
+    }
+    updT();window.scrollTo({top:0,behavior:'smooth'});
+    toast('Atendimento carregado!','ok');
+  },300);
 }
 
-// ===== BACKUP =====
-function backupDown() {
-  const h=getH();
-  if(!h.length){toast('Nenhum dado para exportar',1);return;}
+function deletarH(id,e){e.stopPropagation();if(!confirm('Apagar?'))return;setH(getH().filter(i=>i.id!==id));renderH(document.getElementById('histQ').value);}
+function limparH(){if(!confirm('Apagar TODO o historico?'))return;setH([]);renderH();toast('Historico limpo!');}
+
+function backupDown(){
+  const h=getH();if(!h.length){toast('Nenhum dado','err');return;}
   const blob=new Blob([JSON.stringify({version:1,data:h},null,2)],{type:'application/json'});
-  const a=document.createElement('a');
-  a.href=URL.createObjectURL(blob);
-  a.download='backup_tsc_'+new Date().toLocaleDateString('pt-BR').replace(/\//g,'-')+'.json';
-  a.click();
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);
+  a.download='backup_tsc_'+new Date().toLocaleDateString('pt-BR').replace(/\//g,'-')+'.json';a.click();
   toast('Backup salvo!','ok');
 }
-
-function backupUp(input) {
-  const file=input.files[0];
-  if(!file)return;
+function backupUp(input){
+  const file=input.files[0];if(!file)return;
   const reader=new FileReader();
-  reader.onload=e=>{
-    try {
-      const json=JSON.parse(e.target.result);
-      const data=json.data||json;
-      if(!Array.isArray(data))throw new Error();
-      setH(data);
-      toast('Backup restaurado! '+data.length+' atendimentos.','ok');
-      renderH();
-    } catch { toast('Arquivo invalido',1); }
-  };
-  reader.readAsText(file);
-  input.value='';
+  reader.onload=e=>{try{const json=JSON.parse(e.target.result);const data=json.data||json;if(!Array.isArray(data))throw new Error();setH(data);toast('Backup restaurado! '+data.length+' atend.','ok');renderH();}catch{toast('Arquivo invalido','err');}};
+  reader.readAsText(file);input.value='';
 }
 
-// ===== MIC =====
-function startMic(fid,btn) {
+function startMic(fid,btn){
   const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
-  if(!SR){toast('Microfone: disponivel apos publicar',1);return;}
+  if(!SR){toast('Microfone disponivel apos publicar','err');return;}
   if(recog&&micOn){recog.stop();return;}
   recog=new SR();recog.lang='pt-BR';recog.interimResults=false;
   recog.onstart=()=>{micOn=true;btn.classList.add('on');btn.textContent='STOP';};
   recog.onresult=e=>{document.getElementById(fid).value=e.results[0][0].transcript;};
-  recog.onerror=e=>{if(e.error!=='aborted')toast('Erro microfone',1);};
+  recog.onerror=e=>{if(e.error!=='aborted')toast('Erro microfone','err');};
   recog.onend=()=>{micOn=false;btn.classList.remove('on');btn.textContent='MIC';};
   recog.start();
 }
-function startAIMic() {
-  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
-  const btn=document.getElementById('aiMic');
-  if(!SR){toast('Microfone: disponivel apos publicar',1);return;}
-  if(aiRecog&&aiMicOn){aiRecog.stop();return;}
-  aiRecog=new SR();aiRecog.lang='pt-BR';aiRecog.interimResults=false;
-  aiRecog.onstart=()=>{aiMicOn=true;btn.classList.add('on');btn.textContent='STOP';};
-  aiRecog.onresult=e=>{document.getElementById('aiInp').value=e.results[0][0].transcript;};
-  aiRecog.onerror=e=>{if(e.error!=='aborted')toast('Erro microfone',1);};
-  aiRecog.onend=()=>{aiMicOn=false;btn.classList.remove('on');btn.textContent='MIC';};
-  aiRecog.start();
-}
-
-// ===== UTILS =====
-function v(id){return document.getElementById(id).value.trim();}
-function maskTel(el) {
+function maskTel(el){
   let n=el.value.replace(/\D/g,'').substring(0,11);
-  if(n.length>10) n='('+n.substring(0,2)+') '+n.substring(2,7)+'-'+n.substring(7);
-  else if(n.length>6) n='('+n.substring(0,2)+') '+n.substring(2,6)+'-'+n.substring(6);
-  else if(n.length>2) n='('+n.substring(0,2)+') '+n.substring(2);
-  else if(n.length>0) n='('+n;
+  if(n.length>10)n='('+n.substring(0,2)+') '+n.substring(2,7)+'-'+n.substring(7);
+  else if(n.length>6)n='('+n.substring(0,2)+') '+n.substring(2,6)+'-'+n.substring(6);
+  else if(n.length>2)n='('+n.substring(0,2)+') '+n.substring(2);
+  else if(n.length>0)n='('+n;
   el.value=n;
 }
-function toast(msg,type) {
-  const t=document.getElementById('toast');
-  t.textContent=msg;
-  t.className='toast show'+(type==='ok'?' ok':type===1?' err':'');
+function v(id){return document.getElementById(id).value.trim();}
+function toast(msg,type){
+  const t=document.getElementById('toast');t.textContent=msg;
+  t.className='toast show'+(type==='ok'?' ok':type==='err'?' err':'');
   setTimeout(()=>t.className='toast',2800);
 }
-
 updT();
 </script>
 </body>
