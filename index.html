@@ -145,8 +145,14 @@ html,body{height:100%;overflow:hidden;background:var(--bg);font-family:"Segoe UI
 .iabox{background:var(--bg);border-radius:22px 22px 0 0;width:100%;height:82vh;display:flex;flex-direction:column;padding-bottom:max(12px,env(safe-area-inset-bottom));transform:translateY(100%);transition:transform .3s cubic-bezier(.4,0,.2,1)}
 .iaov.on .iabox{transform:translateY(0)}
 /* Botão flutuante IA geral */
-.iafab{position:fixed;bottom:72px;right:16px;z-index:5500;width:52px;height:52px;border-radius:50%;background:var(--red);border:none;color:#fff;font-size:22px;cursor:pointer;box-shadow:0 4px 16px rgba(192,57,43,.45);display:flex;align-items:center;justify-content:center;transition:transform .15s}
+.iafab{position:fixed;bottom:72px;right:16px;z-index:10000;width:52px;height:52px;border-radius:50%;background:var(--red);border:none;color:#fff;font-size:22px;cursor:pointer;box-shadow:0 4px 16px rgba(192,57,43,.45);display:flex;align-items:center;justify-content:center;transition:transform .15s}
 .iafab:active{transform:scale(.92)}
+.iamenu{position:fixed;bottom:132px;right:16px;z-index:10001;display:flex;flex-direction:column;gap:8px;align-items:flex-end;pointer-events:none;opacity:0;transform:translateY(10px);transition:opacity .2s,transform .2s}
+.iamenu.on{pointer-events:auto;opacity:1;transform:translateY(0)}
+.iamenu-btn{background:var(--card);border:1.5px solid var(--border);color:var(--text);border-radius:22px;padding:10px 16px;font-size:13px;font-weight:700;cursor:pointer;box-shadow:var(--sh);white-space:nowrap}
+.iamenu-btn:active{opacity:.75}
+.iamenu-overlay{position:fixed;inset:0;z-index:9999;display:none}
+.iamenu-overlay.on{display:block}
 .iahdr{display:flex;align-items:center;justify-content:space-between;padding:14px 15px 0;margin-bottom:8px;flex-shrink:0}
 .iamsg-wrap{flex:1;overflow-y:auto;padding:4px 13px 8px;display:flex;flex-direction:column;gap:9px}
 .iamsg{max-width:85%;padding:11px 13px;border-radius:14px;font-size:14px;line-height:1.55}
@@ -224,37 +230,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);font-family:"Segoe UI
 </div>
 <div class="toast" id="toast"></div>
 
-<!-- CHAT IA -->
-<div class="iaov" id="iaov">
-  <div class="iabox">
-    <div style="width:40px;height:4px;background:var(--border);border-radius:2px;margin:10px auto 0"></div>
-    <div class="iahdr">
-      <div>
-        <div style="font-size:17px;font-weight:800">✦ Assistente IA</div>
-        <div id="iasubtitle" style="font-size:11px;color:var(--text3);margin-top:1px">Geral · Cockpit Controle</div>
-      </div>
-      <div style="display:flex;gap:7px;align-items:center">
-        <button onclick="novaConversaIA()" style="background:var(--bg2);border:1px solid var(--border);color:var(--text3);border-radius:8px;padding:6px 10px;font-size:11px;font-weight:700;cursor:pointer">Nova conversa</button>
-        <button onclick="fecharIA()" style="background:var(--bg2);border:none;color:var(--text2);width:34px;height:34px;border-radius:50%;font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center">×</button>
-      </div>
-    </div>
-    <div class="iachip-row" id="iachips">
-      <button class="iachip" onclick="chipIA('Analise meus leads de hoje')">📊 Analisar leads</button>
-      <button class="iachip" onclick="chipIA('Quais leads precisam de atenção urgente?')">⚠️ Urgentes</button>
-      <button class="iachip" onclick="chipIA('Crie uma mensagem de 1ª abordagem para o lead atual')">✉️ 1ª Abordagem</button>
-      <button class="iachip" onclick="chipIA('Crie um follow-up para o lead atual')">🔄 Follow-up</button>
-      <button class="iachip" onclick="chipIA('Simule um financiamento para o imóvel do lead atual')">💰 Financiamento</button>
-      <button class="iachip" onclick="chipIA('Dê dicas para fechar essa venda')">🎯 Dicas de venda</button>
-    </div>
-    <div class="iamsg-wrap" id="iamsgwrap"></div>
-    <div class="iainp-row">
-      <button class="iamicbtn" id="iamicbtn" onclick="toggleMicIA()" title="Falar">🎙️</button>
-      <textarea class="iainp" id="iainp" rows="1" placeholder="Pergunte sobre leads, imóveis, mensagens..." onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();enviarIA()}"></textarea>
-      <button class="iasbtn" onclick="enviarIA()">↑</button>
-    </div>
-    <div id="iamiclabel" style="text-align:center;font-size:12px;color:var(--text3);padding:4px 13px 2px;flex-shrink:0;display:none">🔴 Ouvindo... Toque no 🎙️ para parar</div>
-  </div>
-</div>
+<!-- CHAT IA: abre Claude.ai diretamente -->
 
 <!-- APP -->
 <div class="app">
@@ -266,7 +242,6 @@ html,body{height:100%;overflow:hidden;background:var(--bg);font-family:"Segoe UI
   <div class="hdr">
     <div><div class="ht">Cockpit</div><div class="hs">Joao Batista · Controle</div></div>
     <div class="hbts">
-      <button class="hbtn" onclick="abrirIA()">IA</button>
       <button class="hbtn" onclick="window.open('https://controleimoveis.com.br','_blank')">CI</button>
       <button class="hbtn" onclick="expBkp()">Exportar</button>
       <button class="hbtn" onclick="document.getElementById('bkpf').click()">Importar</button>
@@ -323,7 +298,6 @@ html,body{height:100%;overflow:hidden;background:var(--bg);font-family:"Segoe UI
   <div class="hdr">
     <div><div class="ht">Leads</div><div class="hs">Atendimento rápido</div></div>
     <div class="hbts">
-      <button class="hbtn" onclick="abrirIA()">IA</button>
       <button class="hbtn" onclick="window.open('https://controleimoveis.com.br','_blank')">CI</button>
       <button class="hbtn" onclick="abrirRelatorio()">Rel.</button>
       <button class="hbtn" onclick="novoLead()">+ Novo</button>
@@ -348,7 +322,6 @@ html,body{height:100%;overflow:hidden;background:var(--bg);font-family:"Segoe UI
   <div class="hdr">
     <div><div class="ht" id="priTitulo">Imóveis em Destaque</div><div class="hs" id="priSub">Patrocinados e prioritários</div></div>
     <div class="hbts">
-      <button class="hbtn" onclick="abrirIA()">IA</button>
       <button class="hbtn" onclick="window.open('https://controleimoveis.com.br','_blank')">CI</button>
     </div>
   </div>
@@ -381,7 +354,6 @@ html,body{height:100%;overflow:hidden;background:var(--bg);font-family:"Segoe UI
   <div class="hdr">
     <div><div class="ht">Comparar</div><div class="hs">Até 3 imóveis</div></div>
     <div class="hbts">
-      <button class="hbtn" onclick="abrirIA()">IA</button>
       <button class="hbtn" onclick="window.open('https://controleimoveis.com.br','_blank')">CI</button>
       <button class="hbtn" onclick="limparComp()">Limpar</button>
     </div>
@@ -405,7 +377,6 @@ html,body{height:100%;overflow:hidden;background:var(--bg);font-family:"Segoe UI
   <div class="hdr">
     <div><div class="ht">Mensagens</div><div class="hs">Templates editáveis</div></div>
     <div class="hbts">
-      <button class="hbtn" onclick="abrirIA()">IA</button>
       <button class="hbtn" onclick="window.open('https://controleimoveis.com.br','_blank')">CI</button>
     </div>
   </div>
@@ -434,8 +405,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);font-family:"Segoe UI
 
 </div></div>
 
-<!-- BOTÃO FLUTUANTE IA GERAL -->
-<button class="iafab" id="iafab" onclick="abrirIA(null)" title="Assistente IA">✦</button>
+<!-- botão IA movido para o fim do body -->
 
 <!-- BOTÕES SIMULADORES FIXOS acima do menu -->
 <div style="display:flex;gap:8px;padding:8px 13px;background:var(--card);border-top:1px solid var(--border);flex-shrink:0">
@@ -907,7 +877,6 @@ function rLP(id){
   // AÇÕES
   h+='<div class="psec"><div class="pst">Ações</div>';
   h+='<div class="g2">';
-  h+='<button class="btn btnor btnf" onclick="abrirIA(\''+id+'\')">✦ IA</button>';
   h+='<button class="btn btnor btnf" onclick="abrirWpp(\''+id+'\')">WhatsApp</button>';
   var tent=l.tentativas||0;
   var corT=tent>=5?'var(--red)':tent>=3?'var(--or)':'var(--text3)';
@@ -2054,368 +2023,190 @@ function chkAlarmes(){
 }
 
 // ============================================================
-// CHAT IA EMBUTIDO
+// IA — Abre Claude.ai com contexto dos leads
 // ============================================================
-var iaChatHistorico = [];  // histórico da conversa ativa
-var iaLeadAtual = null;
-var iaCarregando = false;
-var iaHistoricos = {};     // históricos salvos por contexto: {geral: [], leadId: []}
-var IHK = "ck_iahist";    // chave localStorage
 
-function iaCtxKey() { return iaLeadAtual ? "lead_" + iaLeadAtual : "geral"; }
-
-function iaCarregarHistorico() {
-  try { iaHistoricos = JSON.parse(localStorage.getItem(IHK) || "{}"); } catch(e) { iaHistoricos = {}; }
-}
-
-function iaSalvarHistorico() {
-  iaHistoricos[iaCtxKey()] = iaChatHistorico.slice(-30); // guarda últimas 30 mensagens
-  try { localStorage.setItem(IHK, JSON.stringify(iaHistoricos)); } catch(e) {}
-}
-
-function novaConversaIA() {
-  // Confirmação antes de apagar
-  if (!iaChatHistorico.length) return; // já está vazia, não precisa confirmar
-  document.getElementById("mt").textContent = "Apagar conversa?";
-  document.getElementById("mp").style.display = "block";
-  document.getElementById("mp").textContent = "Isso vai apagar o histórico desta conversa. Tem certeza?";
-  document.getElementById("mb").innerHTML = "";
-  document.getElementById("mbtns").innerHTML =
-    '<button class="mbc" onclick="cM()">Cancelar</button>' +
-    '<button class="mbr" onclick="cM();confirmarNovaConversaIA()">Sim, apagar</button>';
-  document.getElementById("mov").classList.add("on");
-}
-
-function confirmarNovaConversaIA() {
-  // Apaga só o contexto atual
-  iaChatHistorico = [];
-  delete iaHistoricos[iaCtxKey()];
-  iaSalvarHistorico();
-  var wrap = document.getElementById("iamsgwrap");
-  if (wrap) wrap.innerHTML = "";
-  var lNome = iaLeadAtual ? (gL().find(function(x){return x.id===iaLeadAtual;})||{}).nome || "lead" : null;
-  var saudacao = lNome
-    ? "Conversa reiniciada! Estou vendo o lead *" + lNome + "*. Como posso ajudar?"
-    : "Conversa reiniciada! O que precisa, João Batista?";
-  appendMsgIA("ai", saudacao);
-}
-
-
-function abrirIA(leadId) {
-  if (leadId === null) {
-    iaLeadAtual = null;
-  } else {
-    iaLeadAtual = leadId || lAid || null;
-  }
-
-  var subtitle = document.getElementById('iasubtitle');
-  var chips = document.getElementById('iachips');
-
-  if (iaLeadAtual) {
-    var lAtual = gL().find(function(x){return x.id === iaLeadAtual;});
-    var nomeL = lAtual ? lAtual.nome : 'Lead';
-    if (subtitle) subtitle.textContent = '👤 ' + nomeL;
-    if (chips) chips.innerHTML =
-      '<button class="iachip" onclick="chipIA(\'Analise este lead e me dê recomendações\')">📊 Analisar</button>' +
-      '<button class="iachip" onclick="chipIA(\'Crie uma mensagem de 1ª abordagem para este lead\')">✉️ 1ª Abordagem</button>' +
-      '<button class="iachip" onclick="chipIA(\'Crie um follow-up para este lead\')">🔄 Follow-up</button>' +
-      '<button class="iachip" onclick="chipIA(\'Dê dicas para fechar esta venda\')">🎯 Fechar venda</button>' +
-      '<button class="iachip" onclick="chipIA(\'Simule um financiamento para o imóvel deste lead\')">💰 Financiamento</button>';
-  } else {
-    if (subtitle) subtitle.textContent = 'Geral · Cockpit Controle';
-    if (chips) chips.innerHTML =
-      '<button class="iachip" onclick="chipIA(\'Analise todos os meus leads e me dê um resumo do dia\')">📊 Resumo do dia</button>' +
-      '<button class="iachip" onclick="chipIA(\'Quais leads precisam de atenção urgente agora?\')">⚠️ Urgentes</button>' +
-      '<button class="iachip" onclick="chipIA(\'Quais leads estão há mais dias sem contato?\')">🕐 Sem contato</button>' +
-      '<button class="iachip" onclick="chipIA(\'Me dê uma estratégia de follow-up para hoje\')">📅 Plano do dia</button>' +
-      '<button class="iachip" onclick="chipIA(\'Quais são os imóveis mais procurados pelos meus leads?\')">🏠 Imóveis</button>' +
-      '<button class="iachip" onclick="chipIA(\'Dê dicas para melhorar minha taxa de conversão\')">🎯 Conversão</button>';
-  }
-
-
-  // Carregar histórico salvo para este contexto
-  iaCarregarHistorico();
-  var hist = iaHistoricos[iaCtxKey()] || [];
-  iaChatHistorico = hist.slice();
-
-  var wrap = document.getElementById('iamsgwrap');
-  wrap.innerHTML = '';
-
-  if (iaChatHistorico.length) {
-    // Restaurar mensagens salvas na tela
-    iaChatHistorico.forEach(function(m) {
-      appendMsgIA(m.role === 'user' ? 'user' : 'ai', m.content);
-    });
-  } else {
-    // Primeira vez neste contexto
-    var lNome = iaLeadAtual ? (gL().find(function(x){return x.id===iaLeadAtual;})||{}).nome || 'lead' : null;
-    var saudacao = lNome
-      ? 'Estou vendo o lead *' + lNome + '*. Como posso ajudar?'
-      : 'Olá, João Batista! 👋 Estou com acesso a todos os seus leads. O que precisa?';
-    appendMsgIA('ai', saudacao);
-  }
-
-  document.getElementById('iaov').classList.add('on');
-  setTimeout(function(){document.getElementById('iainp').focus();},400);
-}
-
-function fecharIA() {
-  document.getElementById('iaov').classList.remove('on');
-}
-
-function chipIA(txt) {
-  document.getElementById('iainp').value = txt;
-  enviarIA();
-}
-
-function appendMsgIA(tipo, texto) {
-  var wrap = document.getElementById('iamsgwrap');
-  var div = document.createElement('div');
-  div.className = 'iamsg ' + tipo;
-  // Formatar texto: **negrito**, quebras de linha
-  var html = texto
-    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
-    .replace(/\*\*(.+?)\*\*/g,'<b>$1</b>')
-    .replace(/\*(.+?)\*/g,'<b>$1</b>')
-    .replace(/\n/g,'<br>');
-  div.innerHTML = html;
-  wrap.appendChild(div);
-  wrap.scrollTop = wrap.scrollHeight;
-  return div;
-}
-
-function construirContexto() {
+function construirContextoGeral() {
   var leads = gL();
   var agAll = gAA();
   var hoje = new Date().toISOString().split('T')[0];
-  var msgs = gMs();
 
-  // Resumo dos leads
   var resumo = leads.map(function(l) {
     var ds = dSC(l);
-    var ag = (agAll[l.id] || []).filter(function(a){return !a.concluido;});
+    var ag = (agAll[l.id] || []).filter(function(a){ return !a.concluido; });
     var imNome = l.imoveis && l.imoveis.length ? l.imoveis[0].nome : 'sem imóvel';
     var imPreco = l.imoveis && l.imoveis.length ? l.imoveis[0].preco : '';
     var imBairro = l.imoveis && l.imoveis.length ? l.imoveis[0].bairro : '';
-    var lembretes = ag.map(function(a){return a.texto + ' (' + a.data + ')';}).join(', ');
-    return '- ' + l.nome + ' | Tel: ' + (l.tel||'?') + ' | Status: ' + (l.status||'novo') +
-      ' | ' + ds + 'd sem contato | Imóvel: ' + imNome + (imPreco?' | Valor: '+imPreco:'') +
-      (imBairro?' | Bairro: '+imBairro:'') +
-      (l.obs?' | Obs: '+l.obs:'') +
-      (lembretes?' | Lembretes: '+lembretes:'') +
-      ' | Histórico: ' + (l.historico||[]).map(function(h){return h.tipo;}).join(', ');
+    var imCod = l.imoveis && l.imoveis.length ? l.imoveis[0].cod : '';
+    var lembretes = ag.map(function(a){ return a.texto + ' (' + a.data + ')'; }).join(', ');
+    var notas = (l.notas || []).map(function(n){ return n.texto; }).join(' | ');
+    return '- ' + l.nome +
+      ' | Tel: ' + (l.tel || '?') +
+      ' | Status: ' + (l.status || 'novo') +
+      ' | ' + ds + 'd sem contato' +
+      ' | Tentativas: ' + (l.tentativas || 0) +
+      ' | Imóvel: ' + imNome + (imCod ? ' Cód.' + imCod : '') +
+      (imPreco ? ' | Valor: ' + imPreco : '') +
+      (imBairro ? ' | Bairro: ' + imBairro : '') +
+      (notas ? ' | Notas: ' + notas : '') +
+      (lembretes ? ' | Lembretes: ' + lembretes : '') +
+      ' | Histórico: ' + (l.historico || []).map(function(h){ return h.tipo; }).join(', ');
   }).join('\n');
 
-  // Lead atual se houver
-  var leadCtx = '';
-  if (iaLeadAtual) {
-    var lAtual = leads.find(function(x){return x.id === iaLeadAtual;});
-    if (lAtual) {
-      var im = lAtual.imoveis && lAtual.imoveis.length ? lAtual.imoveis[0] : null;
-      leadCtx = '\n\nLEAD ATUAL ABERTO:\nNome: ' + lAtual.nome +
-        '\nTelefone: ' + (lAtual.tel||'?') +
-        '\nStatus: ' + (lAtual.status||'novo') +
-        (im ? '\nImóvel: ' + im.nome + '\nValor: ' + im.preco + '\nBairro: ' + im.bairro +
-          '\nÁrea: ' + (im.area||'?') + 'm² | Quartos: ' + (im.quartos||'?') +
-          (im.suites?' | Suítes: '+im.suites:'') + (im.vagas?' | Vagas: '+im.vagas:'') +
-          '\nAgenciador: ' + (im.agenciador||'?') +
-          '\nLink: ' + (im.link||'') : '') +
-        '\nObs: ' + (lAtual.obs||'nenhuma') +
-        '\nHistórico: ' + (lAtual.historico||[]).map(function(h){return h.tipo;}).join(', ') +
-        '\nNotas: ' + (lAtual.notas||[]).map(function(n){return n.texto;}).join(' | ');
-    }
-  }
-
-  return 'Você é um assistente de vendas imobiliárias do corretor João Batista da Controle Imóveis (Florianópolis/SC). ' +
-    'Responda sempre em português, de forma objetiva e prática. Use *negrito* para destacar pontos importantes. ' +
-    'Quando criar mensagens para WhatsApp, use formatação do WhatsApp (*negrito*, emojis moderados). ' +
+  return 'Sou João Batista, corretor da Controle Imóveis (Florianópolis/SC). ' +
     'Data de hoje: ' + hoje + '.\n\n' +
-    'LEADS CADASTRADOS (' + leads.length + ' total):\n' + resumo +
-    leadCtx +
-    '\n\nTEMPLATES DE MENSAGEM:\n1ª Abordagem: ' + (msgs.msg1||'') + '\nFollow-up: ' + (msgs.msg2||'');
+    'MEUS LEADS (' + leads.length + ' total):\n' + resumo + '\n\n' +
+    'Me ajude a gerenciar meus leads e clientes. Responda em português, de forma objetiva e prática.';
 }
 
-async function enviarIA() {
-  if (iaCarregando) return;
-  var inp = document.getElementById('iainp');
-  var texto = inp.value.trim();
-  if (!texto) return;
-  inp.value = '';
-  inp.style.height = 'auto';
+function construirContextoLead(id) {
+  var l = gL().find(function(x){ return x.id === id; });
+  if (!l) return construirContextoGeral();
 
-  appendMsgIA('user', texto);
-  iaChatHistorico.push({role: 'user', content: texto});
-  iaSalvarHistorico();
+  var hoje = new Date().toISOString().split('T')[0];
+  var ds = dSC(l);
+  var ag = (gAA()[l.id] || []).filter(function(a){ return !a.concluido; });
+  var notas = (l.notas || []).map(function(n){ return n.texto; }).join(' | ');
+  var hist = (l.historico || []).map(function(h){ return h.tipo; }).join(', ');
+  var lembretes = ag.map(function(a){ return a.texto + ' (' + a.data + (a.hora ? ' às ' + a.hora : '') + ')'; }).join(', ');
 
-  iaCarregando = true;
-  var typing = appendMsgIA('ai', '...');
-  typing.classList.add('typing');
+  var ctx = 'Sou João Batista, corretor da Controle Imóveis (Florianópolis/SC).\n' +
+    'Data de hoje: ' + hoje + '.\n\n' +
+    'LEAD:\n' +
+    'Nome: ' + l.nome + '\n' +
+    'Telefone: ' + (l.tel || 'não informado') + '\n' +
+    'Status: ' + (l.status || 'novo') + '\n' +
+    ds + ' dias sem contato | ' + (l.tentativas || 0) + ' tentativas sem resposta\n';
 
-  try {
-    var sistema = construirContexto();
-    var msgs = iaChatHistorico.slice(-10); // últimas 10 mensagens
+  if (l.obs) ctx += 'Observação: ' + l.obs + '\n';
+  if (notas) ctx += 'Notas: ' + notas + '\n';
+  if (hist) ctx += 'Histórico de contatos: ' + hist + '\n';
+  if (lembretes) ctx += 'Lembretes pendentes: ' + lembretes + '\n';
 
-    var resp = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'anthropic-version': '2023-06-01',
-        'anthropic-dangerous-allow-browser': 'true'
-      },
-      body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: 1000,
-        system: sistema,
-        messages: msgs
-      })
+  var ims = l.imoveis || [];
+  if (ims.length) {
+    ctx += '\nIMÓVEIS VINCULADOS:\n';
+    ims.forEach(function(im, i) {
+      ctx += (i + 1) + '. ' + (im.nome || 'Imóvel');
+      if (im.cod) ctx += ' | Cód. ' + im.cod;
+      if (im.preco) ctx += ' | ' + im.preco;
+      if (im.bairro) ctx += ' | ' + im.bairro;
+      if (im.area) ctx += ' | ' + im.area + 'm²';
+      if (im.quartos) ctx += ' | ' + im.quartos + ' dorms.';
+      if (im.suites && im.suites !== '0') ctx += ' | ' + im.suites + ' suíte(s)';
+      if (im.vagas) ctx += ' | ' + im.vagas + ' vaga(s)';
+      if (im.agenciador) ctx += ' | Agenciador: ' + im.agenciador;
+      if (im.proprietario) ctx += ' | Proprietário: ' + im.proprietario;
+      if (im.link) ctx += ' | ' + im.link;
+      ctx += '\n';
     });
-
-    var data = await resp.json();
-
-    if (!resp.ok) {
-      typing.remove();
-      var errMsg = (data.error && data.error.message) ? data.error.message : 'Erro ' + resp.status;
-      appendMsgIA('ai', '⚠️ ' + errMsg);
-      iaCarregando = false;
-      return;
-    }
-
-    var resposta = data.content && data.content[0] ? data.content[0].text : 'Erro ao obter resposta.';
-
-    typing.remove();
-    appendMsgIA('ai', resposta);
-    iaChatHistorico.push({role: 'assistant', content: resposta});
-    iaSalvarHistorico();
-
-  } catch(e) {
-    typing.remove();
-    appendMsgIA('ai', '📶 Erro de conexão. Verifique sua internet e tente novamente. (' + (e.message||'') + ')');
   }
-  iaCarregando = false;
+
+  ctx += '\nMe ajude com este lead. Responda em português, de forma objetiva e prática.';
+  return ctx;
 }
 
-// Ajuste automático de altura do textarea
-document.addEventListener('DOMContentLoaded', function(){
-  var inp = document.getElementById('iainp');
-  if(inp) inp.addEventListener('input', function(){
-    this.style.height = 'auto';
-    this.style.height = Math.min(this.scrollHeight, 100) + 'px';
-  });
-});
-
-// MICROFONE DO CHAT IA — sessão única, sem loop
-var iaMicRec = null;
-var iaMicAtivo = false;
-
-function toggleMicIA() {
-  if (iaMicAtivo) {
-    pararMicIA();
+function toggleIAMenu() {
+  var menu = document.getElementById('iamenu');
+  var ov = document.getElementById('iamenuov');
+  var leadBtn = document.getElementById('iamenu-lead');
+  var isOn = menu.classList.contains('on');
+  if (isOn) {
+    menu.classList.remove('on');
+    ov.classList.remove('on');
   } else {
-    iniciarMicIA();
-  }
-}
-
-function resetMicUI() {
-  iaMicAtivo = false;
-  var btn = document.getElementById('iamicbtn');
-  var label = document.getElementById('iamiclabel');
-  if (btn) { btn.classList.remove('gravando'); btn.textContent = '🎙️'; }
-  if (label) label.style.display = 'none';
-}
-
-function destruirMic() {
-  if (iaMicRec) {
-    iaMicRec.onstart = null;
-    iaMicRec.onresult = null;
-    iaMicRec.onend = null;
-    iaMicRec.onerror = null;
-    try { iaMicRec.abort(); } catch(e) {}
-    iaMicRec = null;
-  }
-}
-
-function iniciarMicIA() {
-  var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-  if (!SR) {
-    toast('Microfone não suportado. Use Chrome no Android.', 'err');
-    return;
-  }
-  if (navigator.permissions) {
-    navigator.permissions.query({name:'microphone'}).then(function(status){
-      if (status.state === 'denied') {
-        toast('Microfone bloqueado. Libere nas configurações do Chrome.', 'err');
-        return;
+    // Mostra botão "Lead atual" só se houver lead aberto
+    if (lAid) {
+      var leads = gL();
+      var l = leads.find(function(x){ return x.id === lAid; });
+      if (l) {
+        leadBtn.textContent = '👤 ' + l.nome;
+        leadBtn.style.display = '';
+      } else {
+        leadBtn.style.display = 'none';
       }
-      _iniciarRecSR(SR);
-    }).catch(function(){ _iniciarRecSR(SR); });
-  } else {
-    _iniciarRecSR(SR);
-  }
-}
-
-function _iniciarRecSR(SR) {
-  destruirMic();
-
-  var rec = new SR();
-  rec.lang = 'pt-BR';
-  rec.continuous = false;
-  rec.interimResults = false;
-  rec.maxAlternatives = 1;
-  iaMicRec = rec;
-
-  rec.onstart = function() {
-    iaMicAtivo = true;
-    var btn = document.getElementById('iamicbtn');
-    var label = document.getElementById('iamiclabel');
-    if (btn) { btn.classList.add('gravando'); btn.textContent = '⏹️'; }
-    if (label) label.style.display = 'block';
-  };
-
-  rec.onresult = function(e) {
-    destruirMic();
-    resetMicUI();
-    var texto = e.results[0][0].transcript;
-    var inp = document.getElementById('iainp');
-    if (inp && texto) {
-      inp.value = texto;
-      inp.style.height = 'auto';
-      inp.style.height = Math.min(inp.scrollHeight, 100) + 'px';
-      setTimeout(function(){ enviarIA(); }, 300);
+    } else {
+      leadBtn.style.display = 'none';
     }
-  };
-
-  rec.onend = function() {
-    if (iaMicAtivo) resetMicUI();
-    iaMicRec = null;
-  };
-
-  rec.onerror = function(e) {
-    destruirMic();
-    resetMicUI();
-    var msgs = {
-      'not-allowed': 'Permissão negada. Libere o microfone no Chrome.',
-      'no-speech': '',
-      'aborted': '',
-      'network': 'Sem conexão para reconhecimento de voz.',
-      'service-not-allowed': 'Microfone não permitido neste contexto.'
-    };
-    var m = msgs[e.error];
-    if (m === undefined) m = 'Erro no microfone: ' + e.error;
-    if (m) toast(m, 'err');
-  };
-
-  try {
-    rec.start();
-  } catch(e) {
-    destruirMic();
-    resetMicUI();
-    toast('Erro ao iniciar microfone: ' + e.message, 'err');
+    menu.classList.add('on');
+    ov.classList.add('on');
   }
 }
 
-function pararMicIA() {
-  if (iaMicRec) {
-    try { iaMicRec.stop(); } catch(e) { destruirMic(); resetMicUI(); }
+function fecharIAMenu() {
+  document.getElementById('iamenu').classList.remove('on');
+  document.getElementById('iamenuov').classList.remove('on');
+}
+
+function iAbrirGeral() {
+  fecharIAMenu();
+  abrirIAGeral();
+}
+
+function iAbrirLead() {
+  fecharIAMenu();
+  if (lAid) {
+    abrirIA(lAid);
+  } else {
+    abrirIAGeral();
+  }
+}
+
+function iAbrirLivre() {
+  fecharIAMenu();
+  window.open('https://claude.ai/new', '_blank');
+}
+
+function abrirIAGeral() {
+  var ctx = construirContextoGeral();
+  // Copia para área de transferência e abre Claude.ai
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(ctx).then(function() {
+      toast('Contexto copiado! Cole no Claude.ai 👇', 'ok');
+    }).catch(function() {
+      _fallbackCopy(ctx);
+    });
+  } else {
+    _fallbackCopy(ctx);
+  }
+  setTimeout(function() {
+    window.open('https://claude.ai/new', '_blank');
+  }, 400);
+}
+
+function abrirIA(leadId) {
+  // leadId deve ser explícito — nunca usa lAid para evitar puxar lead errado
+  var id = leadId || null;
+  if (!id) { abrirIAGeral(); return; }
+  var ctx = construirContextoLead(id);
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(ctx).then(function() {
+      toast('Contexto copiado! Cole no Claude.ai 👇', 'ok');
+    }).catch(function() {
+      _fallbackCopy(ctx);
+    });
+  } else {
+    _fallbackCopy(ctx);
+  }
+  setTimeout(function() {
+    window.open('https://claude.ai/new', '_blank');
+  }, 400);
+}
+
+function _fallbackCopy(txt) {
+  try {
+    var ta = document.createElement('textarea');
+    ta.value = txt;
+    ta.style.position = 'fixed';
+    ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.focus();
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    toast('Contexto copiado! Cole no Claude.ai 👇', 'ok');
+  } catch(e) {
+    toast('Abriu o Claude.ai! Cole o contexto manualmente.', 'ok');
   }
 }
 
@@ -2428,5 +2219,13 @@ function esc(s){return(s||'').toString().replace(/&/g,'&amp;').replace(/</g,'&lt
 function cM(){document.getElementById('mov').classList.remove('on');}
 function toast(msg,tipo){var t=document.getElementById('toast');t.textContent=msg;t.className='toast on'+(tipo?' '+tipo:'');setTimeout(function(){t.className='toast';},2500);}
 </script>
+<!-- Mini menu IA - SEMPRE acima de tudo -->
+<div class="iamenu-overlay" id="iamenuov" onclick="fecharIAMenu()"></div>
+<div class="iamenu" id="iamenu">
+  <button class="iamenu-btn" id="iamenu-lead" onclick="iAbrirLead()" style="display:none">👤 Lead atual</button>
+  <button class="iamenu-btn" onclick="iAbrirGeral()">📋 Todos os leads</button>
+  <button class="iamenu-btn" onclick="iAbrirLivre()">💬 Conversa livre</button>
+</div>
+<button class="iafab" id="iafab" onclick="toggleIAMenu()" title="Assistente IA">✦</button>
 </body>
 </html>
